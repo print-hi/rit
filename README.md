@@ -1,3 +1,3 @@
-# Retirement Income Toolkit - Economic Scenario Generator (main branch)
+# Retirement Income Toolkit - Economic Scenario Generator (head branch)
 
 Outputs are joint simulated scenarios over specified horizons (age 50 to 110 – 60 years) for economic variables, distributions of simulated variables at differing horizons (10 years, 20 years, 50 years, 60 years). The R code will input the parameters for a selected model (VAR) and generate: simulated (correlated) paths for all the variables to use in cash flow modelling, computing expected values, valuation of cash flows in the cash flow module, distributions of the variables at different horizons – 5 years, 10 years, 30 years, generate a distribution of values of assets in real terms (deflated by GDP, CPI) over different horizons to show the impact of real returns and uncertainty in returns on other assets (equities, cash, housing, rolling bonds). 
