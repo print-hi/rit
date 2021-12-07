@@ -1,0 +1,72 @@
+---
+title: "Retirement Income Toolkit - Economic Scenario - VAR"
+author: "Queenie Huang"
+output:
+ bookdown::html_document2:
+    toc: yes
+    toc_depth: '3'
+    number_sections: yes
+    fig_caption: yes
+    code_folding: hide
+urlcolor: blue
+header-includes: |    
+ \usepackage{amsmath,amsthm,amssymb,amsfonts, mathtools, empheq, bbm}
+ \newcommand{\vect}[1]{\boldsymbol{#1}}
+---
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 15px;
+  }
+td {  /* Table  */
+  font-size: 15px;
+}
+h1.title {
+  font-size: 30px;
+}
+h1 { /* Header 1 */
+  font-size: 26px;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 18px;
+  color: DarkBlue;
+}
+code.r{ /* Code block */
+    font-size: 15px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 15px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 1, digits = 6) # use 2 d.p. in output
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(lubridate)
+library(vars)
+library(tseries)
+library(corrplot)
+library(kableExtra)
+library(aTSA)
+```
+
+A VAR(p) process can be represented by \begin{align*}
+    \vect Y_t = \vect \alpha + A_1 \vect Y_{t-1} + \ldots + A_p \vect Y_{t-p} + \vect \epsilon, 
+\end{align*} where $n$ is the number of economic/financial variables, $p$ is the lag, $\vect \epsilon$ is a white noise process, $A_1, \ldots, A_p$ are fixed coefficient matrices. 
+
+# Economic/financial variables 
+
+#
+
