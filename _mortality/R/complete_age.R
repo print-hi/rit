@@ -2,8 +2,6 @@
 #'
 #' Implements the Coale and Kisker method of age completion.
 #'
-#'
-#'
 #' @param rates mortality rates in a rectangular array with ages (on the rows)
 #'   and calendar year (on the columns). Can be a matrix or a vector
 #' @param type specifies the type of rates supplied. Takes the following values:
@@ -20,48 +18,47 @@
 #' @examples
 #'
 CK <- function(rates, type, ages, years, old_ages, m_end) {
-  # write tests to ensure inputs are in correct format
-  # e.g. ages and years must be continuous vector,
-  # dimensions of rates needs to match those of ages and years
+  # TODO: Write tests for inputs, e.g.
+    # ages and years must be continuous vector
+    # dimensions of rates needs to match those of ages and years
 
-  # need to import rate2rate function?
+  # Convert to central death rates
   if (type != "central") {
     mxy <- rate2rate(rates, from = type, to = "central")
   } else {
     mxy <- rates
   }
 
+  # Convert vector to matrix if necessary
   mxy <- as.matrix(mxy)
-  # convert vector into matrix if needed
 
+  # Obtaining relevant ages
   boundary_age <- old_ages[1] - 1
+  kept_ages <- ages[1]:boundary_age
+
+  # Calculating parameter sy
   m_boundary <- mxy[boundary_age - ages[1] + 1, ]
   k_boundary <- log(m_boundary/mxy[boundary_age - ages[1], ])
   n <- length(old_ages)
-  s <- 2 / (n * (n+1)) * (n * k_boundary - log(m_end/m_boundary))
+  sy <- 2 / (n * (n+1)) * (n * k_boundary - log(m_end/m_boundary))
 
 
-  old_kxy <- outer(rep(1, length(old_ages)), k_boundary) - outer(old_ages - boundary_age, s)
-  # outer is used to create matrix of appropriate dimensions for element-wise
-  # matrix multiplication
-  rownames(old_kxy) <- as.character(old_ages)
+  old_kxy <- outer(rep(1, length(old_ages)), k_boundary) - outer(old_ages - boundary_age, sy)
+  # Outer creates matrix of appropriate dimensions for element-wise matrix multiplication
 
-
+  # Completion of old ages
   old_kxy_cumsum <- apply(old_kxy, 2, cumsum)
-
   old_mxy <- outer(rep(1, length(old_ages)), m_boundary) * exp(old_kxy_cumsum)
 
-  rownames(old_mxy) <- as.character(old_ages)
-
-
-  kept_mxy <- as.matrix(mxy[-(old_ages - ages[1] + 1), ])
-  # Ensure matrix with 1 column is still of type matrix after subsetting
+  # Preparing final output
+  kept_mxy <- as.matrix(mxy[1:(boundary_age - ages[1] + 1), ]) # as.matrix converts
+  # vector to matrix if necessary
   completed_mxy <- rbind(kept_mxy, old_mxy)
-  rownames(completed_mxy) <- c(rownames(kept_mxy), rownames(old_mxy))
+  rownames(completed_mxy) <- as.character(c(kept_ages, old_ages))
   colnames(completed_mxy) <- as.character(years)
-  completed_mxy
 
-  }
+  completed_mxy
+}
 
 #' Denuit and Goderniaux Method of Age Completion
 #'
@@ -85,7 +82,52 @@ CK <- function(rates, type, ages, years, old_ages, m_end) {
 #' @examples
 #'
 DG <- function(rates, type, ages, years, old_ages, closure_age = 130, min_fit_age = 75, smoothing = FALSE) {
-  # add method later
+  # TODO: Implement smoothing
+  # TODO: Write tests for inputs
+  # Rates data needs to be cleaned prior to input i.e. probabilities > 0 so log is defined
+
+  # Convert to death probabilities
+  if (type != "prob") {
+    qxy <- rate2rate(rates, from = type, to = "prob")
+  } else {
+    qxy <- rates
+  }
+
+  # Convert vector to matrix if necessary
+  qxy <- as.matrix(qxy)
+
+  # Creating data frame to fit log-quadratic model
+  input_df <- as.data.frame(qxy)
+  df_fit <- as.data.frame(input_df[ages >= min_fit_age,])
+
+  # Obtaining relevant ages
+  boundary_age <- old_ages[1] - 1
+  kept_ages <- ages[1]:boundary_age
+  fitted_ages <- min_fit_age:old_ages[length(old_ages)]
+
+  # Helper function to fit log-quadratic model on a vector
+  DG_fit <- function(qx) {
+
+    log_quad_fit <- lm(log(qx) ~ I((closure_age - fitted_ages)^2) - 1)
+    coefficients(log_quad_fit)
+  }
+
+  # Calculating regression coefficient c
+  cy <- as.numeric(lapply(df_fit, DG_fit))
+  cxy <- outer(rep(1, length(old_ages)), cy) # Outer creates matrix of
+  # appropriate dimensions for element-wise matrix multiplication
+
+  # Completion for old ages
+  old_qxy <- as.matrix(exp(cxy * (closure_age - old_ages)^2)) # Convert vector
+  # to matrix if necessary
+
+  # Preparing final output
+  kept_qxy <- as.matrix(qxy[1:(boundary_age - ages[1] + 1), ])
+  completed_qxy <- rbind(kept_qxy, old_qxy)
+  rownames(completed_qxy) <- as.character(c(kept_ages, old_ages))
+  colnames(completed_qxy) <- as.character(years)
+
+  completed_qxy
 }
 
 #' Kannisto Method of Age Completion
