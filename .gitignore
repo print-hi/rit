@@ -3,6 +3,8 @@
 
 Pipfile
 .DS_store
+.vscode
+.ipynb_checkpoints
 
 # ----------------------------------------------------------------
 # --- R Default 
