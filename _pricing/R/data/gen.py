@@ -1,4 +1,3 @@
-#%%
 import pandas as pd
 import numpy as np
 import random as rd
@@ -107,4 +106,3 @@ if __name__ == "__main__":
     genStockPrice(30,130)
     genHouseValue(30,130)
 
-# %%
