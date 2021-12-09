@@ -66,31 +66,35 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
   completed_mxy
 }
 
-#' Denuit and Goderniaux Method of Age Completion
+#' Denuit and Goderniaux Method
 #'
-#' Implements the Denuit and Goderniaux method of age completion.
+#' Implements the Denuit and Goderniaux method of mortality rate completion for
+#' old ages.
 #'
-#' @param rates mortality rates in a rectangular array with ages (on the rows)
-#'   and calendar year (on the columns)
-#' @param type specifies the type of rates supplied. Takes the following values:
-#'   "central" for central death rates, "prob" for 1-year death probabilities,
-#'   "force" for force of mortality
-#' @param ages age vector for \code{rates}
-#' @param years year vector for \code{rates}
-#' @param old_ages old ages to be completed for
-#' @param closure_age age for which closure constraint is applied
-#' @param min_fit_age model is fitted starting from this age
+#' @param rates matrix or vector of mortality rates with age (on the rows) and
+#'   calendar year (on the columns). Vector is equivalent to a matrix with a
+#'   single column
+#' @param ages vector of ages for `rates`
+#' @param old_ages vector of old ages for which `rates` is to be completed for
+#' @param type character string representing the type of mortality rate
+#'   supplied. Takes the following values: "central" for central death rates,
+#'   "prob" for 1-year death probabilities, "force" for force of mortality
+#' @param closure_age maximum life span
+#' @param start_fit_age model is fitted to ages starting from this age
 #' @param smoothing logical value indicating if smoothing is to be applied
+#' @param years optional vector of years for `rates`. If not supplied, then the
+#'   column names of `rates` will be preserved
 #'
-#' @return 1-year death probabilities in a rectangular array for all ages and calendar years
+#' @return matrix of 1-year death probabilities for all ages and calendar years
 #' @export
 #'
 #' @examples
 #'
-DG <- function(rates, type, ages, years, old_ages, closure_age = 130, min_fit_age = 75, smoothing = FALSE) {
-  # TODO: Implement smoothing
-  # TODO: Write tests for inputs
-  # Rates data needs to be cleaned prior to input i.e. probabilities > 0 so log is defined
+DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
+
+  if (is.null(years)) {
+    col_names <- colnames(rates)
+  }
 
   # Convert to death probabilities
   if (type != "prob") {
@@ -104,12 +108,12 @@ DG <- function(rates, type, ages, years, old_ages, closure_age = 130, min_fit_ag
 
   # Creating data frame to fit log-quadratic model
   input_df <- as.data.frame(qxy)
-  df_fit <- as.data.frame(input_df[ages >= min_fit_age,])
+  df_fit <- as.data.frame(input_df[ages >= start_fit_age,])
 
   # Obtaining relevant ages
   boundary_age <- old_ages[1] - 1
   kept_ages <- ages[1]:boundary_age
-  fitted_ages <- min_fit_age:old_ages[length(old_ages)]
+  fitted_ages <- start_fit_age:old_ages[length(old_ages)]
 
   # Helper function to fit log-quadratic model on a vector
   DG_fit <- function(qx) {
@@ -131,7 +135,7 @@ DG <- function(rates, type, ages, years, old_ages, closure_age = 130, min_fit_ag
   kept_qxy <- as.matrix(qxy[1:(boundary_age - ages[1] + 1), ])
   completed_qxy <- rbind(kept_qxy, old_qxy)
   rownames(completed_qxy) <- as.character(c(kept_ages, old_ages))
-  colnames(completed_qxy) <- as.character(years)
+  colnames(completed_qxy) <- if (is.null(years)) col_names else as.character(years)
 
   completed_qxy
 }
