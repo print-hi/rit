@@ -2,31 +2,36 @@
 % Please edit documentation in R/complete_age.R
 \name{CK}
 \alias{CK}
-\title{Coale and Kisker Method of Age Completion}
+\title{Coale and Kisker Method}
 \usage{
-CK(rates, type, ages, years, old_ages, m_end)
+CK(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
 }
 \arguments{
-\item{rates}{mortality rates in a rectangular array with ages (on the rows)
-and calendar year (on the columns). Can be a matrix or a vector}
+\item{rates}{matrix or vector of mortality rates with age (on the rows) and
+calendar year (on the columns). Vector is equivalent to a matrix with a
+single column}
 
-\item{type}{specifies the type of rates supplied. Takes the following values:
-"central" for central death rates, "prob" for 1-year death probabilities,
-"force" for force of mortality}
+\item{ages}{vector of ages for \code{rates}}
 
-\item{ages}{age vector for \code{rates}}
+\item{old_ages}{vector of old ages for which \code{rates} is to be completed for}
 
-\item{years}{year vector for \code{rates}}
+\item{type}{character string representing the type of mortality rate
+supplied. Takes the following values: "central" for central death rates,
+"prob" for 1-year death probabilities, "force" for force of mortality}
 
-\item{old_ages}{old ages to be completed for}
+\item{m_end}{constant or vector specifying the central death rates at the
+final age for each calendar year. If supplied as a vector, vector length
+and number of columns for \code{rates} must be equal}
 
-\item{m_end}{a constant or vector specifying the central death rates at the final age}
+\item{years}{optional vector of years for \code{rates}. If not supplied, then the
+column names of \code{rates} will be preserved}
 }
 \value{
-Central death rates in a rectangular array for all ages and calendar years
+matrix of central death rates for all ages and calendar years
 }
 \description{
-Implements the Coale and Kisker method of age completion.
+Implements the Coale and Kisker method of mortality rate completion for old
+ages.
 }
 \examples{
 

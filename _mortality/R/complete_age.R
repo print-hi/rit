@@ -1,26 +1,32 @@
-#' Coale and Kisker Method of Age Completion
+#' Coale and Kisker Method
 #'
-#' Implements the Coale and Kisker method of age completion.
+#' Implements the Coale and Kisker method of mortality rate completion for old
+#' ages.
 #'
-#' @param rates mortality rates in a rectangular array with ages (on the rows)
-#'   and calendar year (on the columns). Can be a matrix or a vector
-#' @param type specifies the type of rates supplied. Takes the following values:
-#'   "central" for central death rates, "prob" for 1-year death probabilities,
-#'   "force" for force of mortality
-#' @param ages age vector for \code{rates}
-#' @param years year vector for \code{rates}
-#' @param old_ages old ages to be completed for
-#' @param m_end a constant or vector specifying the central death rates at the final age
+#' @param rates matrix or vector of mortality rates with age (on the rows) and
+#'   calendar year (on the columns). Vector is equivalent to a matrix with a
+#'   single column
+#' @param ages vector of ages for `rates`
+#' @param old_ages vector of old ages for which `rates` is to be completed for
+#' @param type character string representing the type of mortality rate
+#'   supplied. Takes the following values: "central" for central death rates,
+#'   "prob" for 1-year death probabilities, "force" for force of mortality
+#' @param m_end constant or vector specifying the central death rates at the
+#'   final age for each calendar year. If supplied as a vector, vector length
+#'   and number of columns for `rates` must be equal
+#' @param years optional vector of years for `rates`. If not supplied, then the
+#'   column names of `rates` will be preserved
 #'
-#' @return Central death rates in a rectangular array for all ages and calendar years
+#' @return matrix of central death rates for all ages and calendar years
 #' @export
 #'
 #' @examples
 #'
-CK <- function(rates, type, ages, years, old_ages, m_end) {
-  # TODO: Write tests for inputs, e.g.
-    # ages and years must be continuous vector
-    # dimensions of rates needs to match those of ages and years
+CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL) {
+
+  if (is.null(years)) {
+    col_names <- colnames(rates)
+  }
 
   # Convert to central death rates
   if (type != "central") {
@@ -55,7 +61,7 @@ CK <- function(rates, type, ages, years, old_ages, m_end) {
   # vector to matrix if necessary
   completed_mxy <- rbind(kept_mxy, old_mxy)
   rownames(completed_mxy) <- as.character(c(kept_ages, old_ages))
-  colnames(completed_mxy) <- as.character(years)
+  colnames(completed_mxy) <- if (is.null(years)) col_names else as.character(years)
 
   completed_mxy
 }
