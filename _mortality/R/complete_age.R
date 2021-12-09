@@ -142,23 +142,78 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 
 #' Kannisto Method of Age Completion
 #'
-#' Implements the Kannisto method of age completion
+#' Implements the Kannisto method of age completion for old ages.
 #'
-#' @param rates mortality rates in a rectangular array with ages (on the rows)
-#'   and calendar year (on the columns)
+#' @param rates matrix or vector of mortality rates with age (on the rows) and
+#'   calendar year y (on the columns). Vector is equivalent to a matrix with a
+#'   single column
+#' @param ages vector of ages for `rates`
+#' @param old_ages vector of old ages for which `rates` is to be completed for
+#' @param fitted_ages vector of ages for which model is fitted on
 #' @param type specifies the type of rates supplied. Takes the following values:
 #'   "central" for central death rates, "prob" for 1-year death probabilities,
 #'   "force" for force of mortality
-#' @param ages age vector for \code{rates}
-#' @param years year vector for \code{rates}
-#' @param old_ages old ages to be completed for
-#' @param fitted_ages ages for which parameters are to be estimated from
+#' @param closure_age maximum life span
+#' @param years optional vector of years for `rates`. If not supplied, then the
+#'   column names of `rates` will be preserved
 #'
-#' @return Force of mortality in a rectangular array for all ages and calendar years
+#' @return matrix of force of mortality for all ages and calendar years
 #' @export
 #'
 #' @examples
 #'
-kannisto <- function(rates, type, ages, years, old_ages, fitted_ages) {
-  # add method later
+kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
+
+  if (is.null(years)) {
+    col_names <- colnames(rates)
+  }
+
+  # Convert to force of mortality
+  if (type != "force") {
+    muxy <- rate2rate(rates, from = type, to = "force")
+  } else {
+    muxy <- rates
+  }
+
+  # Convert vector to matrix if necessary
+  muxy <- as.matrix(muxy)
+
+  # Creating data frame to fit model
+  input_df <- as.data.frame(muxy)
+  df_fit <- as.data.frame(input_df[fitted_ages - ages[1] + 1,])
+
+  # Defining helper functions to fit model and extrapolate
+  logit <- function(x) log(x/(1-x))
+  logistic <- function(x) exp(x)/(1 + exp(x))
+
+  kannisto_fit <- function(mux) {
+    fit <- lm(logit(mux) ~ fitted_ages)
+    coefficients(fit)
+  }
+
+  # Calculating regression coefficients
+  fit_coeff <- sapply(df_fit, kannisto_fit)
+  ay <- exp(fit_coeff[1,])
+  by <- fit_coeff[2,]
+  axy <- outer(rep(1, length(old_ages)), ay)
+  bxy <- outer(rep(1, length(old_ages)), by) # Outer creates matrix of
+  # appropriate dimensions for element-wise matrix multiplication
+
+  old_ages_mat <- outer(old_ages, rep(1, dim(muxy)[2]))
+  old_muxy <- as.matrix(logistic(log(axy) + bxy*old_ages_mat)) # Convert vector
+  # to matrix if necessary
+
+  # Obtaining relevant ages
+  kept_ages <- ages[1]:fitted_ages[length(fitted_ages)]
+
+  # Preparing final output
+  kept_muxy <- as.matrix(muxy[kept_ages - ages[1] + 1, ])
+  completed_muxy <- rbind(kept_muxy, old_muxy)
+  rownames(completed_muxy) <- as.character(c(kept_ages, old_ages))
+  colnames(completed_muxy) <- if (is.null(years)) col_names else as.character(years)
+
+  completed_muxy
+
+  # TODO: enforce closure_age constraint
+
 }

@@ -4,29 +4,41 @@
 \alias{kannisto}
 \title{Kannisto Method of Age Completion}
 \usage{
-kannisto(rates, type, ages, years, old_ages, fitted_ages)
+kannisto(
+  rates,
+  ages,
+  old_ages,
+  fitted_ages,
+  type = "force",
+  closure_age = 130,
+  years = NULL
+)
 }
 \arguments{
-\item{rates}{mortality rates in a rectangular array with ages (on the rows)
-and calendar year (on the columns)}
+\item{rates}{matrix or vector of mortality rates with age (on the rows) and
+calendar year y (on the columns). Vector is equivalent to a matrix with a
+single column}
+
+\item{ages}{vector of ages for \code{rates}}
+
+\item{old_ages}{vector of old ages for which \code{rates} is to be completed for}
+
+\item{fitted_ages}{vector of ages for which model is fitted on}
 
 \item{type}{specifies the type of rates supplied. Takes the following values:
 "central" for central death rates, "prob" for 1-year death probabilities,
 "force" for force of mortality}
 
-\item{ages}{age vector for \code{rates}}
+\item{closure_age}{maximum life span}
 
-\item{years}{year vector for \code{rates}}
-
-\item{old_ages}{old ages to be completed for}
-
-\item{fitted_ages}{ages for which parameters are to be estimated from}
+\item{years}{optional vector of years for \code{rates}. If not supplied, then the
+column names of \code{rates} will be preserved}
 }
 \value{
-Force of mortality in a rectangular array for all ages and calendar years
+matrix of force of mortality for all ages and calendar years
 }
 \description{
-Implements the Kannisto method of age completion
+Implements the Kannisto method of age completion for old ages.
 }
 \examples{
 
