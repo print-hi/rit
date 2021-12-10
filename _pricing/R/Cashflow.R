@@ -70,7 +70,7 @@ cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-  health_3 <- as.matrix(read.csv("R/data/health.csv"))
+    health_3 <- as.matrix(read.csv("R/data/health.csv"))
     health_3 <- ifelse(health_3 > 0, -2, health_3)
     colnames(health_3) <- NULL
     rownames(health_3) <- NULL
