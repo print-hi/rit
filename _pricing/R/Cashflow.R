@@ -26,10 +26,10 @@ cashflow <- function(age = 17, gender = "F", policy = "RM", paths = 1000) {
     # Set state transition + cash flow functions based on input policy
     if (policy == "RM") {
         trans_gen <- get_health_state_3
-        cashf_gen <- cf_reverse_mortgage
+        cashf_gen <- cf_reverse_mortgage # nolint
     } else if (policy == "CA") {
         trans_gen <- get_health_state_5
-        cashf_gen <- cf_reverse_mortgage
+        cashf_gen <- cf_reverse_mortgage # nolint
     } else {
         trans_gen <- get_aggregate_mortality
         cashf_gen <- switch(policy,
