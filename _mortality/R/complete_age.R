@@ -118,8 +118,8 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
   # Helper function to fit log-quadratic model on a vector
   DG_fit <- function(qx) {
 
-    log_quad_fit <- lm(log(qx) ~ I((closure_age - fitted_ages)^2) - 1)
-    coefficients(log_quad_fit)
+    log_quad_fit <- stats::lm(log(qx) ~ I((closure_age - fitted_ages)^2) - 1)
+    stats::coefficients(log_quad_fit)
   }
 
   # Calculating regression coefficient c
@@ -187,8 +187,8 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   logistic <- function(x) exp(x)/(1 + exp(x))
 
   kannisto_fit <- function(mux) {
-    fit <- lm(logit(mux) ~ fitted_ages)
-    coefficients(fit)
+    fit <- stats::lm(logit(mux) ~ fitted_ages)
+    stats::coefficients(fit)
   }
 
   # Calculating regression coefficients
