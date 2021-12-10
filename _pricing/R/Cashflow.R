@@ -25,7 +25,7 @@
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
 
-    # Set cash flow functions based on input policy
+    # Set cash flow function based on input policy
     cf_func <- switch(policy, "AP" = cf_account_based_pension,
                               "RM" = cf_reverse_mortgage,
                               "VA" = cf_variable_annuity,
