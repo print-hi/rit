@@ -53,7 +53,7 @@ cashflow <- function(age = 17, gender = "F", policy = "RM", paths = 1000) {
     return(cf)
 }
 
-############################################################################
+###############################################################################
 ###### PLACEHOLDER FUNCTIONS
 
 # Temporary helper function, should link to health-state module
