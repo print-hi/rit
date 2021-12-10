@@ -4,13 +4,9 @@
 \alias{cashflow}
 \title{Policy Cashflow Simulator}
 \usage{
-cashflow(age = 17, gender = "F", policy = "AP", paths = 1000)
+cashflow(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000)
 }
 \arguments{
-\item{age}{Initial age of policyholder in years}
-
-\item{gender}{Gender of policyholder, \code{gender = "F"} (female), \code{"M"} (male)}
-
 \item{policy}{Policy type to simulate:
 \code{policy = "AP"} (Account Based Pension),
 \code{"RM"} (Reverse Mortgage),
@@ -19,7 +15,13 @@ cashflow(age = 17, gender = "F", policy = "AP", paths = 1000)
 \code{"PA"} (Pooled Annuity),
 \code{"VA"} (Variable Annuity)}
 
-\item{paths}{Number of paths to simulate (Monte-Carlo method)}
+\item{age}{Initial age of policyholder in years}
+
+\item{sex}{sex of policyholder, \code{sex = "F"} (female), \code{"M"} (male)}
+
+\item{seed}{Seed for random generator}
+
+\item{n}{Number of paths to simulate (Monte-Carlo method)}
 }
 \value{
 Matrix of cash flow vectors for each simulated path
@@ -28,5 +30,5 @@ Matrix of cash flow vectors for each simulated path
 Simulate cash flows using Monte-Carlo methods for various policies
 }
 \examples{
-cf <- cashflow(age = 65, gender = "M", policy = "VA", paths = 1000)
+cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 }
