@@ -75,7 +75,7 @@ cashflow <- function(age = 17, gender = "F", policy = "RM", paths = 1000) {
     cf <- matrix(nrow = nrow(state), ncol = ncol(state))
 
     # Generate cash flows for each state vector
-    for (i in seq(1, nrow(state))) 
+    for (i in seq(1, nrow(state)))
         cf[i, ] <- cashf_gen(state[i, ])
 
     return(cf)

@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------
-Bugs Found:
+Bugs Found: # nolint
 
 
 
@@ -7,22 +7,7 @@ Bugs Found:
 ----------------------------------------------------------------------------
 Bugs Fixed:
 
-    # Set state transition + cash flow functions based on input policy
-    if (policy == "RM") {
-        trans_gen <- get_health_state_3
-        cashf_gen <- pricing::cf_reverse_mortgage
-    } else if (policy == "CA") {
-        trans_gen <- get_health_state_5
-        cashf_gen <- pricing::cf_reverse_mortgage
-    } else {
-        trans_gen <- get_aggregate_mortality
-        cashf_gen <- switch(policy,
-                            "AP" = pricing::cf_account_based_pension,
-                            "LA" = pricing::cf_life_annuity,
-                            "CA" = pricing::cf_care_annuity,
-                            "PA" = pricing::cf_pooled_annuity,
-                            "VA" = pricing::cf_variable_annuity)
-    }
+
 
 
 ----------------------------------------------------------------------------
