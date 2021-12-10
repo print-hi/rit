@@ -1,9 +1,10 @@
+#%%
 import pandas as pd
 import numpy as np
 import random as rd
 import math
 
-EPOCH = 100
+EPOCH = 1000
 
 def genMortality(min_age, max_age):
     data = []
@@ -15,11 +16,34 @@ def genMortality(min_age, max_age):
             elif j == max_age:
                 curr = 0
             elif curr != 0:
-                curr -= int(10000/(max_age - min_age)) + rd.randint(-100,120)
+                curr -= int(10000/(max_age - min_age)) + rd.randint(-200,240)
             if curr < 0:
                 curr = 0
             run.append(curr)
         data.append(run)
+    df = pd.DataFrame(data)
+    df.to_csv("mortality-e.csv", index=False)
+    
+    for i in range(EPOCH):
+        for j in range(0, max_age - min_age + 1):
+            if j == 0:
+                data[i][j] = 0
+            elif data[i][j - 1] == -1:
+                data[i][j] = -1
+            elif j < (max_age - min_age)/2:
+                rand = rd.randint(0, 1000)
+                if rand <= 5:
+                    data[i][j] = -1
+                else:
+                    data[i][j] = 0
+            else:
+                px = data[i][j] / EPOCH
+                rand = rd.uniform(0, 1)
+                if rand > px:
+                    data[i][j] = -1
+                else:
+                    data[i][j] = 0
+                    
     df = pd.DataFrame(data)
     df.to_csv("mortality.csv", index=False)
 
@@ -106,3 +130,5 @@ if __name__ == "__main__":
     genStockPrice(30,130)
     genHouseValue(30,130)
 
+
+# %%
