@@ -71,56 +71,56 @@ cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
   health_3 <- as.matrix(read.csv("R/data/health.csv"))
-  health_3 <- ifelse(health_3 > 0, -2, health_3)
-  colnames(health_3) <- NULL
-  rownames(health_3) <- NULL
-  return(health_3)
+    health_3 <- ifelse(health_3 > 0, -2, health_3)
+    colnames(health_3) <- NULL
+    rownames(health_3) <- NULL
+    return(health_3)
 }
 
 # Temporary helper function, should link to health-state module
 get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-  health_5 <- as.matrix(read.csv("R/data/health.csv"))
-  colnames(health_5) <- NULL
-  rownames(health_5) <- NULL
-  return(health_5)
+    health_5 <- as.matrix(read.csv("R/data/health.csv"))
+    colnames(health_5) <- NULL
+    rownames(health_5) <- NULL
+    return(health_5)
 }
 
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-  mortality <- as.matrix(read.csv("R/data/mortality.csv"))
-  colnames(mortality) <- NULL
-  rownames(mortality) <- NULL
-  return(mortality)
+    mortality <- as.matrix(read.csv("R/data/mortality.csv"))
+    colnames(mortality) <- NULL
+    rownames(mortality) <- NULL
+    return(mortality)
 }
 
 # Temporary helper function, should link to economic module
 get_interest <- function(age = 17, seed = 0, n = 1000) {
-  interest <- as.matrix(read.csv("R/data/interest.csv"))
-  colnames(interest) <- NULL
-  rownames(interest) <- NULL
-  return(interest)
+    interest <- as.matrix(read.csv("R/data/interest.csv"))
+    colnames(interest) <- NULL
+    rownames(interest) <- NULL
+    return(interest)
 }
 
 # Temporary helper function, should link to economic module
 get_inflation <- function(age = 17, seed = 0, n = 1000) {
-  inflation <- as.matrix(read.csv("R/data/inflation.csv"))
-  colnames(inflation) <- NULL
-  rownames(inflation) <- NULL
-  return(inflation)
+    inflation <- as.matrix(read.csv("R/data/inflation.csv"))
+    colnames(inflation) <- NULL
+    rownames(inflation) <- NULL
+    return(inflation)
 }
 
 # Temporary helper function, should link to economic module
 get_house_price <- function(age = 17, seed = 0, n = 1000) {
-  house <- as.matrix(read.csv("R/data/house.csv"))
-  colnames(house) <- NULL
-  rownames(house) <- NULL
-  return(house)
+    house <- as.matrix(read.csv("R/data/house.csv"))
+    colnames(house) <- NULL
+    rownames(house) <- NULL
+    return(house)
 }
 
 # Temporary helper function, should link to economic module
 get_stock_price <- function(age = 17, seed = 0, n = 1000) {
-  stock <- as.matrix(read.csv("R/data/stock.csv"))
-  colnames(stock) <- NULL
-  rownames(stock) <- NULL
-  return(stock)
+    stock <- as.matrix(read.csv("R/data/stock.csv"))
+    colnames(stock) <- NULL
+    rownames(stock) <- NULL
+    return(stock)
 }
