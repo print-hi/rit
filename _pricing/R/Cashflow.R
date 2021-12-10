@@ -26,13 +26,12 @@
 cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
 
     # Set cash flow functions based on input policy
-    cf_fn <- switch(policy,
-                    "AP" = cf_account_based_pension,
-                    "RM" = cf_reverse_mortgage,
-                    "VA" = cf_variable_annuity,
-                    "PA" = cf_pooled_annuity,
-                    "CA" = cf_care_annuity,
-                    "LA" = cf_life_annuity)
+    cf_func <- switch(policy, "AP" = cf_account_based_pension,
+                              "RM" = cf_reverse_mortgage,
+                              "VA" = cf_variable_annuity,
+                              "PA" = cf_pooled_annuity,
+                              "CA" = cf_care_annuity,
+                              "LA" = cf_life_annuity)
 
     # Get matrix of states for each path
     if (policy == "RM") {
@@ -61,7 +60,7 @@ cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
     cf <- matrix(nrow = nrow(state), ncol = ncol(state))
 
     # Generate cash flows for each state vector
-    for (i in seq(1, nrow(state))) cf[i, ] <- cf_fn(state[i, ], econ[[i]])
+    for (i in seq(1, nrow(state))) cf[i, ] <- cf_func(state[i, ], econ[[i]])
 
     return(cf)
 }
