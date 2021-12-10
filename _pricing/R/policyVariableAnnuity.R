@@ -1,3 +1,3 @@
-cf_variable_annuity <- function(age, gender, policy, epoch){
+cf_variable_annuity <- function(age, gender, policy, epoch) {
     return(0)
 }

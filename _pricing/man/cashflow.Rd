@@ -4,7 +4,7 @@
 \alias{cashflow}
 \title{Policy Cashflow Simulator}
 \usage{
-cashflow(age = 17, gender = "F", policy = "RM", paths = 1000)
+cashflow(age = 17, gender = "F", policy = "AP", paths = 1000)
 }
 \arguments{
 \item{age}{Initial age of policyholder in years}
