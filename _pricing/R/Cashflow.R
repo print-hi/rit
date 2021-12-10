@@ -27,7 +27,7 @@ get_aggregate_mortality <- function(age = 17, gender = "F", paths = 1000) {
 }
 
 #' Policy Cashflow Simulator
-#' 
+#'
 #' Simulate cash flows using Monte-Carlo methods for various policies
 #' @name cashflow
 #' @param age
