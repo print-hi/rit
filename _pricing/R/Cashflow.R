@@ -1,31 +1,3 @@
-# Initialize scope
-setwd("/Users/cocoamilko/Documents/GitHub/retirement-toolkit/_pricing")
-library("devtools")
-
-# Temporary helper function, should link to health-state module
-get_health_state_3 <- function(age = 17, gender = "F", paths = 1000) {
-  health_3 <- as.matrix(read.csv("R/data/health.csv"))
-  health_3 <- ifelse(health_3 > 0, -2, health_3)
-  colnames(health_3) <- NULL
-  rownames(health_3) <- NULL
-  return(health_3)
-}
-
-get_health_state_5 <- function(age = 17, gender = "F", paths = 1000) {
-  health_5 <- as.matrix(read.csv("R/data/health.csv"))
-  colnames(health_5) <- NULL
-  rownames(health_5) <- NULL
-  return(health_5)
-}
-
-# Temporary helper function, should link to aggregate-mortality module
-get_aggregate_mortality <- function(age = 17, gender = "F", paths = 1000) {
-  mortality <- as.matrix(read.csv("R/data/mortality.csv"))
-  colnames(mortality) <- NULL
-  rownames(mortality) <- NULL
-  return(mortality)
-}
-
 #' Policy Cashflow Simulator
 #'
 #' Simulate cash flows using Monte-Carlo methods for various policies
@@ -79,4 +51,31 @@ cashflow <- function(age = 17, gender = "F", policy = "RM", paths = 1000) {
         cf[i, ] <- cashf_gen(state[i, ])
 
     return(cf)
+}
+
+############################################################################
+###### PLACEHOLDER FUNCTIONS
+
+# Temporary helper function, should link to health-state module
+get_health_state_3 <- function(age = 17, gender = "F", paths = 1000) {
+  health_3 <- as.matrix(read.csv("R/data/health.csv"))
+  health_3 <- ifelse(health_3 > 0, -2, health_3)
+  colnames(health_3) <- NULL
+  rownames(health_3) <- NULL
+  return(health_3)
+}
+
+get_health_state_5 <- function(age = 17, gender = "F", paths = 1000) {
+  health_5 <- as.matrix(read.csv("R/data/health.csv"))
+  colnames(health_5) <- NULL
+  rownames(health_5) <- NULL
+  return(health_5)
+}
+
+# Temporary helper function, should link to aggregate-mortality module
+get_aggregate_mortality <- function(age = 17, gender = "F", paths = 1000) {
+  mortality <- as.matrix(read.csv("R/data/mortality.csv"))
+  colnames(mortality) <- NULL
+  rownames(mortality) <- NULL
+  return(mortality)
 }
