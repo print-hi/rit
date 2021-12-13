@@ -29,11 +29,12 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
   }
 
   # Convert to central death rates
-  if (type != "central") {
-    mxy <- rate2rate(rates, from = type, to = "central")
-  } else {
-    mxy <- rates
-  }
+  mxy <- rate2rate(rates, from = type, to = "central")
+  # if (type != "central") {
+  #   mxy <- rate2rate(rates, from = type, to = "central")
+  # } else {
+  #   mxy <- rates
+  # }                     <====== can remove now
 
   # Convert vector to matrix if necessary
   mxy <- as.matrix(mxy)
@@ -46,7 +47,7 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
   m_boundary <- mxy[boundary_age - ages[1] + 1, ]
   k_boundary <- log(m_boundary/mxy[boundary_age - ages[1], ])
   n <- length(old_ages)
-  sy <- 2 / (n * (n+1)) * (n * k_boundary - log(m_end/m_boundary))
+  sy <- 2 / (n * (n + 1)) * (n * k_boundary - log(m_end / m_boundary))
 
 
   old_kxy <- outer(rep(1, length(old_ages)), k_boundary) - outer(old_ages - boundary_age, sy)
@@ -97,11 +98,12 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
   }
 
   # Convert to death probabilities
-  if (type != "prob") {
-    qxy <- rate2rate(rates, from = type, to = "prob")
-  } else {
-    qxy <- rates
-  }
+  qxy <- rate2rate(rates, from = type, to = "prob")
+  # if (type != "prob") {
+  #   qxy <- rate2rate(rates, from = type, to = "prob")
+  # } else {
+  #   qxy <- rates
+  # }                   <===== can remove now
 
   # Convert vector to matrix if necessary
   qxy <- as.matrix(qxy)
