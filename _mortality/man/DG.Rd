@@ -16,17 +16,16 @@ DG(
 )
 }
 \arguments{
-\item{rates}{matrix or vector of mortality rates with age (on the rows) and
-calendar year (on the columns). Vector is equivalent to a matrix with a
-single column}
+\item{rates}{matrix or vector of mortality rates with age (on the rows) and calendar year
+(on the columns). Vector is equivalent to a matrix with a single column}
 
 \item{ages}{vector of ages for \code{rates}}
 
 \item{old_ages}{vector of old ages for which \code{rates} is to be completed for}
 
-\item{type}{character string representing the type of mortality rate
-supplied. Takes the following values: "central" for central death rates,
-"prob" for 1-year death probabilities, "force" for force of mortality}
+\item{type}{character string representing the type of mortality rate supplied. Takes the
+following values: "central" for central death rates, "prob" for 1-year death
+probabilities, "force" for force of mortality}
 
 \item{closure_age}{maximum life span}
 
@@ -34,8 +33,8 @@ supplied. Takes the following values: "central" for central death rates,
 
 \item{smoothing}{logical value indicating if smoothing is to be applied}
 
-\item{years}{optional vector of years for \code{rates}. If not supplied, then the
-column names of \code{rates} will be preserved}
+\item{years}{optional vector of years for \code{rates}. If not supplied, then the column names
+of \code{rates} will be preserved}
 }
 \value{
 matrix of 1-year death probabilities for all ages and calendar years

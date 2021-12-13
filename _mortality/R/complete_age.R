@@ -3,21 +3,28 @@
 #' Implements the Coale and Kisker method of mortality rate completion for old
 #' ages.
 #'
-#' @param rates matrix or vector of mortality rates with age (on the rows) and
-#'   calendar year (on the columns). Vector is equivalent to a matrix with a
-#'   single column
-#' @param ages vector of ages for `rates`
-#' @param old_ages vector of old ages for which `rates` is to be completed for
-#' @param type character string representing the type of mortality rate
-#'   supplied. Takes the following values: "central" for central death rates,
-#'   "prob" for 1-year death probabilities, "force" for force of mortality
-#' @param m_end constant or vector specifying the central death rates at the
-#'   final age for each calendar year. If supplied as a vector, vector length
-#'   and number of columns for `rates` must be equal
-#' @param years optional vector of years for `rates`. If not supplied, then the
-#'   column names of `rates` will be preserved
+#' @param rates
+#' matrix or vector of mortality rates with age (on the rows) and calendar year
+#' (on the columns). Vector is equivalent to a matrix with a single column
+#' @param ages
+#' vector of ages for `rates`
+#' @param old_ages
+#' vector of old ages for which `rates` is to be completed for
+#' @param type
+#' character string representing the type of mortality rate supplied. Takes the
+#' following values: "central" for central death rates, "prob" for 1-year death
+#' probabilities, "force" for force of mortality
+#' @param m_end
+#' constant or vector specifying the central death rates at the final age for
+#' each calendar year. If supplied as a vector, vector length and number of
+#' columns for `rates` must be equal
+#' @param years
+#' optional vector of years for `rates`. If not supplied, then the column names
+#' of `rates` will be preserved
 #'
-#' @return matrix of central death rates for all ages and calendar years
+#' @return
+#' matrix of central death rates for all ages and calendar years
+#'
 #' @export
 #'
 #' @examples
@@ -30,11 +37,6 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
 
   # Convert to central death rates
   mxy <- rate2rate(rates, from = type, to = "central")
-  # if (type != "central") {
-  #   mxy <- rate2rate(rates, from = type, to = "central")
-  # } else {
-  #   mxy <- rates
-  # }                     <====== can remove now
 
   # Convert vector to matrix if necessary
   mxy <- as.matrix(mxy)
@@ -72,21 +74,30 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
 #' Implements the Denuit and Goderniaux method of mortality rate completion for
 #' old ages.
 #'
-#' @param rates matrix or vector of mortality rates with age (on the rows) and
-#'   calendar year (on the columns). Vector is equivalent to a matrix with a
-#'   single column
-#' @param ages vector of ages for `rates`
-#' @param old_ages vector of old ages for which `rates` is to be completed for
-#' @param type character string representing the type of mortality rate
-#'   supplied. Takes the following values: "central" for central death rates,
-#'   "prob" for 1-year death probabilities, "force" for force of mortality
-#' @param closure_age maximum life span
-#' @param start_fit_age model is fitted to ages starting from this age
-#' @param smoothing logical value indicating if smoothing is to be applied
-#' @param years optional vector of years for `rates`. If not supplied, then the
-#'   column names of `rates` will be preserved
+#' @param rates
+#' matrix or vector of mortality rates with age (on the rows) and calendar year
+#' (on the columns). Vector is equivalent to a matrix with a single column
+#' @param ages
+#' vector of ages for `rates`
+#' @param old_ages
+#' vector of old ages for which `rates` is to be completed for
+#' @param type
+#' character string representing the type of mortality rate supplied. Takes the
+#' following values: "central" for central death rates, "prob" for 1-year death
+#' probabilities, "force" for force of mortality
+#' @param closure_age
+#' maximum life span
+#' @param start_fit_age
+#' model is fitted to ages starting from this age
+#' @param smoothing
+#' logical value indicating if smoothing is to be applied
+#' @param years
+#' optional vector of years for `rates`. If not supplied, then the column names
+#' of `rates` will be preserved
 #'
-#' @return matrix of 1-year death probabilities for all ages and calendar years
+#' @return
+#' matrix of 1-year death probabilities for all ages and calendar years
+#'
 #' @export
 #'
 #' @examples
@@ -99,11 +110,6 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 
   # Convert to death probabilities
   qxy <- rate2rate(rates, from = type, to = "prob")
-  # if (type != "prob") {
-  #   qxy <- rate2rate(rates, from = type, to = "prob")
-  # } else {
-  #   qxy <- rates
-  # }                   <===== can remove now
 
   # Convert vector to matrix if necessary
   qxy <- as.matrix(qxy)
@@ -146,20 +152,28 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 #'
 #' Implements the Kannisto method of age completion for old ages.
 #'
-#' @param rates matrix or vector of mortality rates with age (on the rows) and
-#'   calendar year y (on the columns). Vector is equivalent to a matrix with a
-#'   single column
-#' @param ages vector of ages for `rates`
-#' @param old_ages vector of old ages for which `rates` is to be completed for
-#' @param fitted_ages vector of ages for which model is fitted on
-#' @param type specifies the type of rates supplied. Takes the following values:
-#'   "central" for central death rates, "prob" for 1-year death probabilities,
-#'   "force" for force of mortality
-#' @param closure_age maximum life span
-#' @param years optional vector of years for `rates`. If not supplied, then the
-#'   column names of `rates` will be preserved
+#' @param rates
+#' matrix or vector of mortality rates with age (on the rows) and calendar year
+#' (on the columns). Vector is equivalent to a matrix with a single column
+#' @param ages
+#' vector of ages for `rates`
+#' @param old_ages
+#' vector of old ages for which `rates` is to be completed for
+#' @param fitted_ages
+#' vector of ages for which model is fitted on
+#' @param type
+#' character string representing the type of mortality rate supplied. Takes the
+#' following values: "central" for central death rates, "prob" for 1-year death
+#' probabilities, "force" for force of mortality
+#' @param closure_age
+#' maximum life span
+#' @param years
+#' optional vector of years for `rates`. If not supplied, then the column names
+#' of `rates` will be preserved
 #'
-#' @return matrix of force of mortality for all ages and calendar years
+#' @return
+#' matrix of force of mortality for all ages and calendar years
+#'
 #' @export
 #'
 #' @examples
@@ -171,11 +185,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   }
 
   # Convert to force of mortality
-  if (type != "force") {
-    muxy <- rate2rate(rates, from = type, to = "force")
-  } else {
-    muxy <- rates
-  }
+  muxy <- rate2rate(rates, from = type, to = "force")
 
   # Convert vector to matrix if necessary
   muxy <- as.matrix(muxy)
@@ -185,8 +195,8 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   df_fit <- as.data.frame(input_df[fitted_ages - ages[1] + 1,])
 
   # Defining helper functions to fit model and extrapolate
-  logit <- function(x) log(x/(1-x))
-  logistic <- function(x) exp(x)/(1 + exp(x))
+  logit <- function(x) log(x / (1 - x))
+  logistic <- function(x) exp(x) / (1 + exp(x))
 
   kannisto_fit <- function(mux) {
     fit <- stats::lm(logit(mux) ~ fitted_ages)

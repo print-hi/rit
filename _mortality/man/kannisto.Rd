@@ -15,9 +15,8 @@ kannisto(
 )
 }
 \arguments{
-\item{rates}{matrix or vector of mortality rates with age (on the rows) and
-calendar year y (on the columns). Vector is equivalent to a matrix with a
-single column}
+\item{rates}{matrix or vector of mortality rates with age (on the rows) and calendar year
+(on the columns). Vector is equivalent to a matrix with a single column}
 
 \item{ages}{vector of ages for \code{rates}}
 
@@ -25,14 +24,14 @@ single column}
 
 \item{fitted_ages}{vector of ages for which model is fitted on}
 
-\item{type}{specifies the type of rates supplied. Takes the following values:
-"central" for central death rates, "prob" for 1-year death probabilities,
-"force" for force of mortality}
+\item{type}{character string representing the type of mortality rate supplied. Takes the
+following values: "central" for central death rates, "prob" for 1-year death
+probabilities, "force" for force of mortality}
 
 \item{closure_age}{maximum life span}
 
-\item{years}{optional vector of years for \code{rates}. If not supplied, then the
-column names of \code{rates} will be preserved}
+\item{years}{optional vector of years for \code{rates}. If not supplied, then the column names
+of \code{rates} will be preserved}
 }
 \value{
 matrix of force of mortality for all ages and calendar years

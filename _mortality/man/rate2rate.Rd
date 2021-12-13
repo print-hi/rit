@@ -7,17 +7,17 @@
 rate2rate(rates, from, to)
 }
 \arguments{
-\item{rates}{a matrix containing the rates}
+\item{rates}{matrix containing the rates}
 
-\item{from}{specifies the type of rates we are converting from. Takes the
-following values: "central" for central death rates, "prob" for 1-year
-death probabilities, "force" for force of mortality.}
+\item{from}{character string representing the type of mortality rate to be converted
+from. Takes the following values: "central" for central death rates, "prob"
+for 1-year death probabilities, "force" for force of mortality.}
 
-\item{to}{specifies the type of rates we are converting to. Takes the same
-values as the parameter \code{from}}
+\item{to}{character string representing the type of mortality rate to be converted to.
+Takes the same values as the parameter \code{from}}
 }
 \value{
-a matrix of the same size with the converted rates
+matrix of the same size as \code{rates} containing the converted rates
 }
 \description{
 Converts between central death rates, 1-year death probabilities and force of
