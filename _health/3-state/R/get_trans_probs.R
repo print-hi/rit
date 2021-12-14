@@ -1,5 +1,28 @@
 # function to produce transition probability matrices
 
+#' Calculate transition probability matrices
+#'
+#' Creates a list of transition probability matrices starting from initial age to 
+#' max age of 110 for 3 state model
+#' 
+#' @param model_type 
+#' string that selects model type; S for Static, T for Trend and F for Frailty
+#' @param param_file 
+#' File containing cox regression parameters for all models. 
+#' @param age 
+#' integer denoting age of policy holder
+#' @param female 
+#' takes values 1 or 0, where 1 indicates policyholder is female
+#' @param year 
+#' integer denoting current year
+#'
+#' @return
+#' list of transition probability matrices 
+#' 
+#' @export
+#'
+#' @examples
+#' 
 get_trans_probs <- function(model_type, param_file, age, female, year) {
   # extract parameter values from parameter file
   param_list <- readxl::read_excel(param_file)
