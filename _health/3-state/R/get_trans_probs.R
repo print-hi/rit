@@ -2,41 +2,41 @@
 
 #' Calculate transition probability matrices
 #'
-#' Creates a list of transition probability matrices starting from initial age to 
+#' Creates a list of transition probability matrices starting from initial age to
 #' max age of 110 for 3 state model
-#' 
-#' @param model_type 
+#'
+#' @param model_type
 #' string that selects model type; S for Static, T for Trend and F for Frailty
-#' @param param_file 
-#' File containing cox regression parameters for all models. 
-#' @param age 
+#' @param param_file
+#' File containing cox regression parameters for all models.
+#' @param age
 #' integer denoting age of policy holder
-#' @param female 
+#' @param female
 #' takes values 1 or 0, where 1 indicates policyholder is female
-#' @param year 
+#' @param year
 #' integer denoting current year
 #'
 #' @return
-#' list of transition probability matrices 
-#' 
+#' list of transition probability matrices
+#'
 #' @export
 #'
 #' @examples
-#' 
+#'
 get_trans_probs <- function(model_type, param_file, age, female, year) {
   # extract parameter values from parameter file
   param_list <- readxl::read_excel(param_file)
-  
+
   if (model_type == 'S') {
-    params <- param_list[1:4, ]
+    params <- param_list[1:5, ]
     v <- 0 # no stochastic component
   } else if (model_type == 'T') {
-    params <- param_list[5:8, ]
+    params <- param_list[6:10, ]
     v <- 0 # no stochastic component
   } else if (model_type == 'F') {
-    params <- param_list[9, 12]
-    
-    # we also need to simulate v 
+    params <- param_list[11, 15]
+
+    # we also need to simulate v
     # we will simulate 300 time points, which will be sufficient until year 2297
     v <- rep(0, 300)
     for (i in 2:300) {
@@ -45,87 +45,87 @@ get_trans_probs <- function(model_type, param_file, age, female, year) {
   } else {
     return('model_type Error: Please enter a valid model type from {S, T, F}')
   }
-  
+
   # Get parameters for each of the 4 transition types
   for (i in 1:4) {
-    assign(paste('b', i, sep = ''), as.numeric(params[i, 'beta']))
-    assign(paste('gamma_age', i, sep = ''), as.numeric(params[i, 'gamma_age']))
-    assign(paste('gamma_gender', i, sep = ''), as.numeric(params[i, 'gamma_gender']))
-    assign(paste('gamma_time', i, sep = ''), as.numeric(params[i, 'gamma_time']))
-    assign(paste('a', i, sep = ''), as.numeric(params[i, 'alpha']))
+    assign(paste('b', i, sep = ''), as.numeric(params[1, i+2]))
+    assign(paste('gamma_age', i, sep = ''), as.numeric(params[2, i+2]))
+    assign(paste('gamma_gender', i, sep = ''), as.numeric(params[3, i+2]))
+    assign(paste('gamma_time', i, sep = ''), as.numeric(params[4, i+2]))
+    assign(paste('a', i, sep = ''), as.numeric(params[5, i+2]))
   } # We now have the coefficients for each of the 4 transition types
-  
+
   # create cox regression function
   cox_model <- function(target_age, init_age, female, year, model_type, b, gamma_age,
                         gamma_gender, gamma_time, a, v) {
-    
+
     # we need target t, a coefficient in the cox model
     init_t <- year-1998+1
     t <- target_age - init_age + init_t
-    
+
     # give hazard rate output
     if (model_type != 'F') {
       return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10))
     } else {
       # now t doesnt have to be an integer, so we use linear interpolation to get v(t)
       v_t <- v[floor(t)]*(ceiling(t)-t) + v[ceiling(t)]*(t-floor(t))
-      
+
       # now we return hazard rate output
       return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10 +
                    a*v_t))
     }
   }
-  
+
   # transition 1 rates
   trans1 <- c()
   for (i in age:109) {
     # integrate across each year to get annual piecewise transition rates
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female, 
-                          year = year, model_type = model_type, b = b1, gamma_age = gamma_age1, 
+    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+                          year = year, model_type = model_type, b = b1, gamma_age = gamma_age1,
                           gamma_gender = gamma_gender1, gamma_time = gamma_time1, a = a1, v = v)
     trans1 <- append(trans1, integral$value)
   }
-  
+
   # transition 2 rates
   trans2 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female, 
-                          year = year, model_type = model_type, b = b2, gamma_age = gamma_age2, 
+    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+                          year = year, model_type = model_type, b = b2, gamma_age = gamma_age2,
                           gamma_gender = gamma_gender2, gamma_time = gamma_time2, a = a2, v = v)
     trans2 <- append(trans2, integral$value)
   }
-  
+
   # transition 3 rates
   trans3 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female, 
-                          year = year, model_type = model_type, b = b3, gamma_age = gamma_age3, 
+    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+                          year = year, model_type = model_type, b = b3, gamma_age = gamma_age3,
                           gamma_gender = gamma_gender3, gamma_time = gamma_time3, a = a3, v = v)
     trans3 <- append(trans3, integral$value)
   }
-  
+
   # transition 4 rates
   trans4 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female, 
-                          year = year, model_type = model_type, b = b4, gamma_age = gamma_age4, 
+    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+                          year = year, model_type = model_type, b = b4, gamma_age = gamma_age4,
                           gamma_gender = gamma_gender4, gamma_time = gamma_time4, a = a4, v = v)
     trans4 <- append(trans4, integral$value)
   }
-  
-  
+
+
   # we now use the transition rates we have to create transition rate matrices Q
   Qs <- list()
   for (i in 1:length(trans1)) {
-    Q <- matrix(c(-trans1[i]-trans3[i], trans1[i], trans3[i], 
+    Q <- matrix(c(-trans1[i]-trans3[i], trans1[i], trans3[i],
                   trans2[i], -trans2[i]-trans4[i], trans4[i],
                   0, 0, 0), nrow = 3, byrow = TRUE)
     Qs[[i]] <- Q
   }
-  
+
   # take matrix exponentials to find Ps; the transition probability matrices
   Ps <- lapply(Qs, expm::expm)
-  
+
   # append last transition where everyone dies (will make lifetable section easier)
   Ps[[length(Ps)+1]] <- matrix(c(0, 0, 1, 0, 0, 1, 0, 0, 1), nrow = 3, byrow = TRUE)
   return(Ps)
