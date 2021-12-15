@@ -4,7 +4,7 @@
 \alias{cashflow}
 \title{Policy Cashflow Simulator}
 \usage{
-cashflow(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000)
+cashflow(policy, age = 17, sex = "F", seed = 0, n = 1000)
 }
 \arguments{
 \item{policy}{Policy type to simulate:
@@ -22,6 +22,14 @@ cashflow(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000)
 \item{seed}{Seed for random generator}
 
 \item{n}{Number of paths to simulate (Monte-Carlo method)}
+
+\item{value}{Amount of}
+
+\item{withdrawl}{ABP only, amount withdrawn in first year from account i.e. yearly expense}
+
+\item{loading}{Number of paths to simulate (Monte-Carlo method)}
+
+\item{gmwb}{Number of paths to simulate (Monte-Carlo method)}
 }
 \value{
 Matrix of cash flow vectors for each simulated path

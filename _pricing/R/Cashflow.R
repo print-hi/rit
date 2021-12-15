@@ -18,25 +18,33 @@
 #' Seed for random generator
 #' @param n
 #' Number of paths to simulate (Monte-Carlo method)
+#' @param value
+#' Amount of
+#' @param withdrawl
+#' ABP only, amount withdrawn in first year from account i.e. yearly expense
+#' @param loading
+#' Number of paths to simulate (Monte-Carlo method)
+#' @param gmwb
+#' Number of paths to simulate (Monte-Carlo method)
 #' @return
 #' Matrix of cash flow vectors for each simulated path
 #' @export cashflow
 #' @examples
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
-cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
+cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 
     # Set cash flow function based on input policy
-    cf_func <- switch(policy, "AP" = cf_account_based_pension,
-                              "RM" = cf_reverse_mortgage,
-                              "VA" = cf_variable_annuity,
-                              "PA" = cf_pooled_annuity,
-                              "CA" = cf_care_annuity,
-                              "LA" = cf_life_annuity)
+    cf_func <- switch(policy$name, "AP" = cf_account_based_pension,
+                                   "RM" = cf_reverse_mortgage,
+                                   "VA" = cf_variable_annuity,
+                                   "PA" = cf_pooled_annuity,
+                                   "CA" = cf_care_annuity,
+                                   "LA" = cf_life_annuity)
 
     # Get matrix of states for each path
-    if (policy == "RM") {
+    if (policy$name == "RM") {
         state <- get_health_state_3(age, sex, seed, n)
-    } else if (policy == "CA") {
+    } else if (policy$name == "CA") {
         state <- get_health_state_5(age, sex, seed, n)
     } else {
         state <- get_aggregate_mortality(age, sex, seed, n)
@@ -49,18 +57,18 @@ cashflow <- function(policy = "AP", age = 17, sex = "F", seed = 0, n = 1000) {
     house <- get_house_price(age, seed, n)
 
     # Organise economic inputs into a data.frame for each path
-    econ <- list()
+    data <- list()
     for (i in seq(1, nrow(state))) {
-        data <- data.frame(house = house[i, ], infla = infla[i, ],
+        temp <- data.frame(house = house[i, ], infla = infla[i, ],
                            intrs = intrs[i, ], stock = stock[i, ])
-        econ <- append(econ, list(data))
+        data <- append(data, list(temp))
     }
 
     # Initialize output matrix
     cf <- matrix(nrow = nrow(state), ncol = ncol(state))
 
     # Generate cash flows for each state vector
-    for (i in seq(1, nrow(state))) cf[i, ] <- cf_func(state[i, ], econ[[i]])
+    for (i in seq(1, nrow(state))) cf[i, ] <- cf_func(policy, state[i, ], data[[i]])
 
     return(cf)
 }

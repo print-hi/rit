@@ -80,7 +80,7 @@ def genInflation(min_age, max_age):
     for i in range(EPOCH):
         run = []
         for j in range(min_age, max_age + 1):
-            rand = round(rd.uniform(0, 0.07), 3)
+            rand = round(rd.uniform(0, 0.03), 3)
             run.append(rand)
         data.append(run)
     df = pd.DataFrame(data)
