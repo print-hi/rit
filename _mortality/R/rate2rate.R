@@ -36,12 +36,15 @@ q2m <- function(rates) return(-log(1 - rates))
 #' A <- matrix(c(0.02, 0.04, 0.03, 0.05), nrow = 2, ncol = 2, byrow = TRUE)
 #' rate2rate(A, from = "prob", to = "force")
 rate2rate <- function(rates, from, to) {
-  if (from == to) return(rates)
+
+  type <- c("central", "prob", "force")
+
+  if (!is.element(from, type) | !is.element(to, type)) stop("invalid input for conversion")
   else if (from == "central" & to == "force") return(rates)
   else if (from == "central" & to == "prob") return(m2q(rates))
   else if (from == "force" & to == "central") return(rates)
   else if (from == "force" & to == "prob") return(mu2q(rates))
   else if (from == "prob" & to == "central") return(q2m(rates))
   else if (from == "prob" & to == "force") return(q2mu(rates))
-  else stop("invalid arguments for rate conversion")
+  else return(rates)
 }
