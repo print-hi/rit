@@ -20,7 +20,7 @@
 #' list of transition probability matrices
 #'
 #' @export
-#'
+#' @import expm
 #' @examples
 #'
 get_trans_probs <- function(model_type, param_file, age, female, year) {

@@ -2,3 +2,4 @@
 
 export(create_life_table)
 export(get_trans_probs)
+import(expm)
