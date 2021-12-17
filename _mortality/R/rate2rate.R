@@ -40,11 +40,12 @@ rate2rate <- function(rates, from, to) {
   type <- c("central", "prob", "force")
 
   if (!is.element(from, type) | !is.element(to, type)) stop("invalid input for conversion")
+  else if (from == to) return(rates)
   else if (from == "central" & to == "force") return(rates)
   else if (from == "central" & to == "prob") return(m2q(rates))
   else if (from == "force" & to == "central") return(rates)
   else if (from == "force" & to == "prob") return(mu2q(rates))
   else if (from == "prob" & to == "central") return(q2m(rates))
   else if (from == "prob" & to == "force") return(q2mu(rates))
-  else return(rates)
+  else stop("invalid input for conversion")
 }
