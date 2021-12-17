@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_account_based_pension <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -7,7 +17,7 @@ cf_account_based_pension <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] > -1) {
+    while (state[i] != -1) {    # while PH is not dead
 
         # Withdraw yearly expense from account
         balance <- balance - expense
@@ -28,16 +38,18 @@ cf_account_based_pension <- function(policy, state, data) {
         i <- i + 1
     }
 
-    # Accounting for any remaining funds in account
-    # if (i > length(state)) {
-    #     cf[length(state)] <- cf[length(state)] + balance
-    # }
-    # else {
-    #     cf[i] <- balance
-    # }
-
     return(cf)
 }
+
+
+# Accounting for any remaining funds in account ??
+# if (i > length(state)) {
+#     cf[length(state)] <- cf[length(state)] + balance
+# }
+# else {
+#     cf[i] <- balance
+# }
+
 
 # Assumptions made: cash flows end when account balance is negative
 # ? withdrawl all for max age (e.g. goes to family)
