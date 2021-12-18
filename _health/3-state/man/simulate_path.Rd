@@ -19,7 +19,7 @@ simulate_path(init_age, init_state, trans_probs, cohort = 10000)
 a matrix where each row represents a new individual, and the columns represent
 the individual's movement through each state.
 
-3 (death) is absorbing, so if an individual enters that state, the rest of the row will be 3.
+-1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 }
 \description{
 Simulates the path each life takes in an initial cohort using transition probabilities
