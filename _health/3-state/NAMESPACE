@@ -3,6 +3,7 @@
 export(create_life_table)
 export(get_trans_probs)
 export(prob_plots)
+export(simulate_path)
 export(surv_prob)
 import(expm)
 import(tidyr)
