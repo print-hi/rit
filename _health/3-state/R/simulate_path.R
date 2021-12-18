@@ -8,10 +8,10 @@
 #' integer between 64 and 110 denoting current age
 #' @param init_state
 #' 1 for healthy, 2 for disabled
-#' @param cohort
-#' integer (default 10000) denoting number of people in the simulation
 #' @param trans_probs
 #' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
+#' @param cohort
+#' integer (default 10000) denoting number of people in the simulation
 #'
 #' @return
 #' a matrix where each row represents a new individual, and the columns represent

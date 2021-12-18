@@ -4,16 +4,16 @@
 \alias{simulate_path}
 \title{Simulate cohort life path}
 \usage{
-simulate_path(init_age, init_state, cohort = 10000, trans_probs)
+simulate_path(init_age, init_state, trans_probs, cohort = 10000)
 }
 \arguments{
 \item{init_age}{integer between 64 and 110 denoting current age}
 
 \item{init_state}{1 for healthy, 2 for disabled}
 
-\item{cohort}{integer (default 10000) denoting number of people in the simulation}
-
 \item{trans_probs}{a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
+
+\item{cohort}{integer (default 10000) denoting number of people in the simulation}
 }
 \value{
 a matrix where each row represents a new individual, and the columns represent
