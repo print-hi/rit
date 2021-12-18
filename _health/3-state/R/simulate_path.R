@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-simulate_path <- function(init_age, init_state, cohort = 10000, trans_probs) {
+simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   # screening for errors
   if (init_state != 1 & init_state != 2) {
     return('Please enter a valid initial state: 1 for healthy, 2 for disabled.')
