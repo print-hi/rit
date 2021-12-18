@@ -33,7 +33,7 @@ simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   }
 
   # create empty matrix to contain simulated population
-  simulated_pop <- matrix(0, nrow = cohort, ncol = 110-init_age+1)
+  simulated_pop <- matrix(0, nrow = cohort, ncol = 110-init_age+2)
 
   # initialise all individuals
   simulated_pop[, 1] <- init_state
