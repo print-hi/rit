@@ -14,7 +14,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     # Get loan amount for policyholder
-    loan <- calculate_loan_amount_RM(policy$age, policy$value)
+    loan <- policy$LVR * policy$value
     cf[1] <- loan
 
     prem <- calculate_fair_premium_RM()
@@ -37,14 +37,4 @@ cf_reverse_mortgage <- function(policy, state, data) {
     cf[i] <- excess
 
     return(cf)
-}
-
-# TODO: should this be calculated in main and passed in via policy??
-
-calculate_loan_amount_RM <- function(age, value) {
-    return(value * (age / 130))
-}
-
-calculate_fair_premium_RM <- function() {
-    return(0.0001)
 }

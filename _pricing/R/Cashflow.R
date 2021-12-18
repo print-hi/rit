@@ -34,18 +34,24 @@
 cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 
     # Set cash flow function based on input policy
-    cf_func <- switch(policy$name, "AP" = cf_account_based_pension,
-                                   "RM" = cf_reverse_mortgage,
-                                   "VA" = cf_variable_annuity,
-                                   "PA" = cf_pooled_annuity,
-                                   "CA" = cf_care_annuity,
-                                   "LA" = cf_life_annuity)
+    cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
+                                      "RM" = cf_reverse_mortgage,
+                                      "VA" = cf_variable_annuity,
+                                      "PA" = cf_pooled_annuity,
+                                      "CA" = cf_care_annuity,
+                                      "LA" = cf_life_annuity)
 
     # Get matrix of states for each path
-    if (policy$name == "RM") {
+    if (policy$name[1] == "RM") {
         state <- get_health_state_3(age, sex, seed, n)
-    } else if (policy$name == "CA") {
-        state <- get_health_state_5(age, sex, seed, n)
+    } else if (policy$name[1] == "CA") {
+        if (nrow(policy) == 2) {
+            state <- get_health_state_3(age, sex, seed, n)
+        } else if (nrow(policy) == 4) {
+            state <- get_health_state_5(age, sex, seed, n)
+        } else {
+            print("error")
+        }
     } else {
         state <- get_aggregate_mortality(age, sex, seed, n)
     }

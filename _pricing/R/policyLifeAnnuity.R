@@ -11,21 +11,20 @@
 cf_life_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
+    increase <- policy$increase
     benefit <- policy$benefit
-    defermt <- policy$defer
+    d <- policy$defer
 
     cf <- rep(0, times = length(state))
 
     i <- 1
     while (state[i] != -1) {     # while PH is not dead
 
-        if (i == 1) {
-            cf[i] <- -1 * calculate_price_LA()
-        } else if (i <= d) {
-            cf[i] <- 0
-        } else {
-            cf[i] <- policy$benefit
-        }
+        # Get benefit if alive after deferment period
+        cf[i] <- ifelse (i <= d, 0, benefit)
+
+        # For flat-rate increase
+        benefit <- benefit * (1 + increase)
 
         i <- i + 1
     }
@@ -33,8 +32,6 @@ cf_life_annuity <- function(policy, state, data) {
     return(cf)
 }
 
+# For indexed benefits (e.g. inflation)
+# benefit <- benefit * (1 + index[i])
 
-# Should this be calculated in the main wrapper? and passed in via policy
-calculate_price_LA <- function() {
-
-}

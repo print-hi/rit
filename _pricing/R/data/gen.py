@@ -48,7 +48,31 @@ def genMortality(min_age, max_age):
     df.to_csv("mortality.csv", index=False)
 
 
-def genHealthState(min_age, max_age):
+def genHealthState3(min_age, max_age):
+    data = []
+    for i in range(EPOCH):
+        run = []
+        for j in range(min_age, max_age + 1):
+            if j == min_age:
+                curr = 0
+            elif j == max_age or curr < 0:
+                curr = -1
+            else:
+                rand = rd.randint(0,1000)
+                if rand < 17:
+                    curr = -1
+                elif rand < 700 and (j + min_age) < max_age:
+                    curr = 0
+                elif rand < 400 and (j + min_age) > max_age:
+                    curr = 0
+                elif not curr or curr > 2:
+                    curr = 1
+            run.append(curr)
+        data.append(run)
+    df = pd.DataFrame(data)
+    df.to_csv("health3.csv", index=False)
+
+def genHealthState5(min_age, max_age):
     data = []
     for i in range(EPOCH):
         run = []
@@ -72,8 +96,7 @@ def genHealthState(min_age, max_age):
             run.append(curr)
         data.append(run)
     df = pd.DataFrame(data)
-    df.to_csv("health.csv", index=False)
-
+    df.to_csv("health5.csv", index=False)
 
 def genInflation(min_age, max_age):
     data = []
@@ -124,7 +147,8 @@ def genHouseValue(min_age, max_age):
 
 if __name__ == "__main__":
     genMortality(30,130)
-    genHealthState(30,130)
+    genHealthState3(30,130)
+    genHealthState5(30,130)
     genInflation(30,130)
     genInterestRate(30,130)
     genStockPrice(30,130)
