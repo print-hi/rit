@@ -10,7 +10,7 @@
 #' @param age
 #' integer denoting current age
 #' @param init_state
-#' integer value of 1 or 2, where 1 indicates healthy and 2 indicates disabled
+#' integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled
 #' @param cohort
 #' initial cohort size for lifetable
 #'
@@ -21,9 +21,9 @@
 #'
 #' @examples
 #'
-create_life_table <- function(trans_probs, age, init_state = 1, cohort = 100000) {
+create_life_table <- function(trans_probs, age, init_state = 0, cohort = 100000) {
   # create first row
-  if (init_state == 1) {
+  if (init_state == 0) {
     life_table <- data.frame('age' = age,
                              'lx' = cohort,
                              'dx' = cohort*trans_probs[[1]][1, 3],

@@ -5,7 +5,7 @@
 #' Calculates the probability of surviving to a certain age from an initial state and age
 #'
 #' @param init_state
-#' 1 (for healthy) or 2 (for disabled)
+#' 0 (for healthy) or 1 (for disabled)
 #' @param init_age
 #' integer between 65 and 110 denoting age of individual.
 #' @param target_age
@@ -23,12 +23,12 @@
 #' @examples
 surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state = NULL) {
   # screening for errors
-  if (init_state != 1 & init_state != 2) {
-    return('Please enter a valid initial state: 1 for healthy, 2 for disabled.')
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
   }
 
   if (!is.null(end_state)) {
-    if (end_state != 1 & end_state !=2) {
+    if (end_state != 0 & end_state !=1) {
       return('Please enter a valid end state: default NULL for alive, 1 for healthy, 2 for disabled.')
     }
   }
@@ -50,9 +50,9 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 
   # return relevant item from the probability matrix
   if (is.null(end_state)){
-    return(P[init_state,  1] + P[init_state, 2])
+    return(P[init_state+1,  1] + P[init_state+1, 2])
   } else {
-    return(P[init_state, end_state])
+    return(P[init_state+1, end_state+1])
   }
 }
 
@@ -62,7 +62,7 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 #' Create a plot of survival probabilities to alive, health, and disabled states.
 #'
 #' @param init_state
-#' 1 for healthy, 2 for disabled.
+#' 0 for healthy, 1 for disabled.
 #' @param init_age
 #' integer between 65 and 110 (inclusive) denoting inital age of individual
 #' @param trans_probs
@@ -82,7 +82,7 @@ prob_plots <- function(init_state, init_age, trans_probs) {
   # general alive probability, healthy, and disabled
   alive_probs <- c(1)
 
-  if (init_state == 1) {
+  if (init_state == 0) {
     healthy_probs <- c(1)
     disabled_probs <- c(0)
   } else {

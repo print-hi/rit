@@ -9,7 +9,7 @@ simulate_path(init_age, init_state, trans_probs, cohort = 10000)
 \arguments{
 \item{init_age}{integer between 64 and 110 denoting current age}
 
-\item{init_state}{1 for healthy, 2 for disabled}
+\item{init_state}{0 for healthy, 1 for disabled}
 
 \item{trans_probs}{a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
 

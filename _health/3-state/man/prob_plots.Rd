@@ -7,7 +7,7 @@
 prob_plots(init_state, init_age, trans_probs)
 }
 \arguments{
-\item{init_state}{1 for healthy, 2 for disabled.}
+\item{init_state}{0 for healthy, 1 for disabled.}
 
 \item{init_age}{integer between 65 and 110 (inclusive) denoting inital age of individual}
 

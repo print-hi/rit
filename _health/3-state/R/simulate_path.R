@@ -7,7 +7,7 @@
 #' @param init_age
 #' integer between 64 and 110 denoting current age
 #' @param init_state
-#' 1 for healthy, 2 for disabled
+#' 0 for healthy, 1 for disabled
 #' @param trans_probs
 #' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
 #' @param cohort
@@ -24,8 +24,8 @@
 #' @examples
 simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   # screening for errors
-  if (init_state != 1 & init_state != 2) {
-    return('Please enter a valid initial state: 1 for healthy, 2 for disabled.')
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
   }
 
   if (init_age<65 | init_age>110) {
@@ -39,15 +39,15 @@ simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   simulated_pop[, 1] <- init_state
 
   for (i in 2:ncol(simulated_pop)) {
-    simulated_pop[simulated_pop[,i-1] == 1, i] <- sample(c(1, 2, 3),
-                                                        sum(simulated_pop[, i-1] == 1),
+    simulated_pop[simulated_pop[,i-1] == 0, i] <- sample(c(0, 1, -1),
+                                                        sum(simulated_pop[, i-1] == 0),
                                                         replace = TRUE,
                                                         prob = trans_probs[[i-1]][1, ])
-    simulated_pop[simulated_pop[,i-1] == 2, i] <- sample(c(1, 2, 3),
-                                                        sum(simulated_pop[, i-1] == 2),
+    simulated_pop[simulated_pop[,i-1] == 1, i] <- sample(c(0, 1, -1),
+                                                        sum(simulated_pop[, i-1] == 1),
                                                         replace = TRUE,
                                                         prob = trans_probs[[i-1]][2, ])
-    simulated_pop[simulated_pop[,i-1] == 3, i] <- 3
+    simulated_pop[simulated_pop[,i-1] == -1, i] <- -1
   }
   return(simulated_pop)
 }
