@@ -9,7 +9,7 @@ afld(init_age, init_state, trans_probs, n = 1000)
 \arguments{
 \item{init_age}{Integer between 65 and 110 specifying the initial age of the individual}
 
-\item{init_state}{1 for healthy, 2 for disabled}
+\item{init_state}{0 for healthy, 1 for disabled}
 
 \item{trans_probs}{list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
 

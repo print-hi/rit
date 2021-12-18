@@ -37,7 +37,7 @@ afl <- function(life_table) {# average future life time
 #' @param init_age
 #' Integer between 65 and 110 specifying the initial age of the individual
 #' @param init_state
-#' 1 for healthy, 2 for disabled
+#' 0 for healthy, 1 for disabled
 #' @param trans_probs
 #' list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
 #' @param n
@@ -54,12 +54,23 @@ afld <- function(init_age, init_state, trans_probs, n = 1000) { # average future
   average_disabled_times <- c()
   for (. in 1:n) {
     simulated_path <- simulate_path(init_age, init_state, trans_probs, cohort = 1000)
-    last_index <- ncol(simulated_path)
-    # we use a trick to count the disabled time (assuming that transitions happen in middle of the year)
-    modified <- (simulated_path[, 1:last_index-1] + simulated_path[, 2:last_index])/2
-    disabled_time <- sum(modified[, -(last_index-1)] > 1 & modified[, -(last_index-1)] < 3)
-    disabled_time <- disabled_time + sum(modified[, last_index-1] > 2 & modified[, last_index-1] < 3)
-    average_disabled_times <- append(average_disabled_times, disabled_time/1000)
+    disabled_time <- sum(simulated_path == 1)
+
+    # we also assume that transitions occur in the middle of the year, so we need to
+    # count extra 1 year per block of time spent in disabled
+
+    for (i in 1:nrow(simulated_path)) {
+      indices <- which(simulated_path[i, ] == 1)
+      transitions <- indices[2:length(indices)] - indices[1:(length(indices)-1)]
+      disabled_time <- disabled_time + sum(transitions != 1) + 1
+    }
+
+    # if individuals started on disabled, then we have over accounted 0.5 years of disabled time
+    # for each individual in the simulation
+    if (init_state == 1) {
+      disabled_time <- disabled_time - 0.5*nrow(simulated_path)
+    }
+    average_disabled_time <- append(average_disabled_time, disabled_time)
   }
   return(c('Mean' = mean(average_disabled_times), 'S.dev' = sd(average_disabled_times)))
 }
