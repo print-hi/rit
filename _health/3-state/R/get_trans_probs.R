@@ -34,7 +34,7 @@ get_trans_probs <- function(model_type, param_file, age, female, year) {
     params <- param_list[6:10, ]
     v <- 0 # no stochastic component
   } else if (model_type == 'F') {
-    params <- param_list[11:15]
+    params <- param_list[11:15, ]
 
     # we also need to simulate v
     # we will simulate 300 time points, which will be sufficient until year 2297
