@@ -9,7 +9,8 @@ surv_prob(init_state, init_age, target_age, trans_probs, end_state = NULL)
 \arguments{
 \item{init_state}{0 (for healthy) or 1 (for disabled)}
 
-\item{init_age}{integer between 65 and 110 denoting age of individual.}
+\item{init_age}{integer between 65 and 110 denoting age of individual. This has to be the same initial
+age used in the calculation of transition probability matrices.}
 
 \item{target_age}{integer between 65 and 110 denoting the target age to survive to.}
 

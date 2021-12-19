@@ -7,7 +7,8 @@
 #' @param init_state
 #' 0 (for healthy) or 1 (for disabled)
 #' @param init_age
-#' integer between 65 and 110 denoting age of individual.
+#' integer between 65 and 110 denoting age of individual. This has to be the same initial
+#' age used in the calculation of transition probability matrices.
 #' @param target_age
 #' integer between 65 and 110 denoting the target age to survive to.
 #' @param trans_probs
