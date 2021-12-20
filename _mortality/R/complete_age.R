@@ -49,7 +49,7 @@ arr_apply <- function(X, FUN) {
 #'
 #' @examples
 #'
-CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL) {
+CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
 
   if (is.null(years)) {
     col_names <- colnames(rates)
@@ -61,7 +61,7 @@ CK <- function(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
   # Obtaining relevant ages
   boundary_age <- old_ages[1] - 1
   kept_ages <- ages[1]:boundary_age
-  n <- length(old_ages)
+  n <- closure_age - old_ages[1] + 1
 
   # CK for 2D matrix
   CK_mat <- function(mxy_mat) {
@@ -244,8 +244,6 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 #'
 kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
 
-  # TODO: enforce closure_age constraint
-
   if (is.null(years)) {
     col_names <- colnames(rates)
   }
@@ -291,6 +289,12 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
     kept_muxy <- muxy[kept_ages - ages[1] + 1, , drop = F]
     completed_muxy <- rbind(kept_muxy, old_muxy)
 
+
+    # Enforce closure age constraint
+    if (is.element(closure_age, old_ages)) {
+      completed_muxy[closure_age - ages[1] + 1, ] <- 20
+    }
+
     completed_muxy
 
   }
@@ -305,6 +309,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   colnames(completed_muxy_arr) <- if (is.null(years)) col_names else as.character(years)
 
   completed_muxy_arr
+
 
 
 }
