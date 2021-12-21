@@ -19,15 +19,34 @@ model=5
 age=65
 gender=0
 i=9 # wave index
-latent=0 # initial value of latenr factor
+latent=0 # initial value of latent factor
 
-# function to calculate transition rate
-transition_rate_5_frailty=function(params,age,gender,i,latent){
+# OLD function to calculate transition rate (kept for testing)
+transition_rate_5_frailty_old=function(params,age,gender,i,latent){
   vari=matrix(c(1,age,gender,i,latent),ncol=1) # construct a column vector of the variables
   ln_trans_rate=t(params)%*%vari # do matrix calculation to get a column vector of the ln transition rates
   trans_rate=exp(ln_trans_rate) # column vector of transition rates
+  mid_point_rate=1/params
   return(trans_rate)
 }
+
+# function to calculate transition rate
+transition_rate_5_frailty=function(params,age,gender,i,latent){
+  vari_x=matrix(c(1,age,gender,i,latent),ncol=1) # construct a column vector of the variables
+  vari_x1=vari_x+cbind(c(0,1,0,0,0))
+  ln_trans_rate_x=t(params)%*%vari_x # do matrix calculation to get a column vector of the ln transition rates
+  ln_trans_rate_x1=t(params)%*%vari_x1
+  
+  integral_x=exp(ln_trans_rate_x)/params[2,]
+  integral_x1=exp(ln_trans_rate_x1)/params[2,]
+  
+  trans_rate=t(exp(ln_trans_rate_x1)/params[2,]-exp(ln_trans_rate_x)/params[2,]) # column vector of transition rates
+  return(trans_rate)
+}
+
+# TESTING
+transition_rate_5_frailty_old(params,age,gender,i,latent)
+transition_rate_5_frailty(params,age,gender,i,latent)
 
 ### test package expm
 # abc=matrix(c(-0.7,0.2,0.5,0.3,-0.3,0.3,0.4,0.1,-0.8),ncol=3)
@@ -43,7 +62,7 @@ transition_probability_5_frailty=function(trans_rate){
                           c(0,0,0,0,0))
   trans_prob_matrix=expm(trans_rate_matrix)
   
-  trans_prob_matrix
+  return(trans_prob_matrix)
 }
 
 # simulation section
@@ -77,7 +96,6 @@ for (age in 65:110){
   }else{
   trans_sum_prob_matrix[[age-64]]=trans_prob_matrix[[age-64]] 
   }
-  
   # calculate the probability to be at state j after 1 year
   for (j in 1:5){
   state_status[[age-63]][j,1]=state_status[[age-64]][1,1]*trans_prob_matrix[[age-64]][1,j]+ 
@@ -85,17 +103,15 @@ for (age in 65:110){
                               state_status[[age-64]][3,1]*trans_prob_matrix[[age-64]][3,j]+
                               state_status[[age-64]][4,1]*trans_prob_matrix[[age-64]][4,j]+
                               state_status[[age-64]][5,1]*trans_prob_matrix[[age-64]][5,j]
-  # the probability/or number(if assume 10000 individuals just simply times 10000) of the state at the beginning of this year times the probability of entering state j from this state
+  # state_status is essentially the life table at each age
+  # firstly times the probability/or number(if assume 10000 individuals just simply times 10000) of the state at the beginning of this year with the probability of entering state j from this state
   # then take the sum of all possible initial states of this year
   }
-  
   latent=latent+rnorm(1) # simulate the latent factor
 }
   state_status_full=append(state_status_full,list(state_status)) # state_status_full collects all state status at all ages and of all simulations
   # the size of this list will be large
 }
-
-
 
 
 
