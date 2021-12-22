@@ -62,6 +62,10 @@ afld <- function(init_age, init_state, trans_probs, n = 500000) { # average futu
     return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
   }
 
+  if (n != as.integer(n)) {
+    return('Error: Please input an integer for n.')
+  }
+
   simulated_path <- simulate_path(init_age, init_state, trans_probs, cohort = n)
   # count disabled times
   disabled_time <- sum(simulated_path == 1)
@@ -113,6 +117,10 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 3000) {
 
   if (female != 0 & female != 1) {
     return('Error: Please input 0 or 1 to indicate female.')
+  }
+
+  if (n != as.integer(n)) {
+    return('Error: Please input an integer for n.')
   }
 
   # we simulate average time spent in disabled state for n different latent
