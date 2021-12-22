@@ -33,6 +33,8 @@ afl <- function(life_table) {# average future life time
 #' initial age and state. This average future lifetime depends on the initial state
 #' the individual is in. Generally, this is applied to non-homogeneus Markov chains,
 #' so we will use stochastic simulation to calculate this statistic.
+#' NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODEL, USE ....
+#' FOR FRAILTY MODEL.
 #'
 #' @param init_age
 #' Integer between 65 and 110 specifying the initial age of the individual
@@ -41,7 +43,7 @@ afl <- function(life_table) {# average future life time
 #' @param trans_probs
 #' list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
 #' @param n
-#' integer denoting number of simulations to make
+#' integer denoting number of individuals in simulation
 #'
 #' @return
 #' Mean and standard deviation of average disabled times across n simulations.
@@ -49,29 +51,20 @@ afl <- function(life_table) {# average future life time
 #' @export
 #'
 #' @examples
-afld <- function(init_age, init_state, trans_probs, n = 1000) { # average future lifetime disabled
+afld <- function(init_age, init_state, trans_probs, n = 500000) { # average future lifetime disabled
   # we do this by simulating stochastic lifetimes
-  average_disabled_times <- c()
-  for (. in 1:n) {
-    simulated_path <- simulate_path(init_age, init_state, trans_probs, cohort = 1000)
-    disabled_time <- sum(simulated_path == 1)
-
-    # we also assume that transitions occur in the middle of the year, so we need to
-    # count extra 1 year per block of time spent in disabled
-
-    for (i in 1:nrow(simulated_path)) {
-      indices <- which(simulated_path[i, ] == 1)
-      transitions <- indices[2:length(indices)] - indices[1:(length(indices)-1)]
-      disabled_time <- disabled_time + sum(transitions != 1) + 1
-    }
-
-    # if individuals started on disabled, then we have over accounted 0.5 years of disabled time
-    # for each individual in the simulation
-    if (init_state == 1) {
-      disabled_time <- disabled_time - 0.5*nrow(simulated_path)
-    }
-    average_disabled_time <- append(average_disabled_time, disabled_time)
+  if (init_state != 0 & init_state != 1) {
+    return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
   }
-  return(c('Mean' = mean(average_disabled_times), 'S.dev' = sd(average_disabled_times)))
+
+  simulated_path <- simulate_path(init_age, init_state, trans_probs, cohort = n)
+  # count disabled times
+  disabled_time <- sum(simulated_path == 1)
+
+  if (init_state == 1) {
+    return(disabled_time/n-0.5) # we count extra 0.5 years before the initial age that we need to take off
+  } else {
+    return(disabled_time/n)
+  }
 }
 

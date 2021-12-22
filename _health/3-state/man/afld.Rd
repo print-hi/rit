@@ -4,7 +4,7 @@
 \alias{afld}
 \title{Average future lifetime in disabled state}
 \usage{
-afld(init_age, init_state, trans_probs, n = 1000)
+afld(init_age, init_state, trans_probs, n = 5e+05)
 }
 \arguments{
 \item{init_age}{Integer between 65 and 110 specifying the initial age of the individual}
@@ -13,7 +13,7 @@ afld(init_age, init_state, trans_probs, n = 1000)
 
 \item{trans_probs}{list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
 
-\item{n}{integer denoting number of simulations to make}
+\item{n}{integer denoting number of individuals in simulation}
 }
 \value{
 Mean and standard deviation of average disabled times across n simulations.
@@ -23,4 +23,6 @@ Calculates the average future lifetime that will be spent in disabled state from
 initial age and state. This average future lifetime depends on the initial state
 the individual is in. Generally, this is applied to non-homogeneus Markov chains,
 so we will use stochastic simulation to calculate this statistic.
+NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODEL, USE ....
+FOR FRAILTY MODEL.
 }
