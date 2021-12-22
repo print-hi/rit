@@ -89,7 +89,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   trans1 <- c()
   for (i in age:109) {
     # integrate across each year to get annual piecewise transition rates
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+    integral <- integrate(cox_model, i, i+1, init_age = init_age, female = female,
                           year = year, model_type = model_type, b = b1, gamma_age = gamma_age1,
                           gamma_gender = gamma_gender1, gamma_time = gamma_time1, a = a1, v = v)
     trans1 <- append(trans1, integral$value)
@@ -98,7 +98,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # transition 2 rates
   trans2 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+    integral <- integrate(cox_model, i, i+1, init_age = init_age, female = female,
                           year = year, model_type = model_type, b = b2, gamma_age = gamma_age2,
                           gamma_gender = gamma_gender2, gamma_time = gamma_time2, a = a2, v = v)
     trans2 <- append(trans2, integral$value)
@@ -107,7 +107,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # transition 3 rates
   trans3 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+    integral <- integrate(cox_model, i, i+1, init_age = init_age, female = female,
                           year = year, model_type = model_type, b = b3, gamma_age = gamma_age3,
                           gamma_gender = gamma_gender3, gamma_time = gamma_time3, a = a3, v = v)
     trans3 <- append(trans3, integral$value)
@@ -116,7 +116,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # transition 4 rates
   trans4 <- c()
   for (i in age:109) {
-    integral <- integrate(cox_model, i, i+1, init_age = age, female = female,
+    integral <- integrate(cox_model, i, i+1, init_age = init_age, female = female,
                           year = year, model_type = model_type, b = b4, gamma_age = gamma_age4,
                           gamma_gender = gamma_gender4, gamma_time = gamma_time4, a = a4, v = v)
     trans4 <- append(trans4, integral$value)

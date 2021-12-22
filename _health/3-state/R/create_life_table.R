@@ -33,7 +33,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 
   # create first row
   if (init_state == 0) {
-    life_table <- data.frame('age' = age,
+    life_table <- data.frame('age' = init_age,
                              'lx' = cohort,
                              'dx' = cohort*trans_probs[[1]][1, 3],
                              'fx' = cohort*trans_probs[[1]][1, 2],
@@ -43,7 +43,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
                              'Dx1' = cohort*trans_probs[[1]][1, 3],
                              'Dx2' = 0)
   } else {
-    life_table <- data.frame('age' = age,
+    life_table <- data.frame('age' = init_age,
                              'lx' = 0,
                              'dx' = cohort*trans_probs[[1]][2, 3],
                              'fx' = 0,
@@ -55,7 +55,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
   }
   for (i in 2:(110-age+1)) {
     # we need to account for all transitions at each age using the transition probailities
-    life_table[i, 'age'] <- age + i - 1
+    life_table[i, 'age'] <- init_age + i - 1
     life_table[i, 'lx'] <- life_table[i-1, 'lx'] - life_table[i-1, 'Dx1'] - life_table[i-1, 'fx'] + life_table[i-1, 'rx']
     life_table[i, 'Fx'] <- life_table[i-1, 'Fx'] + life_table[i-1, 'fx'] - life_table[i-1, 'rx'] - life_table[i-1, 'Dx2']
     life_table[i, 'Lx'] <- life_table[i, 'lx'] + life_table[i, 'Fx']
