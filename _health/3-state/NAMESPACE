@@ -2,6 +2,7 @@
 
 export(afl)
 export(afld)
+export(afldF)
 export(create_life_table)
 export(get_trans_probs)
 export(prob_plots)

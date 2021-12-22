@@ -16,7 +16,7 @@ afld(init_age, init_state, trans_probs, n = 5e+05)
 \item{n}{integer denoting number of individuals in simulation}
 }
 \value{
-Mean and standard deviation of average disabled times across n simulations.
+numeric output for average time spent in disabled state
 }
 \description{
 Calculates the average future lifetime that will be spent in disabled state from

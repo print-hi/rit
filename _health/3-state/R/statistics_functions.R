@@ -46,7 +46,7 @@ afl <- function(life_table) {# average future life time
 #' integer denoting number of individuals in simulation
 #'
 #' @return
-#' Mean and standard deviation of average disabled times across n simulations.
+#' numeric output for average time spent in disabled state
 #'
 #' @export
 #'
@@ -74,6 +74,33 @@ afld <- function(init_age, init_state, trans_probs, n = 500000) { # average futu
 }
 
 
+#' Average future lifetime in disabled state (frailty moded)
+#'
+#' Performs the same function as \code{\link[tshm]{afld}}, but it requires inputs
+#' to simulate latent factor in the frailty model. This allows it to simulate the
+#' the randomness from the frailty factor into the calculation as well.
+#' NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH THE FRAILTY MODEL. USE \code{\link[tshm]{afld}}
+#' FOR STATIC AND TREND MODEL.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#' @param init_state
+#' 0 for healthy and 1 for disabled
+#' @param female
+#' 0 for non female, 1 for female
+#' @param year
+#' integer for current year
+#' @param param_file
+#' string for file path containing parameters of cox regression model
+#' @param n
+#' integer representing number of unique latent factors to simulate
+#'
+#' @return
+#' numeric output for average time spent in disabled state
+#'
+#' @export
+#'
+#' @examples
 afldF <- function(init_age, init_state, female, year, param_file, n = 3000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
