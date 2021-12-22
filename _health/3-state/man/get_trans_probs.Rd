@@ -4,14 +4,14 @@
 \alias{get_trans_probs}
 \title{Calculate transition probability matrices}
 \usage{
-get_trans_probs(model_type, param_file, age, female, year)
+get_trans_probs(model_type, param_file, init_age, female, year)
 }
 \arguments{
 \item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
 
 \item{param_file}{File containing cox regression parameters for all models.}
 
-\item{age}{integer denoting age of policy holder}
+\item{init_age}{integer denoting age of policy holder}
 
 \item{female}{takes values 1 or 0, where 1 indicates policyholder is female}
 

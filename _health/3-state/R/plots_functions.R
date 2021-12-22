@@ -79,6 +79,15 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 #'
 #' @examples
 prob_plots <- function(init_state, init_age, trans_probs) {
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
+  if (init_state != 0 & init_state != 1) {
+    return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
+  }
+
   # create 3 different probabilities:
   # general alive probability, healthy, and disabled
   alive_probs <- c(1)

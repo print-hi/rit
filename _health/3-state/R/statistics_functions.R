@@ -53,6 +53,11 @@ afl <- function(life_table) {# average future life time
 #' @examples
 afld <- function(init_age, init_state, trans_probs, n = 500000) { # average future lifetime disabled
   # we do this by simulating stochastic lifetimes
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
   if (init_state != 0 & init_state != 1) {
     return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
   }

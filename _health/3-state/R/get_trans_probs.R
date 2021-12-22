@@ -9,7 +9,7 @@
 #' string that selects model type; S for Static, T for Trend and F for Frailty
 #' @param param_file
 #' File containing cox regression parameters for all models.
-#' @param age
+#' @param init_age
 #' integer denoting age of policy holder
 #' @param female
 #' takes values 1 or 0, where 1 indicates policyholder is female
@@ -23,7 +23,16 @@
 #' @import expm
 #' @examples
 #'
-get_trans_probs <- function(model_type, param_file, age, female, year) {
+get_trans_probs <- function(model_type, param_file, init_age, female, year) {
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
+  if (female != 0 & female != 1) {
+    return('Error: Please enter 1 or 0 for female. ')
+  }
+
   # extract parameter values from parameter file
   param_list <- readxl::read_excel(param_file)
 
