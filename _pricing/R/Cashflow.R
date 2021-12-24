@@ -18,6 +18,7 @@ cf_account_based_pension <- function(policy, state, data) {
     balance <- policy$bal
     expense <- policy$exp
 
+    # Initialize output vector
     cf <- rep(0, times = length(state))
 
     i <- 1
@@ -81,6 +82,7 @@ cf_care_annuity <- function(policy, state, data) {
     benefit <- policy$benefit
     minimum <- policy$min
 
+    # Initialize output vector
     cf <- rep(0, times = length(state))
 
     i <- 1
@@ -141,6 +143,7 @@ cf_life_annuity <- function(policy, state, data) {
     benefit <- policy$benefit
     d <- policy$defer
 
+    # Initialize output vector
     cf <- rep(0, times = length(state))
 
     i <- 1
@@ -182,6 +185,7 @@ cf_pooled_annuity <- function(policy, state, data) {
     size <- policy$size
     interest <- policy$interest
 
+    # Initialize output vector
     cf <- rep(0, times = length(state))
 
     i <- 1
