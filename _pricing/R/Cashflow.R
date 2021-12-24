@@ -59,8 +59,6 @@ cf_account_based_pension <- function(policy, state, data) {
 # Assumptions made: cash flows end when account balance is negative
 # ? withdrawl all for max age (e.g. goes to family)
 
-
-
 # ---------------------------------------------------------------------------- #
 # ------------------------------- Care Annuity ------------------------------- #
 # ---------------------------------------------------------------------------- #
@@ -120,7 +118,6 @@ cf_care_annuity <- function(policy, state, data) {
 
 # For indexed benefits (e.g. inflation)
 # benefit <- benefit * (1 + index[i])
-
 
 # ---------------------------------------------------------------------------- #
 # ------------------------------- Life Annuity ------------------------------- #

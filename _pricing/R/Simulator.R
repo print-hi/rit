@@ -135,6 +135,9 @@ get_policy_scenario <- function(policy) {
 ###############################################################################
 ###### PLACEHOLDER FUNCTIONS
 
+# ------------------------------------------------------------------------
+# ---- Health State Module
+
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     health_3 <- as.matrix(read.csv("R/data/health.csv"))
@@ -152,6 +155,9 @@ get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     return(health_5)
 }
 
+# ------------------------------------------------------------------------
+# ---- Aggregate Mortality Module
+
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     mortality <- as.matrix(read.csv("R/data/mortality.csv"))
@@ -160,6 +166,7 @@ get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     return(mortality)
 }
 
+# Temporary helper function, should link to mortality module
 get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     pool <- as.matrix(read.csv("R/data/pool.csv"))
     colnames(pool) <- NULL
@@ -167,12 +174,16 @@ get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     return(pool)
 }
 
+# Temporary helper function, should link to mortality module
 get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     pool <- as.matrix(read.csv("R/data/pool-exp.csv"))
     colnames(pool) <- NULL
     rownames(pool) <- NULL
     return(pool)
 }
+
+# ------------------------------------------------------------------------
+# ---- Economic Scenario Generator Module
 
 # Temporary helper function, should link to economic module
 get_interest <- function(age = 17, seed = 0, n = 1000) {
