@@ -53,7 +53,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
                              'Dx1' = 0,
                              'Dx2' = cohort*trans_probs[[1]][2, 3])
   }
-  for (i in 2:(110-age+1)) {
+  for (i in 2:(110-init_age+1)) {
     # we need to account for all transitions at each age using the transition probailities
     life_table[i, 'age'] <- init_age + i - 1
     life_table[i, 'lx'] <- life_table[i-1, 'lx'] - life_table[i-1, 'Dx1'] - life_table[i-1, 'fx'] + life_table[i-1, 'rx']
@@ -68,3 +68,19 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 
   return(life_table)
 }
+
+create_life_tableF <- function(init_age, female, year, param_file, init_state = 0, n = 3000) {
+  life_tables <- list()
+  for (i in 1:n) {
+    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
+    LT <- tshm::create_life_table(TP, init_age)
+    life_tables[[i]] <- LT
+  }
+  return(Reduce('+', life_tables)/n)
+}
+
+
+
+
+
+
