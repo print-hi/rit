@@ -47,6 +47,8 @@ afl <- function(init_age, init_state, trans_probs) {
 #' Calculates the average future lifetime spent in disabled state using a similar
 #' idea to the curtate expected life. Function sums up transition probability into
 #' disabled state for each year.
+#' NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODELS. USE
+#' \code{\link[tshm]{afldF}} FOR FRAILTY MODEL.
 #'
 #' @param init_age
 #' integer between 65 and 110 denoting age of individual
