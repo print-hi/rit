@@ -1,8 +1,38 @@
 # statistics functions
 
-
-
+#' Average future lifetime
+#'
+#' Calculates the average future life time given initial state and age of an
+#' individual. This is calculated using the curtate expected life time, which is
+#' essentially a sum survival probabilities.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#'
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#'
+#' @param trans_probs
+#' a list of transition probability matrices, preferably generated from
+#' \code{\link[tshm]{get_trans_probs}}.
+#'
+#' @return
+#' numeric output for average future lifetime
+#'
+#' @export
+#'
+#' @examples
 afl <- function(init_age, init_state, trans_probs) {
+  # screening for errors
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+  }
+
+  if (init_age<65 | init_age>110) {
+    return('Error: init_age outside bounds of allowable age values')
+  }
+
+  # we calculate survival probs for each age and sum
   probs <- c()
   for (i in 1:(110-init_age)) {
     prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs)
@@ -12,8 +42,38 @@ afl <- function(init_age, init_state, trans_probs) {
 }
 
 
-
+#' Average future lifetime in disabled state
+#'
+#' Calculates the average future lifetime spent in disabled state using a similar
+#' idea to the curtate expected life. Function sums up transition probability into
+#' disabled state for each year.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting age of individual
+#'
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#'
+#' @param trans_probs
+#' a list of transition probability matrices, preferably generated from
+#' \code{\link[tshm]{get_trans_probs}}.
+#'
+#' @return
+#' numeric output for average future lifetime
+#'
+#' @export
+#'
+#' @examples
 afld <- function(init_age, init_state, trans_probs) {
+  # screening for errors
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+  }
+
+  if (init_age<65 | init_age>110) {
+    return('Error: init_age outside bounds of allowable age values')
+  }
+
   # we sum up probabilities of being disabled in each state
   # this is similar to curtate life expectation
   probs <- c()
