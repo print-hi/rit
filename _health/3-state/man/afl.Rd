@@ -2,21 +2,23 @@
 % Please edit documentation in R/statistics_functions.R
 \name{afl}
 \alias{afl}
-\title{average future lifetime}
+\title{Average future lifetime}
 \usage{
-afl(life_table)
+afl(init_age, init_state, trans_probs)
 }
 \arguments{
-\item{life_table}{This is a life table generated from \code{\link[tshm]{create_life_table}}.
-Since the creation of the life table already has an initial state that the cohort
-is in, the function does not require the same input.}
+\item{init_age}{integer between 65 and 110 denoting initial age of individual}
+
+\item{init_state}{0 for healthy, 1 for disabled}
+
+\item{trans_probs}{a list of transition probability matrices, preferably generated from
+\code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-Numeric output for the average future lifetime. This is calculated by taking the
-curtate expected lifetime; essentially a sum of survival probabilities.
+numeric output for average future lifetime
 }
 \description{
-Calculates average future lifetime remaining from initial age and state. Note that the
-average future lifetime calculates the remaining time left (regardless of state) from the
-initial state. So remaining lifetimes for individuals starting healthy or disabled will differ.
+Calculates the average future life time given initial state and age of an
+individual. This is calculated using the curtate expected life time, which is
+essentially a sum survival probabilities.
 }

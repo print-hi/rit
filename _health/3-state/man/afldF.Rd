@@ -4,7 +4,7 @@
 \alias{afldF}
 \title{Average future lifetime in disabled state (frailty moded)}
 \usage{
-afldF(init_age, init_state, female, year, param_file, n = 3000)
+afldF(init_age, init_state, female, year, param_file, n = 5000)
 }
 \arguments{
 \item{init_age}{integer between 65 and 110 denoting initial age of individual}
