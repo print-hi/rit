@@ -165,7 +165,7 @@ cf_life_annuity <- function(policy, state, data) {
 # benefit <- benefit * (1 + index[i])
 
 # ---------------------------------------------------------------------------- #
-# ------------------------------- Pool Annuity ------------------------------- #
+# ------------------------------ Pooled Annuity ------------------------------ #
 # ---------------------------------------------------------------------------- #
 
 #' Title
@@ -220,7 +220,7 @@ cf_pooled_annuity <- function(policy, state, data) {
 
 # calculate_unit_annuity_due <- function(time, interest, mortality_expected) {
 
-#     # Initiliaze output variable
+#     # Initialize output variable
 #     value <- 0
 
 #     # Add discounted count of lives alive at time t
@@ -277,3 +277,8 @@ cf_reverse_mortgage <- function(policy, state, data) {
 }
 
 # consider using { state[i] > -1 & state[i] < 3 } for 5 state model
+
+# ---------------------------------------------------------------------------- #
+# ----------------------------- Variable Annuity ----------------------------- #
+# ---------------------------------------------------------------------------- #
+

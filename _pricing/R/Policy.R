@@ -1,3 +1,7 @@
+# ---------------------------------------------------------------------------- #
+# --------------------------- Account Based Pension -------------------------- #
+# ---------------------------------------------------------------------------- #
+
 #' Title
 #'
 #' @param balance
@@ -13,21 +17,9 @@ create_policy_AP <- function(balance, expenses) {
 }
 # ap <- create_policy_AP(balance = 500000, expenses = 25500)
 
-#' Title
-#'
-#' @param benefit
-#' @param defer
-#'
-#' @return
-#' @export
-#'
-#' @examples
-create_policy_LA <- function(benefit, defer, increase = 0, loading) {
-    pol <- data.frame(name = c("LA"), benefit = c(benefit), defer = c(defer),
-                      increase = c(increase), loading = c(loading))
-    return(pol)
-}
-# la <- create_policy_LA(120000, 5, 0.04, 0.01)
+# ---------------------------------------------------------------------------- #
+# ------------------------------- Care Annuity ------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 create_policy_CA <- function(benefit, increase, min, loading) {
 
@@ -51,6 +43,29 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 # min <- c(10, 0 , 0, 0)
 # ca <- create_policy_CA(benefit, increase, min, 0.01)
 
+# ---------------------------------------------------------------------------- #
+# ------------------------------- Life Annuity ------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
+#'
+#' @param benefit
+#' @param defer
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_policy_LA <- function(benefit, defer, increase = 0, loading) {
+    pol <- data.frame(name = c("LA"), benefit = c(benefit), defer = c(defer),
+                      increase = c(increase), loading = c(loading))
+    return(pol)
+}
+# la <- create_policy_LA(120000, 5, 0.04, 0.01)
+
+# ---------------------------------------------------------------------------- #
+# ------------------------------ Pooled Annuity ------------------------------ #
+# ---------------------------------------------------------------------------- #
 
 create_policy_PA <- function(age, benefit, size, interest, loading) {
     pol <- data.frame(name = c("PA"), benefit = c(benefit), size = c(size),
@@ -58,6 +73,9 @@ create_policy_PA <- function(age, benefit, size, interest, loading) {
     return(pol)
 }
 
+# ---------------------------------------------------------------------------- #
+# ----------------------------- Reverse Mortgage ----------------------------- #
+# ---------------------------------------------------------------------------- #
 
 #' Title
 #'
@@ -77,6 +95,9 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 }
 # rm <- create_policy_RM(500000, 60, 0.04, 0.01)
 
+# ---------------------------------------------------------------------------- #
+# ----------------------------- Variable Annuity ----------------------------- #
+# ---------------------------------------------------------------------------- #
 
 create_policy_VA <- function() {
 
