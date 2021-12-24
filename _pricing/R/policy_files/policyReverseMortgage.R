@@ -23,11 +23,16 @@ cf_reverse_mortgage <- function(policy, state, data) {
     loan <- LVR * value
     cf[1] <- loan
 
-    # Accrue interest of loan and Appreciate house value
+    # Accrue interest of loan + Appreciate house value
     i <- 1
     while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
+
+        # Compound loan value over 1 year period
         loan <- loan * exp(data$rfree[i] + margin)
+
+        # Update house value after 1 year period
         value <- value * data$house[i]
+
         i <- i + 1
     }
 
