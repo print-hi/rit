@@ -1,7 +1,7 @@
 #' Policy Cashflow Simulator
 #'
 #' Simulate cash flows using Monte-Carlo methods for various policies
-#' @name cashflow
+#' @name simulate_cf
 #' @param policy
 #' Policy type to simulate:
 #' `policy = "AP"` (Account Based Pension),
@@ -31,7 +31,7 @@
 #' @export cashflow
 #' @examples
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
-simulate_cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
+simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 
     # Set cash flow function based on input policy
     cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
