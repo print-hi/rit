@@ -70,8 +70,10 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 # ca <- create_policy_CA(benefit, increase, min, 0.01)
 
 
-create_policy_PA <- function() {
-
+create_policy_PA <- function(age, benefit, size, interest, loading) {
+    pol <- data.frame(name = c("PA"), benefit = c(benefit), size = c(size),
+                      interest = c(interest), loading = c(loading))
+    return(pol)
 }
 
 create_policy_VA <- function() {

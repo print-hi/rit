@@ -42,9 +42,7 @@ cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
                                       "LA" = cf_life_annuity)
 
     # Get matrix of states for each path
-    if (policy$name[1] == "RM") {
-        state <- get_health_state_3(age, sex, seed, n)
-    } else if (policy$name[1] == "CA") {
+    if (policy$name[1] == "CA") {
         if (nrow(policy) == 2) {
             state <- get_health_state_3(age, sex, seed, n)
         } else if (nrow(policy) == 4) {
@@ -52,23 +50,14 @@ cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
         } else {
             print("error")
         }
+    } else if (policy$name[1] == "RM") {
+        state <- get_health_state_3(age, sex, seed, n)
     } else {
         state <- get_aggregate_mortality(age, sex, seed, n)
     }
 
     # Get matrix of economic variables for each path
-    intrs <- get_interest(age, seed, n)
-    infla <- get_inflation(age, seed, n)
-    stock <- get_stock_price(age, seed, n)
-    house <- get_house_price(age, seed, n)
-
-    # Organise economic inputs into a data.frame for each path
-    data <- list()
-    for (i in seq(1, nrow(state))) {
-        temp <- data.frame(house = house[i, ], infla = infla[i, ],
-                           intrs = intrs[i, ], stock = stock[i, ])
-        data <- append(data, list(temp))
-    }
+    data <- get_policy_scenario(policy)
 
     # Initialize output matrix
     cf <- matrix(nrow = nrow(state), ncol = ncol(state))
@@ -78,6 +67,70 @@ cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 
     return(cf)
 }
+
+
+###############################################################################
+###### POLICY SCENARIO FUNCTION
+
+# Organise economic inputs into a data.frame for each path
+get_policy_scenario <- function(policy) {
+
+    if (policy$name[1] == "AP") {
+        infla <- get_inflation(age, seed, n)
+        stock <- get_stock_price(age, seed, n)
+        data <- list()
+        for (i in seq(1, nrow(state))) {
+            temp <- data.frame(infla = infla[i, ], stock = stock[i, ])
+            data <- append(data, list(temp))
+        }
+
+    } else if (policy$name[1] == "CA" | policy$name[1] == "LA") {
+        infla <- get_inflation(age, seed, n)
+        data <- list()
+        for (i in seq(1, nrow(state))) {
+            temp <- data.frame(infla = infla[i, ])
+            data <- append(data, list(temp))
+        }
+    } else if (policy$name[1] == "PA") {
+        pool_r <- get_pool_realised(age, seed, n)
+        pool_e <- get_pool_expected(age, seed, n)
+        stock <- get_stock_price(age, seed, n)
+        data <- list()
+        for (i in seq(1, nrow(state))) {
+            temp <- data.frame(pool_r = pool_r[i, ], pool_e = pool_e,
+                               stock = stock[i, ])
+            data <- append(data, list(temp))
+        }
+    } else if (policy$name[1] == "RM") {
+        intrs <- get_interest(age, seed, n)
+        infla <- get_inflation(age, seed, n)
+        stock <- get_stock_price(age, seed, n)
+        house <- get_house_price(age, seed, n)
+        data <- list()
+        for (i in seq(1, nrow(state))) {
+            temp <- data.frame(house = house[i, ], infla = infla[i, ],
+                               intrs = intrs[i, ], stock = stock[i, ])
+            data <- append(data, list(temp))
+        }
+    } else if (policy$name[1] == "VA") {
+        intrs <- get_interest(age, seed, n)
+        infla <- get_inflation(age, seed, n)
+        stock <- get_stock_price(age, seed, n)
+        house <- get_house_price(age, seed, n)
+        data <- list()
+        for (i in seq(1, nrow(state))) {
+            temp <- data.frame(house = house[i, ], infla = infla[i, ],
+                               intrs = intrs[i, ], stock = stock[i, ])
+            data <- append(data, list(temp))
+        }
+    } else {
+        print("error")
+    }
+
+    return(data)
+
+}
+
 
 ###############################################################################
 ###### PLACEHOLDER FUNCTIONS
@@ -105,6 +158,20 @@ get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
     colnames(mortality) <- NULL
     rownames(mortality) <- NULL
     return(mortality)
+}
+
+get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
+    pool <- as.matrix(read.csv("R/data/pool.csv"))
+    colnames(pool) <- NULL
+    rownames(pool) <- NULL
+    return(pool)
+}
+
+get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
+    pool <- as.matrix(read.csv("R/data/pool-exp.csv"))
+    colnames(pool) <- NULL
+    rownames(pool) <- NULL
+    return(pool)
 }
 
 # Temporary helper function, should link to economic module
