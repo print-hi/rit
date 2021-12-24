@@ -69,6 +69,30 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
   return(life_table)
 }
 
+#' Create life table (frailty model)
+#'
+#' Creates a large number of life tables simulated from different latent factor paths
+#' and averages them to create 1 life table output.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#' @param female
+#' 1 for female, 0 for male
+#' @param year
+#' integer denoting year of individual
+#' @param param_file
+#' file containing parameters of cox regression model
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#' @param n
+#' number of latent factor paths to simulate
+#'
+#' @return
+#' Dataframe containing life table
+#'
+#' @export
+#'
+#' @examples
 create_life_tableF <- function(init_age, female, year, param_file, init_state = 0, n = 3000) {
   life_tables <- list()
   for (i in 1:n) {
