@@ -23,7 +23,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
     # Accrue interest of loan and Appreciate house value
     i <- 1
     while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
-        loan <- loan * exp(data$rfree[i] + policy$margin + prem)
+        loan <- loan * exp(data$rfree[i] + policy$margin)
         value <- value * data$house[i]
         i <- i + 1
     }
