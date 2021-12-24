@@ -115,7 +115,7 @@ afld <- function(init_age, init_state, trans_probs) {
 #' @export
 #'
 #' @examples
-afldF <- function(init_age, init_state, female, year, param_file, n = 3000) {
+afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
@@ -139,15 +139,8 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 3000) {
   for(. in 1:n) {
     # simulate transition probabilities and life time paths
     TP <- get_trans_probs('F', param_file, init_age, female, year)
-    simulated_path <- simulate_path(init_age, init_state, TP)
-    disabled_time <- sum(simulated_path == 1)
-
-    # add result to simulations
-    if (init_state == 1) {
-      avg_disabled_times <- append(avg_disabled_times, disabled_time/10000-0.5)
-    } else {
-      avg_disabled_times <- append(avg_disabled_times, disabled_time/10000)
-    }
+    disabled_time <- tshm::afld(init_age, init_state, TP)
+    avg_disabled_times <- append(avg_disabled_times, disabled_time)
   }
   return(mean(avg_disabled_times))
 }
