@@ -1,207 +1,271 @@
-#' Policy Cashflow Simulator
+# ---------------------------------------------------------------------------- #
+# --------------------------- Account Based Pension -------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
 #'
-#' Simulate cash flows using Monte-Carlo methods for various policies
-#' @name cashflow
 #' @param policy
-#' Policy type to simulate:
-#' `policy = "AP"` (Account Based Pension),
-#' `"RM"` (Reverse Mortgage),
-#' `"LA"` (Life Annuity),
-#' `"CA"` (Care Annuity),
-#' `"PA"` (Pooled Annuity),
-#' `"VA"` (Variable Annuity)
-#' @param age
-#' Initial age of policyholder in years
-#' @param sex
-#' sex of policyholder, `sex = "F"` (female), `"M"` (male)
-#' @param seed
-#' Seed for random generator
-#' @param n
-#' Number of paths to simulate (Monte-Carlo method)
-#' @param value
-#' Amount of
-#' @param withdrawl
-#' ABP only, amount withdrawn in first year from account i.e. yearly expense
-#' @param loading
-#' Number of paths to simulate (Monte-Carlo method)
-#' @param gmwb
-#' Number of paths to simulate (Monte-Carlo method)
+#' @param state
+#' @param data
+#'
 #' @return
-#' Matrix of cash flow vectors for each simulated path
-#' @export cashflow
+#' @export
+#'
 #' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
-cashflow <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
+cf_account_based_pension <- function(policy, state, data) {
 
-    # Set cash flow function based on input policy
-    cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
-                                      "RM" = cf_reverse_mortgage,
-                                      "VA" = cf_variable_annuity,
-                                      "PA" = cf_pooled_annuity,
-                                      "CA" = cf_care_annuity,
-                                      "LA" = cf_life_annuity)
+    # Extract relevant policy variables
+    balance <- policy$bal
+    expense <- policy$exp
 
-    # Get matrix of states for each path
-    if (policy$name[1] == "CA") {
-        if (nrow(policy) == 2) {
-            state <- get_health_state_3(age, sex, seed, n)
-        } else if (nrow(policy) == 4) {
-            state <- get_health_state_5(age, sex, seed, n)
-        } else {
-            print("error")
+    cf <- rep(0, times = length(state))
+
+    i <- 1
+    while (state[i] != -1) {    # while PH is not dead
+
+        # Withdraw yearly expense from account
+        balance <- balance - expense
+
+        # Reduce withdrawl amount + exit loop if fund value is negative
+        if (balance < 0) {
+            cf[i] <- expense + balance
+            break
         }
-    } else if (policy$name[1] == "RM") {
-        state <- get_health_state_3(age, sex, seed, n)
-    } else {
-        state <- get_aggregate_mortality(age, sex, seed, n)
+
+        # Record cashflow to output vector
+        cf[i] <- expense
+
+        # Update balance and yearly expense
+        balance <- balance * (1 + data$stock[i])
+        expense <- expense * (1 + data$infla[i])
+
+        i <- i + 1
     }
-
-    # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy)
-
-    # Initialize output matrix
-    cf <- matrix(nrow = nrow(state), ncol = ncol(state))
-
-    # Generate cash flows for each state vector
-    for (i in seq(1, nrow(state))) cf[i, ] <- cf_func(policy, state[i, ], data[[i]])
 
     return(cf)
 }
 
 
-###############################################################################
-###### POLICY SCENARIO FUNCTION
+# Accounting for any remaining funds in account ??
+# if (i > length(state)) {
+#     cf[length(state)] <- cf[length(state)] + balance
+# }
+# else {
+#     cf[i] <- balance
+# }
 
-# Organise economic inputs into a data.frame for each path
-get_policy_scenario <- function(policy) {
 
-    if (policy$name[1] == "AP") {
-        infla <- get_inflation(age, seed, n)
-        stock <- get_stock_price(age, seed, n)
-        data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(infla = infla[i, ], stock = stock[i, ])
-            data <- append(data, list(temp))
+# Assumptions made: cash flows end when account balance is negative
+# ? withdrawl all for max age (e.g. goes to family)
+
+
+
+# ---------------------------------------------------------------------------- #
+# ------------------------------- Care Annuity ------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cf_care_annuity <- function(policy, state, data) {
+
+    # Extract relevant policy variables
+    increase <- policy$increase
+    benefit <- policy$benefit
+    minimum <- policy$min
+
+    cf <- rep(0, times = length(state))
+
+    i <- 1
+    while (state[i] != -1) {     # while PH is not dead
+
+        # Get base level benefit for being alive
+        cf[i] <- benefit[1]
+
+        # Add additional benefits from LTC: state[i] = 1 (M), 2 (D), 3(MD)
+        if (state[i] > 0) {
+            cf[i] <- cf[i] + benefit[state[i] + 1]
         }
 
-    } else if (policy$name[1] == "CA" | policy$name[1] == "LA") {
-        infla <- get_inflation(age, seed, n)
-        data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(infla = infla[i, ])
-            data <- append(data, list(temp))
-        }
-    } else if (policy$name[1] == "PA") {
-        pool_r <- get_pool_realised(age, seed, n)
-        pool_e <- get_pool_expected(age, seed, n)
-        stock <- get_stock_price(age, seed, n)
-        data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(pool_r = pool_r[i, ], pool_e = pool_e,
-                               stock = stock[i, ])
-            data <- append(data, list(temp))
-        }
-    } else if (policy$name[1] == "RM") {
-        intrs <- get_interest(age, seed, n)
-        infla <- get_inflation(age, seed, n)
-        stock <- get_stock_price(age, seed, n)
-        house <- get_house_price(age, seed, n)
-        data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(house = house[i, ], infla = infla[i, ],
-                               intrs = intrs[i, ], stock = stock[i, ])
-            data <- append(data, list(temp))
-        }
-    } else if (policy$name[1] == "VA") {
-        intrs <- get_interest(age, seed, n)
-        infla <- get_inflation(age, seed, n)
-        stock <- get_stock_price(age, seed, n)
-        house <- get_house_price(age, seed, n)
-        data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(house = house[i, ], infla = infla[i, ],
-                               intrs = intrs[i, ], stock = stock[i, ])
-            data <- append(data, list(temp))
-        }
-    } else {
-        print("error")
+        # For flat-rate increases of benefits
+        benefit <- benefit * (1 + increase)
+
+        i <- i + 1
     }
 
-    return(data)
+    # Account for any cashflows associated with minimum guarantees
+    while (i <= max(minimum)) {
 
+        # Create mask for all policies with min guarantees for current period
+        mask <- ifelse((minimum - i + 1) > 0, as.logical(minimum), 0)
+        cf[i] <- sum(mask * benefit)
+
+        # For flat-rate increases of benefits
+        benefit <- benefit * (1 + increase)
+
+        i <- i + 1
+    }
+
+    return(cf)
 }
 
+# For indexed benefits (e.g. inflation)
+# benefit <- benefit * (1 + index[i])
 
-###############################################################################
-###### PLACEHOLDER FUNCTIONS
 
-# Temporary helper function, should link to health-state module
-get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_3 <- as.matrix(read.csv("R/data/health.csv"))
-    health_3 <- ifelse(health_3 > 0, -2, health_3)
-    colnames(health_3) <- NULL
-    rownames(health_3) <- NULL
-    return(health_3)
+# ---------------------------------------------------------------------------- #
+# ------------------------------- Life Annuity ------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cf_life_annuity <- function(policy, state, data) {
+
+    # Extract relevant policy variables
+    increase <- policy$increase
+    benefit <- policy$benefit
+    d <- policy$defer
+
+    cf <- rep(0, times = length(state))
+
+    i <- 1
+    while (state[i] != -1) {     # while PH is not dead
+
+        # Get benefit if alive after deferment period
+        cf[i] <- ifelse (i <= d, 0, benefit)
+
+        # For flat-rate increase
+        benefit <- benefit * (1 + increase)
+
+        i <- i + 1
+    }
+
+    return(cf)
 }
 
-# Temporary helper function, should link to health-state module
-get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_5 <- as.matrix(read.csv("R/data/health.csv"))
-    colnames(health_5) <- NULL
-    rownames(health_5) <- NULL
-    return(health_5)
+# For indexed benefits (e.g. inflation)
+# benefit <- benefit * (1 + index[i])
+
+# ---------------------------------------------------------------------------- #
+# ------------------------------- Pool Annuity ------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cf_pooled_annuity <- function(policy, state, data) {
+
+    # Extract relevant policy variables
+    benefit <- policy$benefit
+    size <- policy$size
+    interest <- policy$interest
+
+    cf <- rep(0, times = length(state))
+
+    i <- 1
+    while (state[i] != -1) {     # while PH is not dead
+
+        # Get benefit if alive
+        cf[i] <- benefit
+
+        # Skip rate calculations for final year
+        if (i + 1 > length(state)) {
+            break
+        }
+
+        # Calculate expected and realized survivorship rates
+        suv_e <- data$pool_e[i + 1] / data$pool_e[i]
+        suv_r <- data$pool_r[i + 1] / data$pool_r[i]
+
+        # Increase benefit by ratio of rates
+        benefit <- benefit * suv_e / suv_r
+
+        # Compound realized + discount expected rates
+        benefit <- benefit * (1 + data$stock) / (1 + interest)
+
+        i <- i + 1
+    }
+
+    return(cf)
 }
 
-# Temporary helper function, should link to mortality module
-get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    mortality <- as.matrix(read.csv("R/data/mortality.csv"))
-    colnames(mortality) <- NULL
-    rownames(mortality) <- NULL
-    return(mortality)
+# For indexed benefits (e.g. inflation)
+# benefit <- benefit * (1 + index[i])
+
+calculate_unit_annuity_due <- function(time, interest, mortality_expected) {
+
+    value <- 0
+    discount <- 1
+    for (i in seq(time, length(mortality_expected))) {
+        value <- value + (discount * mortality_expected[i])
+        discount <- discount / (1 + interest)
+    }
+
+    value <- value/mortality_expected[1]
+
+    return(value)
 }
 
-get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool.csv"))
-    colnames(pool) <- NULL
-    rownames(pool) <- NULL
-    return(pool)
+# ---------------------------------------------------------------------------- #
+# ----------------------------- Reverse Mortgage ----------------------------- #
+# ---------------------------------------------------------------------------- #
+
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cf_reverse_mortgage <- function(policy, state, data) {
+
+    # Initialize output vector
+    cf <- rep(0, times = length(state))
+
+    # Get loan amount for policyholder
+    loan <- policy$LVR * policy$value
+    cf[1] <- loan
+
+    # Track house value over time
+    value <- policy$value
+
+    # Accrue interest of loan and Appreciate house value
+    i <- 1
+    while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
+        loan <- loan * exp(data$intrs[i] + policy$margin + prem)
+        value <- value * data$house[i]
+        i <- i + 1
+    }
+
+    # Calculate cashflow from sale (includes negative value)
+    cf[i] <- (1 - policy$cost) * value - loan
+
+    return(cf)
 }
 
-get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool-exp.csv"))
-    colnames(pool) <- NULL
-    rownames(pool) <- NULL
-    return(pool)
-}
-
-# Temporary helper function, should link to economic module
-get_interest <- function(age = 17, seed = 0, n = 1000) {
-    interest <- as.matrix(read.csv("R/data/interest.csv"))
-    colnames(interest) <- NULL
-    rownames(interest) <- NULL
-    return(interest)
-}
-
-# Temporary helper function, should link to economic module
-get_inflation <- function(age = 17, seed = 0, n = 1000) {
-    inflation <- as.matrix(read.csv("R/data/inflation.csv"))
-    colnames(inflation) <- NULL
-    rownames(inflation) <- NULL
-    return(inflation)
-}
-
-# Temporary helper function, should link to economic module
-get_house_price <- function(age = 17, seed = 0, n = 1000) {
-    house <- as.matrix(read.csv("R/data/house.csv"))
-    colnames(house) <- NULL
-    rownames(house) <- NULL
-    return(house)
-}
-
-# Temporary helper function, should link to economic module
-get_stock_price <- function(age = 17, seed = 0, n = 1000) {
-    stock <- as.matrix(read.csv("R/data/stock.csv"))
-    colnames(stock) <- NULL
-    rownames(stock) <- NULL
-    return(stock)
-}
+# consider using { state[i] > -1 & state[i] < 3 } for 5 state model

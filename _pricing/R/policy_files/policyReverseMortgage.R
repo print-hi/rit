@@ -17,11 +17,10 @@ cf_reverse_mortgage <- function(policy, state, data) {
     loan <- policy$LVR * policy$value
     cf[1] <- loan
 
-    prem <- calculate_fair_premium_RM()
-
+    # Track house value over time
     value <- policy$value
 
-    # Accrue interest of loan and house value
+    # Accrue interest of loan and Appreciate house value
     i <- 1
     while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
         loan <- loan * exp(data$intrs[i] + policy$margin + prem)
@@ -29,12 +28,10 @@ cf_reverse_mortgage <- function(policy, state, data) {
         i <- i + 1
     }
 
-    # Calculate any profits leftover from sale
-    excess <- (1 - policy$cost) * value - loan
-    # cf[i] <- max(excess, 0)
-
-    # For debugging
-    cf[i] <- excess
+    # Calculate cashflow from sale (includes negative value)
+    cf[i] <- (1 - policy$cost) * value - loan
 
     return(cf)
 }
+
+# consider using { state[i] > -1 & state[i] < 3 } for 5 state model

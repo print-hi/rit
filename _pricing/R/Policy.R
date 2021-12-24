@@ -15,24 +15,6 @@ create_policy_AP <- function(balance, expenses) {
 
 #' Title
 #'
-#' @param value
-#' @param age
-#' @param cost
-#' @param margin
-#'
-#' @return
-#' @export
-#'
-#' @examples
-create_policy_RM <- function(value, LVR, trans_cost, margin) {
-    pol <- data.frame(name = c("RM"), value = c(value), LVR = c(LVR),
-                      trans_cost = c(trans_cost), margin = c(margin))
-    return(pol)
-}
-# rm <- create_policy_RM(500000, 60, 0.04, 0.01)
-
-#' Title
-#'
 #' @param benefit
 #' @param defer
 #'
@@ -76,15 +58,28 @@ create_policy_PA <- function(age, benefit, size, interest, loading) {
     return(pol)
 }
 
+
+#' Title
+#'
+#' @param value
+#' @param age
+#' @param cost
+#' @param margin
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_policy_RM <- function(value, LVR, trans_cost, margin) {
+    pol <- data.frame(name = c("RM"), value = c(value), LVR = c(LVR),
+                      trans_cost = c(trans_cost), margin = c(margin))
+    return(pol)
+}
+# rm <- create_policy_RM(500000, 60, 0.04, 0.01)
+
+
 create_policy_VA <- function() {
 
 }
-
-
-
-
-
-
-
 
 

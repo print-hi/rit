@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
