@@ -249,26 +249,29 @@ cf_pooled_annuity <- function(policy, state, data) {
 #' @examples
 cf_reverse_mortgage <- function(policy, state, data) {
 
+    # Extract relevant policy variables
+    LVR <- policy$LVR
+    cost <- policy$cost
+    value <- policy$value
+    margin <- policy$margin
+
     # Initialize output vector
     cf <- rep(0, times = length(state))
 
     # Get loan amount for policyholder
-    loan <- policy$LVR * policy$value
+    loan <- LVR * value
     cf[1] <- loan
-
-    # Track house value over time
-    value <- policy$value
 
     # Accrue interest of loan and Appreciate house value
     i <- 1
     while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
-        loan <- loan * exp(data$rfree[i] + policy$margin)
+        loan <- loan * exp(data$rfree[i] + margin)
         value <- value * data$house[i]
         i <- i + 1
     }
 
     # Calculate cashflow from sale (includes negative value)
-    cf[i] <- (1 - policy$cost) * value - loan
+    cf[i] <- (1 - cost) * value - loan
 
     return(cf)
 }
