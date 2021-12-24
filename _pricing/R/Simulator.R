@@ -72,12 +72,15 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 ###############################################################################
 ###### POLICY SCENARIO FUNCTION
 
-# Organise economic inputs into a data.frame for each path
 get_policy_scenario <- function(policy) {
 
     if (policy$name[1] == "AP") {
+
+        # Get all relevant economic variables
         infla <- get_inflation(age, seed, n)
         stock <- get_stock_price(age, seed, n)
+
+        # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, nrow(state))) {
             temp <- data.frame(infla = infla[i, ], stock = stock[i, ])
@@ -85,44 +88,63 @@ get_policy_scenario <- function(policy) {
         }
 
     } else if (policy$name[1] == "CA" | policy$name[1] == "LA") {
+
+        # Get all relevant economic variables
         infla <- get_inflation(age, seed, n)
+
+        # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, nrow(state))) {
             temp <- data.frame(infla = infla[i, ])
             data <- append(data, list(temp))
         }
+
     } else if (policy$name[1] == "PA") {
+
+        # Get all relevant health variables for pool
         pool_r <- get_pool_realised(age, seed, n)
         pool_e <- get_pool_expected(age, seed, n)
+
+        # Get all relevant economic variables
         stock <- get_stock_price(age, seed, n)
+
+        # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, nrow(state))) {
             temp <- data.frame(pool_r = pool_r[i, ], pool_e = pool_e,
                                stock = stock[i, ])
             data <- append(data, list(temp))
         }
+
     } else if (policy$name[1] == "RM") {
-        intrs <- get_interest(age, seed, n)
-        infla <- get_inflation(age, seed, n)
-        stock <- get_stock_price(age, seed, n)
+
+        # Get all relevant economic variables
+        rfree <- get_risk_free(age, seed, n)
         house <- get_house_price(age, seed, n)
+
+        # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, nrow(state))) {
-            temp <- data.frame(house = house[i, ], infla = infla[i, ],
-                               intrs = intrs[i, ], stock = stock[i, ])
+            temp <- data.frame(house = house[i, ], rfree = rfree[i, ])
             data <- append(data, list(temp))
         }
+
     } else if (policy$name[1] == "VA") {
+
+        # Get all relevant economic / health variables
         intrs <- get_interest(age, seed, n)
         infla <- get_inflation(age, seed, n)
         stock <- get_stock_price(age, seed, n)
         house <- get_house_price(age, seed, n)
+
+        # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, nrow(state))) {
             temp <- data.frame(house = house[i, ], infla = infla[i, ],
                                intrs = intrs[i, ], stock = stock[i, ])
             data <- append(data, list(temp))
         }
+
     } else {
         print("error")
     }
@@ -191,6 +213,14 @@ get_interest <- function(age = 17, seed = 0, n = 1000) {
     colnames(interest) <- NULL
     rownames(interest) <- NULL
     return(interest)
+}
+
+# Temporary helper function, should link to economic module
+get_risk_free <- function(age = 17, seed = 0, n = 1000) {
+    risk_free <- as.matrix(read.csv("R/data/interest.csv"))
+    colnames(risk_free) <- NULL
+    rownames(risk_free) <- NULL
+    return(risk_free)
 }
 
 # Temporary helper function, should link to economic module
