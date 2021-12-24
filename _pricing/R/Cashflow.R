@@ -178,8 +178,8 @@ cf_life_annuity <- function(policy, state, data) {
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
-    benefit <- policy$benefit
     size <- policy$size
+    benefit <- policy$benefit
     interest <- policy$interest
 
     # Initialize output vector

@@ -11,8 +11,8 @@
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
-    benefit <- policy$benefit
     size <- policy$size
+    benefit <- policy$benefit
     interest <- policy$interest
 
     cf <- rep(0, times = length(state))
