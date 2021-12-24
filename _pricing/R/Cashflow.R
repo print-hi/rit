@@ -220,13 +220,17 @@ cf_pooled_annuity <- function(policy, state, data) {
 
 calculate_unit_annuity_due <- function(time, interest, mortality_expected) {
 
+    # Initiliaze output variable
     value <- 0
+
+    # Add discounted count of lives alive at time t
     discount <- 1
     for (i in seq(time, length(mortality_expected))) {
         value <- value + (discount * mortality_expected[i])
         discount <- discount / (1 + interest)
     }
 
+    # Divide sum by size of initial population to get unit annuity-due
     value <- value/mortality_expected[1]
 
     return(value)
