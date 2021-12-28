@@ -21,6 +21,17 @@ create_policy_AP <- function(balance, expenses) {
 # ------------------------------- Care Annuity ------------------------------- #
 # ---------------------------------------------------------------------------- #
 
+#' Title
+#'
+#' @param benefit
+#' @param increase
+#' @param min
+#' @param loading
+#'
+#' @return
+#' @export
+#'
+#' @examples
 create_policy_CA <- function(benefit, increase, min, loading) {
 
     if (length(benefit) != length(increase) & length(benefit) != length(min)) {
@@ -51,6 +62,8 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 #'
 #' @param benefit
 #' @param defer
+#' @param increase
+#' @param loading
 #'
 #' @return
 #' @export
@@ -67,7 +80,18 @@ create_policy_LA <- function(benefit, defer, increase = 0, loading) {
 # ------------------------------ Pooled Annuity ------------------------------ #
 # ---------------------------------------------------------------------------- #
 
-create_policy_PA <- function(age, benefit, size, interest, loading) {
+#' Title
+#'
+#' @param benefit
+#' @param size
+#' @param interest
+#' @param loading
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_policy_PA <- function(benefit, size, interest, loading) {
     pol <- data.frame(name = c("PA"), benefit = c(benefit), size = c(size),
                       interest = c(interest), loading = c(loading))
     return(pol)
@@ -80,9 +104,9 @@ create_policy_PA <- function(age, benefit, size, interest, loading) {
 #' Title
 #'
 #' @param value
-#' @param age
-#' @param cost
 #' @param margin
+#' @param LVR
+#' @param trans_cost
 #'
 #' @return
 #' @export
@@ -99,8 +123,29 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 # ----------------------------- Variable Annuity ----------------------------- #
 # ---------------------------------------------------------------------------- #
 
-create_policy_VA <- function() {
-
+#' Title
+#'
+#' @param value
+#' @param prop
+#' @param step_time
+#' @param step_size
+#' @param s_fee
+#' @param g_fee
+#'
+#' @return
+#' @export
+#'
+#' @examples
+create_policy_VA <- function(value, length, prop, s_fee, g_fee) {
+    pol <- data.frame(name = c("RM"), value = c(value), length = c(length),
+                      prop = c(prop),  s_fee = c(s_fee), g_fee = c(g_fee))
+    return(pol)
 }
 
-
+# create_policy_VA <- function(value, length, prop, s_fee, g_fee, step_time,
+#                              step_size) {
+#     pol <- data.frame(name = c("RM"), value = c(value), length = c(length),
+#                       prop = c(prop),  s_fee = c(s_fee), g_fee = c(g_fee),
+#                       step_time = c(step_time), step_size = c(step_size))
+#     return(pol)
+# }

@@ -59,11 +59,14 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
     # Get matrix of economic variables for each path
     data <- get_policy_scenario(policy)
 
+    # Get dimensions of state matrix
+    nrow_s = nrow(state); ncol_s = ncol(state)
+
     # Initialize output matrix
-    cf <- matrix(nrow = nrow(state), ncol = ncol(state))
+    cf <- matrix(nrow = nrow_s, ncol = ncol_s)
 
     # Generate cash flows for each state vector
-    for (i in seq(1, nrow(state))) cf[i, ] <- cf_func(policy, state[i, ], data[[i]])
+    for (i in seq(1, nrow_s)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
 
     return(cf)
 }
