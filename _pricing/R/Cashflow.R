@@ -270,6 +270,8 @@ cf_variable_annuity <- function(policy, state, data) {
         # Calculate withdraw limit for current period
         withdraw_limit <- min(max_withdraw, total_remaining)
 
+        # Receive account balance at maturity, otherwise withdrawn maximum
+        # amount admissible and update values
         if (i >= contract_length) {
             cf[i] <- account_value
             break
