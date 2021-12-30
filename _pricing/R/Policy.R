@@ -71,6 +71,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
                       benefit = c(benefit),
                       min = c(min),
                       loading = c(loading))
+
     return(pol)
 }
 # benefit <- c(12000, 24000, 24000, 18000)
@@ -110,7 +111,6 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
                       defer = c(defer),
                       increase = c(increase),
                       loading = c(loading))
-
 
     return(pol)
 }
