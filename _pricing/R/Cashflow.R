@@ -2,16 +2,6 @@
 # --------------------------- Account Based Pension -------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
 cf_account_based_pension <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -22,7 +12,7 @@ cf_account_based_pension <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] != -1) {    # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {    # while PH is not dead
 
         # Withdraw yearly expense from account
         balance <- balance - expense
@@ -63,16 +53,7 @@ cf_account_based_pension <- function(policy, state, data) {
 # ------------------------------- Care Annuity ------------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 cf_care_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -84,7 +65,7 @@ cf_care_annuity <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] != -1) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
         # Get base level benefit for being alive
         cf[i] <- benefit[1]
@@ -123,16 +104,7 @@ cf_care_annuity <- function(policy, state, data) {
 # ------------------------------- Life Annuity ------------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 cf_life_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -144,7 +116,7 @@ cf_life_annuity <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] != -1) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
         # Get benefit if alive after deferment period
         cf[i] <- ifelse (i <= d, 0, benefit)
@@ -165,16 +137,7 @@ cf_life_annuity <- function(policy, state, data) {
 # ------------------------------ Pooled Annuity ------------------------------ #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -186,7 +149,7 @@ cf_pooled_annuity <- function(policy, state, data) {
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] != -1) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
         # Get benefit if alive
         cf[i] <- benefit
@@ -204,7 +167,7 @@ cf_pooled_annuity <- function(policy, state, data) {
         benefit <- benefit * suv_e / suv_r
 
         # Compound realized + discount expected rates
-        benefit <- benefit * (1 + data$stock) / (1 + interest)
+        benefit <- benefit * (1 + data$stock[i]) / (1 + interest)
 
         i <- i + 1
     }
@@ -237,21 +200,12 @@ cf_pooled_annuity <- function(policy, state, data) {
 # ----------------------------- Reverse Mortgage ----------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 cf_reverse_mortgage <- function(policy, state, data) {
 
     # Extract relevant policy variables
     LVR <- policy$LVR
-    cost <- policy$cost
+    cost <- policy$trans_cost
     value <- policy$value
     margin <- policy$margin
 
@@ -263,7 +217,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
     cf[1] <- loan
 
     i <- 1
-    while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
+    while (state[i] == 0 & i < length(state)) {     # while PH is healthy
 
         # Compound loan value over 1 year period
         loan <- loan * exp(data$rfree[i] + margin)
@@ -286,16 +240,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
 # ----------------------------- Variable Annuity ----------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
-#'
-#' @param policy
-#' @param state
-#' @param data
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 cf_variable_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -317,7 +262,7 @@ cf_variable_annuity <- function(policy, state, data) {
     account_value <- value * data$stock[1]
 
     i <- 2
-    while (state[i] != -1) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
         # Compound account value - expenses for withdrawl guarantee
         account_value <- account_value * data$stock[i] * exp(-g_fee)
@@ -325,11 +270,11 @@ cf_variable_annuity <- function(policy, state, data) {
         # Calculate withdraw limit for current period
         withdraw_limit <- min(max_withdraw, total_remaining)
 
-        if (t >= contract_length) {
-            cf[i] = account_value
+        if (i >= contract_length) {
+            cf[i] <- account_value
             break
         } else {
-            cf[i] = withdraw_limit
+            cf[i] <- withdraw_limit
             account_value <- max(account_value - withdraw_limit, 0)
             total_remaining <- max(total_remaining - withdraw_limit, 0)
         }

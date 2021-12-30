@@ -12,7 +12,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
 
     # Extract relevant policy variables
     LVR <- policy$LVR
-    cost <- policy$cost
+    cost <- policy$trans_cost
     value <- policy$value
     margin <- policy$margin
 
@@ -23,9 +23,8 @@ cf_reverse_mortgage <- function(policy, state, data) {
     loan <- LVR * value
     cf[1] <- loan
 
-    # Accrue interest of loan + Appreciate house value
     i <- 1
-    while (state[i] == 0) {     # while PH is healthy (i.e. not dead or sick)
+    while (state[i] == 0 & i < length(state)) {     # while PH is healthy (i.e. not dead or sick)
 
         # Compound loan value over 1 year period
         loan <- loan * exp(data$rfree[i] + margin)

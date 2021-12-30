@@ -15,10 +15,11 @@ cf_pooled_annuity <- function(policy, state, data) {
     benefit <- policy$benefit
     interest <- policy$interest
 
+    # Initialize output vector
     cf <- rep(0, times = length(state))
 
     i <- 1
-    while (state[i] != -1) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
         # Get benefit if alive
         cf[i] <- benefit
@@ -36,7 +37,7 @@ cf_pooled_annuity <- function(policy, state, data) {
         benefit <- benefit * suv_e / suv_r
 
         # Compound realized + discount expected rates
-        benefit <- benefit * (1 + data$stock) / (1 + interest)
+        benefit <- benefit * (1 + data$stock[i]) / (1 + interest)
 
         i <- i + 1
     }

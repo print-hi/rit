@@ -18,17 +18,9 @@
 #' Seed for random generator
 #' @param n
 #' Number of paths to simulate (Monte-Carlo method)
-#' @param value
-#' Amount of
-#' @param withdrawl
-#' ABP only, amount withdrawn in first year from account i.e. yearly expense
-#' @param loading
-#' Number of paths to simulate (Monte-Carlo method)
-#' @param gmwb
-#' Number of paths to simulate (Monte-Carlo method)
 #' @return
 #' Matrix of cash flow vectors for each simulated path
-#' @export cashflow
+#' @export simulate_cf
 #' @examples
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
@@ -57,16 +49,17 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
     }
 
     # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy)
+    data <- get_policy_scenario(policy, n)
 
-    # Get dimensions of state matrix
-    nrow_s = nrow(state); ncol_s = ncol(state)
+    # Ensures that state <-> data has 1:1 match for each path at each time
+    if (nrow(state) != n)           stop("Error fetching state data")
+    if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     # Initialize output matrix
-    cf <- matrix(nrow = nrow_s, ncol = ncol_s)
+    cf <- matrix(nrow = n, ncol = ncol(state))
 
     # Generate cash flows for each state vector
-    for (i in seq(1, nrow_s)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
+    for (i in seq(1, n)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
 
     return(cf)
 }
@@ -75,7 +68,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 ###############################################################################
 ###### POLICY SCENARIO FUNCTION
 
-get_policy_scenario <- function(policy) {
+get_policy_scenario <- function(policy, n) {
 
     if (policy$name[1] == "AP") {
 
@@ -85,8 +78,9 @@ get_policy_scenario <- function(policy) {
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(infla = infla[i, ], stock = stock[i, ])
+        for (i in seq(1, n)) {
+            temp <- data.frame(infla = infla[i, ],
+                               stock = stock[i, ])
             data <- append(data, list(temp))
         }
 
@@ -97,7 +91,7 @@ get_policy_scenario <- function(policy) {
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
-        for (i in seq(1, nrow(state))) {
+        for (i in seq(1, n)) {
             temp <- data.frame(infla = infla[i, ])
             data <- append(data, list(temp))
         }
@@ -113,8 +107,9 @@ get_policy_scenario <- function(policy) {
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(pool_r = pool_r[i, ], pool_e = pool_e,
+        for (i in seq(1, n)) {
+            temp <- data.frame(pool_r = pool_r[i, ],
+                               pool_e = as.vector(pool_e),
                                stock = stock[i, ])
             data <- append(data, list(temp))
         }
@@ -127,8 +122,9 @@ get_policy_scenario <- function(policy) {
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(house = house[i, ], rfree = rfree[i, ])
+        for (i in seq(1, n)) {
+            temp <- data.frame(house = house[i, ],
+                               rfree = rfree[i, ])
             data <- append(data, list(temp))
         }
 
@@ -142,9 +138,11 @@ get_policy_scenario <- function(policy) {
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
-        for (i in seq(1, nrow(state))) {
-            temp <- data.frame(house = house[i, ], infla = infla[i, ],
-                               intrs = intrs[i, ], stock = stock[i, ])
+        for (i in seq(1, n)) {
+            temp <- data.frame(house = house[i, ],
+                               infla = infla[i, ],
+                               intrs = intrs[i, ],
+                               stock = stock[i, ])
             data <- append(data, list(temp))
         }
 
@@ -165,7 +163,7 @@ get_policy_scenario <- function(policy) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_3 <- as.matrix(read.csv("R/data/health.csv"))
+    health_3 <- as.matrix(read.csv("R/data/health3.csv"))
     health_3 <- ifelse(health_3 > 0, -2, health_3)
     colnames(health_3) <- NULL
     rownames(health_3) <- NULL
@@ -174,7 +172,7 @@ get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_5 <- as.matrix(read.csv("R/data/health.csv"))
+    health_5 <- as.matrix(read.csv("R/data/health5.csv"))
     colnames(health_5) <- NULL
     rownames(health_5) <- NULL
     return(health_5)
@@ -201,7 +199,7 @@ get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool-exp.csv"))
+    pool <- as.matrix(read.csv("R/data/pool-exp.csv", header = FALSE))
     colnames(pool) <- NULL
     rownames(pool) <- NULL
     return(pool)
