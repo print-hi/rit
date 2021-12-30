@@ -68,7 +68,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
 ###############################################################################
 ###### POLICY SCENARIO FUNCTION
 
-get_policy_scenario <- function(policy, n) {
+get_policy_scenario <- function(policy, age, seed, n) {
 
     if (policy$name[1] == "AP") {
 
