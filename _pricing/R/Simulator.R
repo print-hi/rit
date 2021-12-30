@@ -147,7 +147,7 @@ get_policy_scenario <- function(policy, n) {
         }
 
     } else {
-        print("error")
+        stop("Error: invalid policy object")
     }
 
     return(data)
