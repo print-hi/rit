@@ -160,13 +160,13 @@ create_policy_PA <- function(benefit, size, interest, loading) {
 #'
 #' Generates policy object for Reverse Mortgage policies
 #' @param value
-#'
+#' Initial value of property
 #' @param margin
-#'
+#' Lending margin
 #' @param LVR
-#'
+#' Loan to Value ratio for PH
 #' @param trans_cost
-#'
+#' Transaction cost associated with sale
 #' @return
 #' Policy object
 #' @export create_policy_RM
@@ -176,7 +176,7 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 
     if (value < 0) stop("Invalid value: value > 0")
     if (margin < 0) stop("Invalid margin: margin > 0")
-    if (LVR < 0 | LVR > 1) stop("Invalid LVR: 0 < LVR < 1")
+    if (LVR < 0 | LVR > 1) stop("Invalid LVR: 0 <= LVR <= 1")
     if (trans_cost < 0 | trans_cost > 1) stop("Invalid trans_cost: 0 < LVR < 1")
 
     pol <- data.frame(name = c("RM"),
@@ -217,7 +217,7 @@ create_policy_VA <- function(value, length, prop, s_fee, g_fee) {
     if (g_fee < 0)              stop("Invalid g_fee: g_fee > 0")
     if (value < 0)              stop("Invalid value: value > 0")
     if (length < 0)             stop("Invalid length: length > 0")
-    if (prop < 0 | prop > 1)    stop("Invalid prop: 0 < prop < 1")
+    if (prop < 0 | prop > 1)    stop("Invalid prop: 0 <= prop <= 1")
 
     pol <- data.frame(name = c("VA"),
                       value = c(value),
