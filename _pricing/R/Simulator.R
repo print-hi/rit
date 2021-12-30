@@ -49,7 +49,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
     }
 
     # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy, n)
+    data <- get_policy_scenario(policy, age, seed, n)
 
     # Ensures that state <-> data has 1:1 match for each path at each time
     if (nrow(state) != n)           stop("Error fetching state data")
