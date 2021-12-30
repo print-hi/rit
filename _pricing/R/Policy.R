@@ -62,7 +62,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
     } else if (length(benefit) == 4) {
         state <- c("H", "M", "D", "MD")
     } else {
-        stop("Invalid input: vectors must be of length 3 or 5")
+        stop("Invalid input: vectors must be of length 2 or 4")
     }
 
     pol <- data.frame(name = c("CA"),

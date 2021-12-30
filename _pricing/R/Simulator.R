@@ -40,7 +40,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
         } else if (nrow(policy) == 4) {
             state <- get_health_state_5(age, sex, seed, n)
         } else {
-            print("error")
+            stop("Error: CA policy object needs to have 2 or 4 rows")
         }
     } else if (policy$name[1] == "RM") {
         state <- get_health_state_3(age, sex, seed, n)
