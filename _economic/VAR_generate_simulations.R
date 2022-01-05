@@ -11,7 +11,7 @@ stopCluster(cl)
 
 ##############
 # save objects 
-
+save(var_simulated_paths, file = "var_simulated_paths.RData")
 # 3-month zero-coupon yield
 var_simulated_zcp3m_yield = as.data.frame(t(var_simulated_paths$zcp3m_yield))
 write.csv(var_simulated_zcp3m_yield, file = "var_simulated_zcp3m_yield.csv")
