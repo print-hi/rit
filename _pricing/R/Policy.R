@@ -212,7 +212,7 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' @export create_policy_VA
 #' @examples
 #' va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
-create_policy_VA <- function(value, length, prop, s_fee, g_fee) {
+create_policy_VA <- function(value, length, prop, g_fee, s_fee) {
 
     if (g_fee < 0)              stop("Invalid g_fee: g_fee > 0")
     if (value < 0)              stop("Invalid value: value > 0")

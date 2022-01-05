@@ -67,12 +67,11 @@ cf_care_annuity <- function(policy, state, data) {
     i <- 1
     while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
-        # Get base level benefit for being alive
-        cf[i] <- benefit[1]
-
-        # Add additional benefits from LTC: state[i] = 1 (M), 2 (D), 3(MD)
-        if (state[i] > 0) {
-            cf[i] <- cf[i] + benefit[state[i] + 1]
+        # Base + additional benefits from LTC: state[i] = 1 (M), 2 (D), 3(MD)
+        if (!state[i]) {
+            cf[i] <- benefit[1]
+        } else {
+            cf[i] <- benefit[1] + benefit[state[i] + 1]
         }
 
         # For flat-rate increases of benefits
@@ -245,9 +244,9 @@ cf_variable_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
     value <- policy$value
-    g_fee <- policy$g_fee
     contract_length <- policy$length
-    withdraw_prop <- policy$withdraw_prop
+    withdraw_prop <- policy$prop
+    g_fee <- policy$g_fee
 
     #s_fee <- policy$s_fee # not used in static model
 
@@ -256,29 +255,29 @@ cf_variable_annuity <- function(policy, state, data) {
 
     # Tracks Total amount that can be withdrawn + Value of portfolio account
     total_remaining <- value
-    max_withdraw <- total_remaining * withdraw_prop
+    max_withdraw <- value * withdraw_prop
 
     # Start account value at time 1, as no time 0 cashflow
-    account_value <- value * data$stock[1]
+    account_value <- value * (1 + data$stock[1])
 
     i <- 2
-    while (state[i] != -1 & i < length(state)) {     # while PH is not dead
+    while (state[i] != -1 & i < length(state) & i <= contract_length) {
 
         # Compound account value - expenses for withdrawl guarantee
-        account_value <- account_value * data$stock[i] * exp(-g_fee)
+        account_value <- account_value * (1 + data$stock[i]) * exp(-g_fee)
 
         # Calculate withdraw limit for current period
         withdraw_limit <- min(max_withdraw, total_remaining)
 
         # Receive account balance at maturity, otherwise withdrawn maximum
         # amount admissible and update values
-        if (i >= contract_length) {
-            cf[i] <- account_value
-            break
-        } else {
+        if (i < contract_length) {
             cf[i] <- withdraw_limit
             account_value <- max(account_value - withdraw_limit, 0)
             total_remaining <- max(total_remaining - withdraw_limit, 0)
+        } else {
+            cf[i] <- account_value
+            break
         }
 
         i <- i + 1

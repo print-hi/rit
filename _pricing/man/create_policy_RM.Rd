@@ -7,13 +7,13 @@
 create_policy_RM(value, LVR, trans_cost, margin)
 }
 \arguments{
-\item{value}{}
+\item{value}{Initial value of property}
 
-\item{LVR}{}
+\item{LVR}{Loan to Value ratio for PH}
 
-\item{trans_cost}{}
+\item{trans_cost}{Transaction cost associated with sale}
 
-\item{margin}{}
+\item{margin}{Lending margin}
 }
 \value{
 Policy object

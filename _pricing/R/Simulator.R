@@ -52,8 +52,9 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
     data <- get_policy_scenario(policy, age, seed, n)
 
     # Ensures that state <-> data has 1:1 match for each path at each time
-    if (nrow(state) != n)           stop("Error fetching state data")
-    if (ncol(state) != nrow(data))  stop("Error fetching policy data")
+    # DISABLED WHILE USING TEMP DATA
+    #if (nrow(state) != n)           stop("Error fetching state data")
+    #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     # Initialize output matrix
     cf <- matrix(nrow = n, ncol = ncol(state))
@@ -163,7 +164,7 @@ get_policy_scenario <- function(policy, age, seed, n) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_3 <- as.matrix(read.csv("R/data/health3.csv"))
+    health_3 <- as.matrix(read.csv("R/data/health3.csv", header = FALSE))
     health_3 <- ifelse(health_3 > 0, -2, health_3)
     colnames(health_3) <- NULL
     rownames(health_3) <- NULL
@@ -172,7 +173,7 @@ get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_5 <- as.matrix(read.csv("R/data/health5.csv"))
+    health_5 <- as.matrix(read.csv("R/data/health5.csv", header = FALSE))
     colnames(health_5) <- NULL
     rownames(health_5) <- NULL
     return(health_5)
@@ -183,7 +184,7 @@ get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    mortality <- as.matrix(read.csv("R/data/mortality.csv"))
+    mortality <- as.matrix(read.csv("R/data/mortality.csv", header = FALSE))
     colnames(mortality) <- NULL
     rownames(mortality) <- NULL
     return(mortality)
@@ -191,7 +192,7 @@ get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool.csv"))
+    pool <- as.matrix(read.csv("R/data/pool.csv", header = FALSE))
     colnames(pool) <- NULL
     rownames(pool) <- NULL
     return(pool)
@@ -210,7 +211,7 @@ get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_interest <- function(age = 17, seed = 0, n = 1000) {
-    interest <- as.matrix(read.csv("R/data/interest.csv"))
+    interest <- as.matrix(read.csv("R/data/interest.csv", header = FALSE))
     colnames(interest) <- NULL
     rownames(interest) <- NULL
     return(interest)
@@ -218,7 +219,7 @@ get_interest <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_risk_free <- function(age = 17, seed = 0, n = 1000) {
-    risk_free <- as.matrix(read.csv("R/data/interest.csv"))
+    risk_free <- as.matrix(read.csv("R/data/interest.csv", header = FALSE))
     colnames(risk_free) <- NULL
     rownames(risk_free) <- NULL
     return(risk_free)
@@ -226,7 +227,7 @@ get_risk_free <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_inflation <- function(age = 17, seed = 0, n = 1000) {
-    inflation <- as.matrix(read.csv("R/data/inflation.csv"))
+    inflation <- as.matrix(read.csv("R/data/inflation.csv", header = FALSE))
     colnames(inflation) <- NULL
     rownames(inflation) <- NULL
     return(inflation)
@@ -234,7 +235,7 @@ get_inflation <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_house_price <- function(age = 17, seed = 0, n = 1000) {
-    house <- as.matrix(read.csv("R/data/house.csv"))
+    house <- as.matrix(read.csv("R/data/house.csv", header = FALSE))
     colnames(house) <- NULL
     rownames(house) <- NULL
     return(house)
@@ -242,7 +243,7 @@ get_house_price <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_stock_price <- function(age = 17, seed = 0, n = 1000) {
-    stock <- as.matrix(read.csv("R/data/stock.csv"))
+    stock <- as.matrix(read.csv("R/data/stock.csv", header = FALSE))
     colnames(stock) <- NULL
     rownames(stock) <- NULL
     return(stock)
