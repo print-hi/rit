@@ -3,4 +3,6 @@
 export(CK)
 export(DG)
 export(kannisto)
+export(q2survival)
 export(rate2rate)
+export(survivalP2Q)

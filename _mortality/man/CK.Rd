@@ -4,7 +4,15 @@
 \alias{CK}
 \title{Coale and Kisker Method}
 \usage{
-CK(rates, ages, old_ages, type = "central", m_end = 1, years = NULL)
+CK(
+  rates,
+  ages,
+  old_ages,
+  type = "central",
+  closure_age = 130,
+  m_end = 1,
+  years = NULL
+)
 }
 \arguments{
 \item{rates}{matrix or vector of mortality rates with age (on the rows) and calendar year
