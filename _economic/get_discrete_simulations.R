@@ -118,16 +118,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         ################################################
         # convert forecasted variables -> original units 
         zcp3m_inv = function (x, init) {
-            # x: from forecast
-            # init: initial value from original series 
-            
             # differenced once 
             diffinv(x, xi = init)[-1]
         }
         home_value_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 index to growth rate 
             # 2 shortened once 
             output = rep(NA, length(x))
@@ -138,16 +132,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             return (output)
         }
         rental_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 differenced once 
             diffinv(x, xi = init)[-1]
         }
         gdp_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 index to growth rate 
             # 2 shortened once 
             output = rep(NA, length(x))
@@ -158,9 +146,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             return (output)
         }
         cpi_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 index to growth rate 
             # 2 shortened once 
             output = rep(NA, length(x))
@@ -171,9 +156,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             return (output)
         }
         asx_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 index to growth rate 
             # 2 shortened once 
             output = rep(NA, length(x))
@@ -184,9 +166,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             return (output)
         }
         aud_inv = function (x, init) {
-            # x: from forecast
-            # init: initial index from original series 
-            
             # 1 index to growth rate 
             # 2 shortened once 
             output = rep(NA, length(x))
@@ -199,14 +178,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         
         # simulations for the original series
         output = stat
-        helper = function (x) {
-            zcp3m_inv(stat[[1]][, which(c)])
-        }
-        #apply(output[[1]], 2, function (x) {zcp3m_inv(stat[[1]][, which(colnames(stat[[1]][,x]) == colnames(stat[[1]][,x]))], init_orig[1])})
-        
         
         for (path in 1:num_paths) {
-            
             output[[1]][,path] = zcp3m_inv(stat[[1]][,path], init_orig[1]) # zcp3m_yield 
             # zcp10y_spread: not changed 
             output[[3]][,path] = home_value_inv(stat[[3]][,path], init_orig[3]) # home_index
