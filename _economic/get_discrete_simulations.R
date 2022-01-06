@@ -117,81 +117,30 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         
         ################################################
         # convert forecasted variables -> original units 
-        zcp3m_inv = function (x, init) {
-            # differenced once 
+        diff_inv = function (x, init) {
+            # undo differencing once: zcp3m_yield, rental_yield
             diffinv(x, xi = init)[-1]
         }
-        home_value_inv = function (x, init) {
-            # 1 index to growth rate 
-            # 2 shortened once 
-            output = rep(NA, length(x))
-            for (i in 1:length(x)) {
-                output[i] = init * exp(x[i])
-                init = output[i]
-            } 
-            return (output)
-        }
-        rental_inv = function (x, init) {
-            # 1 differenced once 
-            diffinv(x, xi = init)[-1]
-        }
-        gdp_inv = function (x, init) {
-            # 1 index to growth rate 
-            # 2 shortened once 
-            output = rep(NA, length(x))
-            for (i in 1:length(x)) {
-                output[i] = init * exp(x[i])
-                init = output[i]
-            } 
-            return (output)
-        }
-        cpi_inv = function (x, init) {
-            # 1 index to growth rate 
-            # 2 shortened once 
-            output = rep(NA, length(x))
-            for (i in 1:length(x)) {
-                output[i] = init * exp(x[i])
-                init = output[i]
-            } 
-            return (output)
-        }
-        asx_inv = function (x, init) {
-            # 1 index to growth rate 
-            # 2 shortened once 
-            output = rep(NA, length(x))
-            for (i in 1:length(x)) {
-                output[i] = init * exp(x[i])
-                init = output[i]
-            } 
-            return (output)
-        }
-        aud_inv = function (x, init) {
-            # 1 index to growth rate 
-            # 2 shortened once 
-            output = rep(NA, length(x))
-            for (i in 1:length(x)) {
-                output[i] = init * exp(x[i])
-                init = output[i]
-            } 
-            return (output)
+        index2grow_inv = function (x, init) {
+            # 1 reverse index to growth rate 
+            # 2 reverse shortening once: home_value, gdp, cpi, asx200, aud
+            Reduce (function (init, x) {init * exp(x)}, c(init, x), accumulate = T)[-1]
         }
         
         # simulations for the original series
         output = stat
-        
         for (path in 1:num_paths) {
-            output[[1]][,path] = zcp3m_inv(stat[[1]][,path], init_orig[1]) # zcp3m_yield 
+            output[[1]][,path] = diff_inv(output[[1]][,path], init_orig[1]) # zcp3m_yield 
             # zcp10y_spread: not changed 
-            output[[3]][,path] = home_value_inv(stat[[3]][,path], init_orig[3]) # home_index
-            output[[4]][,path] = rental_inv(stat[[4]][,path], init_orig[4]) # rental_yield 
-            output[[5]][,path] = gdp_inv(stat[[5]][,path], init_orig[5]) # GDP
-            output[[6]][,path] = cpi_inv(stat[[6]][,path], init_orig[6]) # CPI
-            output[[7]][,path] = asx_inv(stat[[7]][,path], init_orig[7]) # ASX200
-            output[[8]][,path] = aud_inv(stat[[8]][,path], init_orig[8]) # AUD
+            output[[3]][,path] = index2grow_inv(output[[3]][,path], init_orig[3]) # home_index
+            output[[4]][,path] = diff_inv(output[[4]][,path], init_orig[4]) # rental_yield 
+            output[[5]][,path] = index2grow_inv(output[[5]][,path], init_orig[5]) # GDP
+            output[[6]][,path] = index2grow_inv(output[[6]][,path], init_orig[6]) # CPI
+            output[[7]][,path] = index2grow_inv(output[[7]][,path], init_orig[7]) # ASX200
+            output[[8]][,path] = index2grow_inv(output[[8]][,path], init_orig[8]) # AUD
         }
         output[[9]] = output[[1]] + 2.825 # mortage_rate
         output[[10]] = output[[2]] + 4.956 # unemployment_rate 
-        names(output) = sim_var_names
         
         return (output)
     }
