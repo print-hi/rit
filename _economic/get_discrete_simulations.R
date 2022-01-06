@@ -12,9 +12,13 @@
 #' @examples get_discrete_simulations(num_years = 10, num_paths = 100)
 #' 
 get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
-    if (num_years <= 0 | num_paths <= 0 | !is.integer(num_years) | !is.integer(num_paths)) {
+    
+    ################
+    # error messages 
+    is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
+    if (num_years <= 0 | num_paths <= 0 | !is.wholenumber(num_years) | !is.wholenumber(num_paths)) {
         stop("Number of years and paths to simulate must be positivie integers. ")
-
+        
     } else {
         ########################################################
         # VAR(1) calibrated coefficients (for stationary series)
@@ -51,6 +55,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         # starting quarter 
         init_qtr = as.Date("2021-04-01")
         num_pred = 4 * num_years 
+        time_index = as.yearqtr(seq(from = init_qtr, length.out = num_pred, by = "quarter"))
+        path_index = paste("trajectory_", 1:num_paths, sep = "")
         # initial values for stationary series 
         init_stat = c(-0.033243728,1.422580645,0.050236685, -0.000455718,0.018766511,0.005954930,0.059250269,0.037258168)
         # initial values for original series 
@@ -58,22 +64,24 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         
         ##########################
         # step-by-step simulations 
+        # white noise
+        noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1), nrow = length(intercept))
         # one-step (inputs/outputs are both stationary)
-        var_step = function (intercept, coef, initial) {
-            e = rnorm(length(intercept), 0, 1)
+        var_step = function (initial, noise_index) {
+            e = as.vector(noise[,noise_index])
             return (intercept + coef %*% initial + as.matrix(chol(covres)) %*% e)
         }
         
         # whole path (inputs/outputs are both stationary)
-        var_path = function (intercept, coef, num_pred) {
+        var_path = function (num_pred, noise_index) {
             path = as.data.frame(matrix(NA, nrow = num_pred, ncol = length(var_names)))
-            row.names(path) = as.yearqtr(seq(from = init_qtr, length.out = num_pred, by = "quarter"))
+            row.names(path) = time_index
             colnames(path) = var_names 
             
             # simulate for num_pred steps 
             new_init = init_stat
             for (i in 1:num_pred) {
-                new = var_step(intercept, coef, new_init)
+                new = var_step(new_init, noise_index[i])
                 path[i,] = new
                 new_init = new
             }
@@ -82,34 +90,30 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         
         ######################################
         # simulation for the stationary series 
-        var_sim_stationary = function (intercept, coef, num_pred, num_paths) {
-            stat1 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # zcp3m_yield 
-            stat2 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # zcp10y_spread
-            stat3 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # home_index
-            stat4 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # rental_yield
-            stat5 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # GDP
-            stat6 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # CPI
-            stat7 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # ASX200
-            stat8 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # AUD 
-            stat9 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # mortgage_rate
-            stat10 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths)) # unemployment_rate 
-            stat = list (stat1, stat2, stat3, stat4, stat5, stat6, stat7, stat8, stat9, stat10)
+        var_sim_stationary = function (num_pred, num_paths) {
+            
+            # initialises the list for output
+            stat = replicate(n = length(sim_var_names), 
+                             expr = {data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))},
+                             simplify = F)
+            names(stat) = sim_var_names
+            stat = lapply(stat, function(x){row.names(x) <- time_index; x})
+            stat = lapply(stat, function(x){colnames(x) <- path_index; x})
             
             # loops thru the series (separate lists)
-            for (var in 1:length(intercept)) {
-                row.names(stat[[var]]) = as.yearqtr(seq(from = init_qtr, length.out = num_pred, by = "quarter"))
-                colnames(stat[[var]]) = paste("trajectory_", 1:num_paths, sep = "")
+            noise_index = 1:num_pred
+            for (path in 1:num_paths) {
+                v_path = var_path(num_pred, noise_index)
                 
-                # loops thru the trajectories
-                for (path in 1:num_paths) {
-                    stat[[var]][,path] = var_path(intercept, coef, num_pred)[,var]
+                for (var in 1:length(intercept)) {
+                    stat[[var]][,path] = v_path[,var]
                 }
+                noise_index = noise_index + num_pred
             }
             
-            names(stat) = sim_var_names
             return (stat)
         }
-        stat = var_sim_stationary(intercept, coef, num_pred, num_paths)
+        stat = var_sim_stationary(num_pred, num_paths)
         
         ################################################
         # convert forecasted variables -> original units 
@@ -117,7 +121,7 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             # x: from forecast
             # init: initial value from original series 
             
-            # 1 it was differenced once 
+            # differenced once 
             diffinv(x, xi = init)[-1]
         }
         home_value_inv = function (x, init) {
@@ -195,7 +199,14 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         
         # simulations for the original series
         output = stat
+        helper = function (x) {
+            zcp3m_inv(stat[[1]][, which(c)])
+        }
+        #apply(output[[1]], 2, function (x) {zcp3m_inv(stat[[1]][, which(colnames(stat[[1]][,x]) == colnames(stat[[1]][,x]))], init_orig[1])})
+        
+        
         for (path in 1:num_paths) {
+            
             output[[1]][,path] = zcp3m_inv(stat[[1]][,path], init_orig[1]) # zcp3m_yield 
             # zcp10y_spread: not changed 
             output[[3]][,path] = home_value_inv(stat[[3]][,path], init_orig[3]) # home_index
