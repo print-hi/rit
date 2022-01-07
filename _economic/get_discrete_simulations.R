@@ -95,6 +95,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
             # loops thru the series (separate lists)
             v_path = list()
             noise_index = 1:num_pred
+            #v_path = lapply(v_path, function (x) {var_path(num_pred, noise_index + num_pred * x)})
+            
             for (path in 1:num_paths) {
                 v_path[[path]] = var_path(num_pred, noise_index)
                 noise_index = noise_index + num_pred
@@ -106,18 +108,18 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
                              simplify = F)
             names(stat) = var_names
             
-            stat$zcp3m_yield = as.data.frame(lapply(v_path, function (x) {x[,1]}))
-            stat$zcp10y_spread = as.data.frame(lapply(v_path, function (x) {x[,2]}))
-            stat$home_index = as.data.frame(lapply(v_path, function (x) {x[,3]}))
-            stat$rental_yield = as.data.frame(lapply(v_path, function (x) {x[,4]}))
-            stat$GDP = as.data.frame(lapply(v_path, function (x) {x[,5]}))
-            stat$CPI = as.data.frame(lapply(v_path, function (x) {x[,6]}))
-            stat$ASX200 = as.data.frame(lapply(v_path, function (x) {x[,7]}))
-            stat$AUD = as.data.frame(lapply(v_path, function (x) {x[,8]}))
+            stat$zcp3m_yield = lapply(v_path, function (x) {x[,1]})
+            stat$zcp10y_spread = lapply(v_path, function (x) {x[,2]})
+            stat$home_index = lapply(v_path, function (x) {x[,3]})
+            stat$rental_yield = lapply(v_path, function (x) {x[,4]})
+            stat$GDP = lapply(v_path, function (x) {x[,5]})
+            stat$CPI = lapply(v_path, function (x) {x[,6]})
+            stat$ASX200 = lapply(v_path, function (x) {x[,7]})
+            stat$AUD = lapply(v_path, function (x) {x[,8]})
             
-            stat = lapply(stat, function(x){row.names(x) <- time_index; x})
-            stat = lapply(stat, function(x){colnames(x) <- path_index; x})
-            
+            stat = lapply(stat, function(x){x = as.data.frame(x)})
+            stat = lapply(stat, function(x){row.names(x) = time_index; x})
+            stat = lapply(stat, function(x){colnames(x) = path_index; x})
             return (stat)
         }
         stat = var_sim_stationary(num_pred, num_paths)
@@ -146,7 +148,7 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         output[[8]] = apply(stat[[8]], 2, function (x) {index2grow_inv(x, init_orig[8])}) # AUD
         output[[9]] = output[[1]] + 2.825 # mortage_rate
         output[[10]] = output[[2]] + 4.956 # unemployment_rate 
-        output = lapply(output, function(x){x = as.data.frame(x); x})
+        output = lapply(output, function(x){x = as.data.frame(x)})
         names(output) = sim_var_names
         
         return (output)
