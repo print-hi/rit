@@ -13,17 +13,36 @@
 #'
 #' @examples
 #'
-q2survival <- function(qx) {
-  px <- 1 - qx
+q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
 
-  if (length(dim(px)) == 2) {
-    return(apply(px, 2, cumprod))
-  } else if (length(dim(px)) == 3) {
-    return(arr_apply(px, function(x) apply(x, 2, cumprod)))
+
+  if (is.null(years)) {
+    col_names <- colnames(qx)
   }
 
-  # Dealing with vector, need to check/improve
-  return(cumprod(px))
+  if(is.null(target_age)) {
+    target_age <- ages[1]
+  }
+
+  if(target_age == ages[1]) {
+    px <- 1 - qx
+  } else {
+    px <- 1 - tail(qx, ages[1] - target_age)
+  }
+
+  if (is.vector(px)) {
+    St <- rbind(1, matrix(cumprod(px)))
+  } else if (is.matrix(px)) {
+    St <- rbind(1, apply(px, 2, cumprod))
+  } else if (is.array(px)) {
+    St <- arr_apply(px, function(x) rbind(1, apply(x, 2, cumprod)))
+  }
+
+  rownames(St) <- as.character(0:(ages[length(ages)] - target_age + 1))
+  colnames(St) <- if (is.null(years)) col_names else as.character(years)
+
+  return(list(surv = St, age = target_age))
+
 }
 
 
