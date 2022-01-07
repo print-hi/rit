@@ -39,7 +39,7 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
   if(target_age == ages[1]) {
     px <- 1 - qx
   } else {
-    px <- 1 - tail(qx, ages[1] - target_age)
+    px <- 1 - utils::tail(qx, ages[1] - target_age)
   }
 
   # Calculating survival function
@@ -79,12 +79,6 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
 #' character string representing the distortion risk measure to be used. See "Details".
 #' @param lambda
 #' parameter associated with the distortion risk measure
-#' @param t
-#' optional vector of survival time
-#' @param ages
-#' optional vector of ages
-#' @param years
-#' optional vector of years
 #'
 #' @return
 #' the transformed survival function under the Q-measure
@@ -92,14 +86,14 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
 #'
 #' @examples
 #'
-survivalP2Q <- function(StP, method, lambda, t = NULL, ages = NULL, years = NULL) {
+survivalP2Q <- function(StP, method, lambda) {
 
-  # Need to make sure values only between 0 and 1
+  # TODO: make sure values only between 0 and 1
 
   # Defining distortion functions
   wang <- function(x, lam) {
     if (lam < 0) stop("invalid lambda value")
-    return(1 - pnorm(qnorm(1 - x) - lam))
+    return(1 - stats::pnorm(stats::qnorm(1 - x) - lam))
   }
 
   ph <- function(x, lam) {
@@ -147,7 +141,7 @@ survivalP2Q <- function(StP, method, lambda, t = NULL, ages = NULL, years = NULL
 
 }
 
-pdfP2Q <- function(StP, method, lambda, t = NULL, ages = NULL, years = NULL) {
+pdfP2Q <- function(StP, method, lambda) {
 
   type <- c("canon", "esscher")
 

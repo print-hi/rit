@@ -4,7 +4,7 @@
 \alias{survivalP2Q}
 \title{Survival Function Transformation}
 \usage{
-survivalP2Q(StP, method, lambda, t = NULL, ages = NULL, years = NULL)
+survivalP2Q(StP, method, lambda)
 }
 \arguments{
 \item{StP}{vector, matrix or 3D array of the survival function under the P-measure with
@@ -13,12 +13,6 @@ survival time (on the rows) and calendar year (on the columns)}
 \item{method}{character string representing the distortion risk measure to be used. See "Details".}
 
 \item{lambda}{parameter associated with the distortion risk measure}
-
-\item{t}{optional vector of survival time}
-
-\item{ages}{optional vector of ages}
-
-\item{years}{optional vector of years}
 }
 \value{
 the transformed survival function under the Q-measure
