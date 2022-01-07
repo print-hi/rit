@@ -35,6 +35,8 @@ arr_apply <- function(X, FUN) {
 #' character string representing the type of mortality rate supplied. Takes the
 #' following values: "central" for central death rates, "prob" for 1-year death
 #' probabilities, "force" for force of mortality
+#' @param closure_age
+#' maximum life span
 #' @param m_end
 #' constant or vector specifying the central death rates at the final age for
 #' each calendar year. If supplied as a vector, vector length and number of

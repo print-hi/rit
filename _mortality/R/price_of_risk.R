@@ -6,6 +6,17 @@
 #' vector, matrix or 3D array of 1-year death probabilities with age
 #' (on the rows) and calendar year (on the columns)
 #'
+#' @param ages
+#' vector of ages for `qx`
+#'
+#' @param target_age
+#' age for which the survival function is to be calculated at. If not provided,
+#' the survival function will be calculated for the smallest age supplied in `ages`
+#'
+#' @param years
+#' optional vector of years for `qx`. If not supplied, then the column names
+#' of `qx` will be preserved
+#'
 #' @return
 #' survival rates in the same format as `qx`
 #'
@@ -24,12 +35,14 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
     target_age <- ages[1]
   }
 
+  # Converting to 1-year survival probabilities
   if(target_age == ages[1]) {
     px <- 1 - qx
   } else {
     px <- 1 - tail(qx, ages[1] - target_age)
   }
 
+  # Calculating survival function
   if (is.vector(px)) {
     St <- rbind(1, matrix(cumprod(px)))
   } else if (is.matrix(px)) {

@@ -26,6 +26,8 @@ CK(
 following values: "central" for central death rates, "prob" for 1-year death
 probabilities, "force" for force of mortality}
 
+\item{closure_age}{maximum life span}
+
 \item{m_end}{constant or vector specifying the central death rates at the final age for
 each calendar year. If supplied as a vector, vector length and number of
 columns for \code{rates} must be equal}
