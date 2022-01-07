@@ -14,7 +14,8 @@
 #' @examples
 #'
 arr_apply <- function(X, FUN) {
-  X_list <- lapply(seq(dim(X)[3]), function(i) X[, , i])
+
+  X_list <- lapply(seq(dim(X)[3]), function(i) matrix(X[, , i], nrow = dim(X)[1], ncol = dim(X)[2]))
   sapply(X_list, FUN, simplify = "array")
 }
 
