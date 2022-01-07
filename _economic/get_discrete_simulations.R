@@ -128,19 +128,19 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000) {
         }
         
         # simulations for the original series
-        output = stat
-        for (path in 1:num_paths) {
-            output[[1]][,path] = diff_inv(output[[1]][,path], init_orig[1]) # zcp3m_yield 
-            # zcp10y_spread: not changed 
-            output[[3]][,path] = index2grow_inv(output[[3]][,path], init_orig[3]) # home_index
-            output[[4]][,path] = diff_inv(output[[4]][,path], init_orig[4]) # rental_yield 
-            output[[5]][,path] = index2grow_inv(output[[5]][,path], init_orig[5]) # GDP
-            output[[6]][,path] = index2grow_inv(output[[6]][,path], init_orig[6]) # CPI
-            output[[7]][,path] = index2grow_inv(output[[7]][,path], init_orig[7]) # ASX200
-            output[[8]][,path] = index2grow_inv(output[[8]][,path], init_orig[8]) # AUD
-        }
+        output = list ()
+        output[[1]] = apply(stat[[1]], 2, function (x) {diff_inv(x, init_orig[1])}) # zcp3m_yield 
+        output[[2]] = stat[[2]] # zcp10y_spread: not changed 
+        output[[3]] = apply(stat[[3]], 2, function (x) {index2grow_inv(x, init_orig[3])}) # home_index
+        output[[4]] = apply(stat[[4]], 2, function (x) {diff_inv(x, init_orig[4])}) # rental_yield 
+        output[[5]] = apply(stat[[5]], 2, function (x) {index2grow_inv(x, init_orig[5])}) # GDP
+        output[[6]] = apply(stat[[6]], 2, function (x) {index2grow_inv(x, init_orig[6])}) # CPI
+        output[[7]] = apply(stat[[7]], 2, function (x) {index2grow_inv(x, init_orig[7])}) # ASX200
+        output[[8]] = apply(stat[[8]], 2, function (x) {index2grow_inv(x, init_orig[8])}) # AUD
         output[[9]] = output[[1]] + 2.825 # mortage_rate
         output[[10]] = output[[2]] + 4.956 # unemployment_rate 
+        output = lapply(output, function(x){x = as.data.frame(x); x})
+        names(output) = sim_var_names
         
         return (output)
     }
