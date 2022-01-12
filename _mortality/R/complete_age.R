@@ -94,7 +94,7 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
 
   if (is.vector(mxy_arr) | is.matrix(mxy_arr)) {
     completed_mxy_arr <- CK_mat(mxy_arr)
-  } else {
+  } else if (is.array(mxy_arr)) {
     completed_mxy_arr <- arr_apply(mxy_arr, CK_mat)
   }
 
@@ -204,7 +204,7 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 
   if (is.vector(qxy_arr) | is.matrix(qxy_arr)) {
     completed_qxy_arr <- DG_mat(qxy_arr)
-  } else {
+  } else if (is.array(qxy_arr)) {
     completed_qxy_arr <- arr_apply(qxy_arr, DG_mat)
   }
 
@@ -304,7 +304,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 
   if (is.vector(muxy_arr) | is.matrix(muxy_arr)) {
     completed_muxy_arr <- kannisto_mat(muxy_arr)
-  } else {
+  } else if (is.array(muxy_arr)) {
     completed_muxy_arr <- arr_apply(muxy_arr, kannisto_mat)
   }
 
