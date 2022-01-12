@@ -77,6 +77,47 @@ period2cohort <- function(period_rates, ages) {
 }
 
 
+cohort2period <- function(cohort_rates, ages) {
 
+  c2p_mat <- function(c_rates) {
+
+    # Convert vector to matrix if necessary
+    c_mat <- as.matrix(c_rates)
+
+    r <- nrow(c_mat)
+    c <- ncol(c_mat)
+
+    p_rates <- matrix(NA, nrow = r, ncol = c)
+
+    for (i in 1:r) {
+
+      # Check for 0 as tail does not handle 0 well
+      if (ages[i] == 0) {
+        p_rates[i, ] <- c_mat[i, ]
+        next
+      }
+
+      if (ages[i] < c) {
+        p_vec <- c(rep(NA, ages[i]), utils::head(c_mat[i, ], -ages[i]))
+        p_rates[i, ] <- p_vec
+      } else break
+    }
+
+    p_rates
+
+  }
+
+  if (is.vector(cohort_rates) | is.matrix(cohort_rates)) {
+    period_rates <- c2p_mat(cohort_rates)
+  } else if (is.array(cohort_rates)) {
+    period_rates <- arr_apply(cohort_rates, c2p_mat)
+  }
+
+  dimnames(period_rates) <- dimnames(cohort_rates)
+
+
+  period_rates
+
+}
 
 
