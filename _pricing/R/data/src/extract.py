@@ -17,8 +17,8 @@ files = {
 #%%
 for name in files:
     data = pd.read_csv("var_simulated_" + name)
-    trim = data[data.columns[2::4]]
-    if data["2021 Q2"][1] > 10:
+    trim = data.iloc[: , 1:]
+    if data["2021-01-01"][1] > 10:
         trim = trim.round(2)
     else:
         trim = trim.round(4)
@@ -82,6 +82,17 @@ pool_e = pd.read_csv("extracted/pool-exp.csv", header=None)
 pool = pd.read_csv("extracted/pool.csv", header=None)
 
 #%%
+sdf = []
+
+for i in range(10000):
+    s = np.random.lognormal(0.06, 0.02, 100)
+    sdf.append(s)
+
+sdf = pd.DataFrame(sdf)
+
+sdf.to_csv("extracted/sdf.csv", index=False, header = False)
+
+#%%
 files = {
     "extracted/asx200.csv",
     "extracted/aud_index.csv",
@@ -97,6 +108,7 @@ files = {
     "extracted/rental_yield.csv",
     "extracted/zcp3m_yield.csv",
     "extracted/zcp10y_spread.csv"    
+    "extracted/sdf.csv"    
 }
 
 for f in files:
