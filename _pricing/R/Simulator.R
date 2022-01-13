@@ -118,32 +118,26 @@ get_policy_scenario <- function(policy, age, seed, n) {
     } else if (policy$name[1] == "RM") {
 
         # Get all relevant economic variables
-        rfree <- get_risk_free(age, seed, n)
+        rfree <- get_zcp3m_yield(age, seed, n)
         house <- get_house_price(age, seed, n)
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, n)) {
             temp <- data.frame(house = house[i, ],
-                               rfree = rfree[i, ])
+                               zcp3m = zcp3m[i, ])
             data <- append(data, list(temp))
         }
 
     } else if (policy$name[1] == "VA") {
 
         # Get all relevant economic / health variables
-        intrs <- get_interest(age, seed, n)
-        infla <- get_inflation(age, seed, n)
         stock <- get_stock_price(age, seed, n)
-        house <- get_house_price(age, seed, n)
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, n)) {
-            temp <- data.frame(house = house[i, ],
-                               infla = infla[i, ],
-                               intrs = intrs[i, ],
-                               stock = stock[i, ])
+            temp <- data.frame(stock = stock[i, ])
             data <- append(data, list(temp))
         }
 
@@ -210,16 +204,8 @@ get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 # ---- Economic Scenario Generator Module
 
 # Temporary helper function, should link to economic module
-get_interest <- function(age = 17, seed = 0, n = 1000) {
-    interest <- as.matrix(read.csv("R/data/interest.csv", header = FALSE))
-    colnames(interest) <- NULL
-    rownames(interest) <- NULL
-    return(interest)
-}
-
-# Temporary helper function, should link to economic module
-get_risk_free <- function(age = 17, seed = 0, n = 1000) {
-    risk_free <- as.matrix(read.csv("R/data/interest.csv", header = FALSE))
+get_zcp3m_yield <- function(age = 17, seed = 0, n = 1000) {
+    risk_free <- as.matrix(read.csv("R/data/zcp3m_yield.csv", header = FALSE))
     colnames(risk_free) <- NULL
     rownames(risk_free) <- NULL
     return(risk_free)

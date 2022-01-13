@@ -219,7 +219,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
     while (state[i] == 0 & i < length(state)) {     # while PH is healthy
 
         # Compound loan value over 1 year period
-        loan <- loan * exp(data$rfree[i] + margin)
+        loan <- loan * exp(data$zcp3m[i] + margin)
 
         # Update house value after 1 year period
         value <- value * data$house[i]
