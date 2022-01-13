@@ -154,13 +154,13 @@ cf_pooled_annuity <- function(policy, state, data) {
         cf[i] <- benefit
 
         # Skip rate calculations for final year
-        if (i + 1 > length(state)) {
-            break
-        }
+        if (i + 1 > length(state)) break
 
         # Calculate expected and realized survivorship rates
         suv_e <- data$pool_e[i + 1] / data$pool_e[i]
         suv_r <- data$pool_r[i + 1] / data$pool_r[i]
+
+        if (suv_r == 0) break
 
         # Increase benefit by ratio of rates
         benefit <- benefit * suv_e / suv_r
@@ -170,6 +170,15 @@ cf_pooled_annuity <- function(policy, state, data) {
 
         i <- i + 1
     }
+
+    # Calculate value of unit annuity for entire pool
+    ax <- rep(0, length(data$pool_e))
+    for (i in seq(1, length(data$pool_e))) {
+        ax[i] <- (data$pool_e[i]/data$pool_e[1]) * (1 + interest)^(-i)
+    }
+
+    # Deduct initial costs from cashflow
+    cf[1] <- cf[1] - policy$benefit * sum(ax)
 
     return(cf)
 }
@@ -213,22 +222,25 @@ cf_reverse_mortgage <- function(policy, state, data) {
 
     # Get loan amount for policyholder
     loan <- LVR * value
-    cf[1] <- loan
+    #cf[1] <- loan
 
     i <- 1
     while (state[i] == 0 & i < length(state)) {     # while PH is healthy
 
-        # Compound loan value over 1 year period
-        loan <- loan * exp(data$zcp3m[i] + margin)
+        # Compound loan value over 1 year period (excluding lending margin)
+        loan <- loan * (1 + data$zcp3m[i])
 
         # Update house value after 1 year period
-        value <- value * data$house[i]
+        value <- value * (1 + data$house[i])
 
         i <- i + 1
     }
 
+    # Add excess from lending margin to loan
+    loan <- loan * exp((i - 1) * margin)
+
     # Calculate cashflow from sale (includes negative value)
-    cf[i] <- (1 - cost) * value - loan
+    cf[i] <- max(loan - (1 - cost) * value, 0)
 
     return(cf)
 }

@@ -39,7 +39,7 @@ value_cf <- function(cashflows, ret_paths = FALSE) {
     cmsdf <- rowCumprods((1/sdf))
 
     # Calculate discounted value of cashflows for each path
-    value <- rowSums(cf * cmsdf)
+    value <- rowSums(cashflows * cmsdf)
 
     # Return vector of cashflows if requested via params
     if (ret_paths) return(value)

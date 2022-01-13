@@ -4,7 +4,7 @@
 \alias{simulate_cf}
 \title{Policy Cashflow Simulator}
 \usage{
-simulate_cf(policy, age = 17, sex = "F", seed = 0, n = 1000)
+simulate_cf(policy, age = 17, sex = "F", seed = 0, n = 10000)
 }
 \arguments{
 \item{policy}{Policy type to simulate:
