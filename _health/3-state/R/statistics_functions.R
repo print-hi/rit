@@ -42,6 +42,37 @@ afl <- function(init_age, init_state, trans_probs) {
 }
 
 
+
+aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
+  if (init_state != 0 & init_state != 1) {
+    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
+  }
+
+  if (female != 0 & female != 1) {
+    return('Error: Please input 0 or 1 to indicate female.')
+  }
+
+  if (n != as.integer(n)) {
+    return('Error: Please input an integer for n.')
+  }
+
+  afls <- c()
+  for (. in 1:n) {
+    # simulate new frailty path for each iteration
+    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
+    future_lifetime <- tshm::afl(init_age, init_state, TP)
+    afls <- append(afls, future_lifetime)
+  }
+  return(mean(afls))
+}
+
+
+
 #' Average future lifetime in disabled state
 #'
 #' Calculates the average future lifetime spent in disabled state using a similar
