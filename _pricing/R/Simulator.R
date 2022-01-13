@@ -23,7 +23,7 @@
 #' @export simulate_cf
 #' @examples
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
-simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 1000) {
+simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000) {
 
     # Set cash flow function based on input policy
     cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
@@ -110,7 +110,7 @@ get_policy_scenario <- function(policy, age, seed, n) {
         data <- list()
         for (i in seq(1, n)) {
             temp <- data.frame(pool_r = pool_r[i, ],
-                               pool_e = as.vector(pool_e),
+                               pool_e = pool_e[i, ],
                                stock = stock[i, ])
             data <- append(data, list(temp))
         }
@@ -118,7 +118,7 @@ get_policy_scenario <- function(policy, age, seed, n) {
     } else if (policy$name[1] == "RM") {
 
         # Get all relevant economic variables
-        rfree <- get_zcp3m_yield(age, seed, n)
+        zcp3m <- get_zcp3m_yield(age, seed, n)
         house <- get_house_price(age, seed, n)
 
         # Organise economic inputs into a data.frame for each path
@@ -205,15 +205,18 @@ get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_zcp3m_yield <- function(age = 17, seed = 0, n = 1000) {
-    risk_free <- as.matrix(read.csv("R/data/zcp3m_yield.csv", header = FALSE))
-    colnames(risk_free) <- NULL
-    rownames(risk_free) <- NULL
-    return(risk_free)
+    get_zcp3m_yield <- as.matrix(read.csv("R/data/zcp3m_yield.csv", header = FALSE))
+    get_zcp3m_yield <- (get_zcp3m_yield/100)
+    colnames(get_zcp3m_yield) <- NULL
+    rownames(get_zcp3m_yield) <- NULL
+    return(get_zcp3m_yield)
 }
 
 # Temporary helper function, should link to economic module
 get_inflation <- function(age = 17, seed = 0, n = 1000) {
-    inflation <- as.matrix(read.csv("R/data/inflation.csv", header = FALSE))
+    inflation <- as.matrix(read.csv("R/data/cpi.csv", header = FALSE))
+    inflation <- cbind(rep(0,100),
+                       (inflation[,-1] - inflation[,-100])/inflation[,-100])
     colnames(inflation) <- NULL
     rownames(inflation) <- NULL
     return(inflation)
@@ -221,7 +224,9 @@ get_inflation <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_house_price <- function(age = 17, seed = 0, n = 1000) {
-    house <- as.matrix(read.csv("R/data/house.csv", header = FALSE))
+    house <- as.matrix(read.csv("R/data/home_index.csv", header = FALSE))
+    house <- cbind(rep(0,100),
+                    (house[,-1] - house[,-100])/house[,-100])
     colnames(house) <- NULL
     rownames(house) <- NULL
     return(house)
@@ -229,7 +234,9 @@ get_house_price <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_stock_price <- function(age = 17, seed = 0, n = 1000) {
-    stock <- as.matrix(read.csv("R/data/stock.csv", header = FALSE))
+    stock <- as.matrix(read.csv("R/data/asx200.csv", header = FALSE))
+    stock <- cbind(rep(0,100),
+                   (stock[,-1] - stock[,-100])/stock[,-100])
     colnames(stock) <- NULL
     rownames(stock) <- NULL
     return(stock)
