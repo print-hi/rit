@@ -210,3 +210,28 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
   return(mean(avg_disabled_times))
 }
 
+time_to_disabled <- function(init_age, init_state, trans_probs) {
+  # screening for errors
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+  }
+
+  if (init_age<65 | init_age>110) {
+    return('Error: init_age outside bounds of allowable age values')
+}
+
+  # create a simulation
+  simulated_path <- tshm::simulate_path(init_age, init_state, trans_probs)
+
+  first_time <- c()
+  for (i in 1:nrow(simulated_path)) {
+    row_val <-simulated_path[i, ]
+    if (1 %in% row_val) {
+      first_time <- append(first_time, match(1, row_val)-0.5)
+    } else {
+      first_time <- append(first_time, 0)
+    }
+  }
+  return(mean(first_time))
+}
+
