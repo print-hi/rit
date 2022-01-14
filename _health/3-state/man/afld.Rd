@@ -15,7 +15,7 @@ afld(init_age, init_state, trans_probs)
 \code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-numeric output for average future lifetime
+numeric output for average future lifetime in disabled state
 }
 \description{
 Calculates the average future lifetime spent in disabled state using a similar

@@ -5,6 +5,7 @@
 #' Calculates the average future life time given initial state and age of an
 #' individual. This is calculated using the curtate expected life time, which is
 #' essentially a sum survival probabilities.
+#' NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 #'
 #' @param init_age
 #' integer between 65 and 110 denoting initial age of individual
@@ -43,6 +44,37 @@ afl <- function(init_age, init_state, trans_probs) {
 
 
 
+#' Average future lifetime (Frailty Model)
+#'
+#' Performs the same function as the \code{\link[tshm]{afl}}, but simulates a number of
+#' unique latent factor paths to make probabilities stochastic.
+#' NOTE: USE \code{\link[tshm]{afl}} for static and trend models.
+#'
+#' @param init_age
+#' integer between 65 and 110 indicating initial age of individual
+#'
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#'
+#' @param female
+#' 0 for male, 1 for female
+#'
+#' @param year
+#' integer indicating current year
+#'
+#' @param param_file
+#' string name of file containing all the parameters of the model
+#'
+#' @param n
+#' integer denoting number of unique latent factor simulations
+#'
+#'
+#' @return
+#' numeric output for expected future lifetime
+#'
+#' @export
+#'
+#' @examples
 aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -92,7 +124,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
 #' \code{\link[tshm]{get_trans_probs}}.
 #'
 #' @return
-#' numeric output for average future lifetime
+#' numeric output for average future lifetime in disabled state
 #'
 #' @export
 #'

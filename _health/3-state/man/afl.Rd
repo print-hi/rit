@@ -21,4 +21,5 @@ numeric output for average future lifetime
 Calculates the average future life time given initial state and age of an
 individual. This is calculated using the curtate expected life time, which is
 essentially a sum survival probabilities.
+NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 }
