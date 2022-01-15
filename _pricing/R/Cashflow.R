@@ -2,6 +2,16 @@
 # --------------------------- Account Based Pension -------------------------- #
 # ---------------------------------------------------------------------------- #
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_account_based_pension <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -54,6 +64,16 @@ cf_account_based_pension <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_care_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -104,6 +124,16 @@ cf_care_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_life_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -137,6 +167,16 @@ cf_life_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -209,6 +249,16 @@ cf_pooled_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_reverse_mortgage <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -252,6 +302,16 @@ cf_reverse_mortgage <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
+#' Title
+#'
+#' @param policy
+#' @param state
+#' @param data
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cf_variable_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
