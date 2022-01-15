@@ -213,18 +213,35 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
 
 
 
-time_to_disabled <- function(init_age, init_state, trans_probs) {
+#' Time until onset of disability (conditional on being disabled)
+#'
+#' Uses simulation to produce an average time until a healthy individual becomes disabled
+#' during their life time. Note that this is conditional on the individual becoming disabled,
+#' so it doesn't factor in life simulations where the indiviudal is always healthy.
+#' NOTE: USE \code{\link[tshm]{time_to_disabledF}} for frailty model.
+#'
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#'
+#' @param trans_probs
+#' a list of transition probability matrices, preferably generated from
+#' \code{\link[tshm]{get_trans_probs}}.
+#'
+#' @return
+#' numeric denoting the average time until indiviudal becomes disabled
+#'
+#' @export
+#'
+#' @examples
+time_to_disabled <- function(init_age, trans_probs) {
   # screening for errors
-  if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
-  }
-
   if (init_age<65 | init_age>110) {
     return('Error: init_age outside bounds of allowable age values')
-}
+  }
 
   # create a simulation
-  simulated_path <- tshm::simulate_path(init_age, init_state, trans_probs, cohort = 5000)
+  simulated_path <- tshm::simulate_path(init_age, 0, trans_probs, cohort = 5000)
 
   first_time <- c()
   for (i in 1:nrow(simulated_path)) {
@@ -238,14 +255,36 @@ time_to_disabled <- function(init_age, init_state, trans_probs) {
 
 
 
-time_to_disabledF <- function(init_age, init_state, female, year, param_file, n = 2500) {
+#' Time until onset of disability (Frailty model)
+#'
+#' Function serves the same purpose as \code{\link[tshm]{time_to_disabled}}, but it is for
+#' the frailty model.
+#'
+#' @param init_age
+#' integer between 65 and 110
+#'
+#' @param female
+#' 0 for male, 1 for female
+#'
+#' @param year
+#' integer denoting current year
+#'
+#' @param param_file
+#' string for file path containing parameters of cox regression model
+#'
+#' @param n
+#' integer denoting number of simulations to make
+#'
+#' @return
+#' numeric denoting the average time until indiviudal becomes disabled
+#'
+#' @export
+#'
+#' @examples
+time_to_disabledF <- function(init_age, female, year, param_file, n = 2500) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
-  }
-
-  if (init_state != 0 & init_state != 1) {
-    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
   }
 
   if (female != 0 & female != 1) {
@@ -260,7 +299,7 @@ time_to_disabledF <- function(init_age, init_state, female, year, param_file, n 
   ttds <- c() # vector to contain each time to disabled
   for (. in 1:n) {
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    ttd <- tshm::time_to_disabled(init_age, init_state, TP)
+    ttd <- tshm::time_to_disabled(init_age, TP)
     ttds <- append(ttds, ttd)
   }
   return(mean(ttds))
