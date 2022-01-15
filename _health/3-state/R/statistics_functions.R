@@ -210,6 +210,9 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
   return(mean(avg_disabled_times))
 }
 
+
+
+
 time_to_disabled <- function(init_age, init_state, trans_probs) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -221,17 +224,46 @@ time_to_disabled <- function(init_age, init_state, trans_probs) {
 }
 
   # create a simulation
-  simulated_path <- tshm::simulate_path(init_age, init_state, trans_probs)
+  simulated_path <- tshm::simulate_path(init_age, init_state, trans_probs, cohort = 5000)
 
   first_time <- c()
   for (i in 1:nrow(simulated_path)) {
     row_val <-simulated_path[i, ]
     if (1 %in% row_val) {
       first_time <- append(first_time, match(1, row_val)-0.5)
-    } else {
-      first_time <- append(first_time, 0)
     }
   }
   return(mean(first_time))
 }
+
+
+
+time_to_disabledF <- function(init_age, init_state, female, year, param_file, n = 2500) {
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
+  if (init_state != 0 & init_state != 1) {
+    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
+  }
+
+  if (female != 0 & female != 1) {
+    return('Error: Please input 0 or 1 to indicate female.')
+  }
+
+  if (n != as.integer(n)) {
+    return('Error: Please input an integer for n.')
+  }
+
+  # create n unique latent factor paths
+  ttds <- c() # vector to contain each time to disabled
+  for (. in 1:n) {
+    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
+    ttd <- tshm::time_to_disabled(init_age, init_state, TP)
+    ttds <- append(ttds, ttd)
+  }
+  return(mean(ttds))
+}
+
 
