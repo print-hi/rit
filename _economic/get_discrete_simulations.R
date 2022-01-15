@@ -1,18 +1,19 @@
 #' get_discrete_simulations
 #'
-#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon spread, (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate. 
+#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
 #' Simulations are based on a Vector Autoregression model. 
 #' 
 #' @param num_years Number of years to forecast, counting from 2021-01-01. Default is 5 years, recommended period is less than 10 years. 
 #' @param num_paths Number of simulation paths. Default is 10000 paths. 
 #' @param frequency One of "year", "quarter", and "month". Default is "quarter", which is the simulation frequency for the Vector Autoregression model. Linear interpolation will be used if the required frequency is higher, whereas arithmetic average will be used if the frequency is lower.   
+#' @param perc_change If the outputs are expressed in terms of percentage change. Default FALSE 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for each economic variable. 
 #' @export
 #'
 #' @examples get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year")
 #' 
-get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter") {
+get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE) {
     
     ################
     # error messages 
@@ -22,6 +23,9 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         
     } else if (!frequency %in% c("year", "quarter", "month")) { 
         stop ("Frequency must be one of 'year', 'quarter', and 'month'. ")
+        
+    } else if (!is.logical(perc_change)) {
+        stop ("Percentage change must be logical. ")
         
     } else {
         ########################################################
@@ -175,8 +179,13 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
             output = lapply(sim, function (x) apply(x[-nrow(x), ], 2, function (y) {colMeans(matrix(y, nrow=4))} ))
             output = lapply(output, function(x) {row.names(x) = as.character(time_index_year); x})
         }
-        
         output = lapply(output, function(x){x = as.data.frame(x)})
+        
+        ##############
+        # output units 
+        if (isTRUE(perc_change)) {
+            output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        }
         
         return (output)
     }
