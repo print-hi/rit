@@ -104,6 +104,30 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
 }
 
 
+hfl <- function(init_age, init_state, trans_probs) {
+  # screening for errors
+  if (init_state != 0 & init_state != 1) {
+    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+  }
+
+  if (init_age<65 | init_age>110) {
+    return('Error: init_age outside bounds of allowable age values')
+  }
+
+  # we sum up probabilities of being disabled in each state
+  # this is similar to curtate life expectation
+  probs <- c()
+  for (i in 1:(110-init_age)) {
+    prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs, end_state = 0)
+    probs <- append(probs, prob)
+  }
+  if (init_state == 0) {
+    return(sum(probs) + 0.5) # extra half year of disabled at the start
+  } else {
+    return(sum(probs))
+  }
+}
+
 
 #' Average future lifetime in disabled state
 #'
