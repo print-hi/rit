@@ -34,3 +34,18 @@ paths_la <- value_cf(cf_la, TRUE)
 paths_pa <- value_cf(cf_pa, TRUE)
 paths_rm <- value_cf(cf_rm, TRUE)
 paths_va <- value_cf(cf_va, TRUE)
+
+plot_cf(cf_ap)
+plot_cf(cf_ca)
+plot_cf(cf_la)
+plot_cf(cf_pa)
+plot_cf(cf_rm)
+plot_cf(cf_va)
+
+plot_cf(cf_ap, TRUE)
+plot_cf(cf_ca, TRUE)
+plot_cf(cf_la, TRUE)
+plot_cf(cf_pa, TRUE)
+plot_cf(cf_rm, TRUE)
+plot_cf(cf_va, TRUE)
+

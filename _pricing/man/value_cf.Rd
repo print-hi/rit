@@ -2,21 +2,16 @@
 % Please edit documentation in R/Valuation.R
 \name{value_cf}
 \alias{value_cf}
-\title{Valuation via cashflows}
+\title{Title}
 \usage{
-value_cf(cashflows, ret_paths = FALSE)
+value_cf(policy, cashflows)
 }
 \arguments{
-\item{cashflows}{Matrix of simulated cashflow paths}
-
-\item{ret_paths}{If ret_paths = TRUE, vector of prices for each path is returned}
+\item{cashflows}{}
 }
 \value{
-Value of policy
+
 }
 \description{
-Simulate cash flows using Monte-Carlo methods for various policies
-}
-\examples{
-cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
+Title
 }
