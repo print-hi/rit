@@ -39,7 +39,7 @@ afl <- function(init_age, init_state, trans_probs) {
     prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs)
     probs <- append(probs, prob)
   }
-  return(sum(probs))
+  return(sum(probs) + 0.5)
 }
 
 
@@ -98,7 +98,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
     # simulate new frailty path for each iteration
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
     future_lifetime <- tshm::afl(init_age, init_state, TP)
-    afls <- append(afls, future_lifetime)
+    afls <- append(afls, future_lifetime + 0.5)
   }
   return(mean(afls))
 }
