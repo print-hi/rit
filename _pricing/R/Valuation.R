@@ -28,31 +28,68 @@ value_cf <- function(policy, cashflows) {
     dist <- plot_convergence(paths)
     conv <- plot_distribution(paths)
 
+    attr_mapping <- list(
+        AP          = "Account Based Policy",
+        CA          = "Care Annuity",
+        LA          = "Life Annuity",
+        PA          = "Pooled Annuity",
+        VA          = "Variable Annuity",
+        RM          = "Reverse Mortgage",
+        bal         = "Balance     ",
+        exp         = "Expense     ",
+        benefit     = "Benefit     ",
+        defer       = "Defer       ",
+        increase    = "Increase    ",
+        loading     = "Loading     ",
+        size        = "Pool Size   ",
+        state       = "States      ",
+        min         = "Min Length  ",
+        interest    = "Interest    ",
+        value       = "Value       ",
+        LVR         = "LVR         ",
+        trans_cost  = "Trans. Cost ",
+        length      = "Length      ",
+        prop        = "Prop        ",
+        g_fee       = "Guar. Fee   ",
+        s_fee       = "Surr. Fee   "
+    )
+
+
+    msg <- c("========= Policy Details =========",
+             paste("Type        :", attr_mapping[[policy$name[1]]]),
+             "----------------------------------")
+
+    for (i in colnames(policy)) {
+        if (i != "name") {
+            msg <- c(msg, paste(attr_mapping[[i]], ": ", policy[i], sep = ""))
+        }
+    }
+
+    formatted <- function(x) {
+        formatC(as.numeric(x), format="f", digits=2, big.mark=",")
+    }
+
+    msg <- c(msg, "",
+             "======= Summary Statistics =======",
+             paste("Mean        : $", formatted(stat$mean), sep = ""),
+             paste("Std Dev     : $", formatted(stat$sd), sep = ""),
+             "----------------------------------",
+             paste("Minimum     : $", formatted(stat$min), sep = ""),
+             paste("Maximum     : $", formatted(stat$max), sep = ""),
+             "----------------------------------",
+             paste("P_0.25      : $", formatted(stat$quantile[1]), sep = ""),
+             paste("P_0.50      : $", formatted(stat$median), sep = ""),
+             paste("P_0.75      : $", formatted(stat$quantile[3]), sep = ""),
+             "----------------------------------",
+             paste("Skewness    : ", formatted(stat$skew), sep = ""),
+             paste("Kurtosis    : ", formatted(stat$kurtosis), sep = ""),
+             "==================================")
+
+    writeLines(msg)
+
     x <- list(paths = paths, stats = stat, conv = conv, dist = dist)
 
     ret <- structure(x, class = "cf")
-
-    msg <- c(paste("Valuation of", policy$name), "",
-             "----- Policy Details -----")
-
-    for (i in colnames(policy)) {
-        if (i != "name") msg <- c(msg, paste(i, ": ", policy[i], sep = ""))
-    }
-
-    mean = round(stat$mean, 2)
-    var = round(stat$var, 2)
-    sd = round(sqrt(stat$var), 2)
-
-
-    msg <- c(msg,
-             "--------------------------\n",
-             "--- Summary Statistics ---",
-             paste("Mean       : ", mean, sep = ""),
-             paste("StDev      : ", sd, sep = ""),
-             paste("Variance   : ", var, sep = ""),
-             "--------------------------")
-
-    writeLines(msg)
 
     return(ret)
 }
@@ -109,7 +146,15 @@ get_path_prices <- function(cashflows) {
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 get_price_stats <- function(prices) {
 
-    stats <- list(mean = mean(prices), var = var(prices))
+    stats <- list(mean = mean(prices),
+                  var = var(prices),
+                  sd = sqrt(var(prices)),
+                  min = min(prices),
+                  max = max(prices),
+                  skew = skewness(prices),
+                  kurtosis = kurtosis(prices),
+                  median = median(prices),
+                  quantile = quantile(prices, probs = c(.25, .5, .75)))
 
     # Otherwise, return expected value
     return(stats)

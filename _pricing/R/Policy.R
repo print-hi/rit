@@ -16,6 +16,9 @@
 #' ap <- create_policy_AP(400000, 60000)
 create_policy_AP <- function(balance, expenses) {
 
+    if (length(balance) > 1)    stop("Invalid balance: length(balance) = 1")
+    if (length(expenses) > 1)   stop("Invalid expenses: length(balance) = 1")
+
     if (balance < 0)        stop("Invalid balance: balance > 0")
     if (expenses < 0)       stop("Invalid expenses: expenses > 0")
     if (balance < expenses) stop("Invalid expenses: expenses < balance")
@@ -101,6 +104,11 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 #' la <- create_policy_LA(60000, 5, 0.04, 0.05)
 create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 
+    if (length(defer) > 1)      stop("Invalid defer: length(defer) = 1")
+    if (length(benefit) > 1)    stop("Invalid benefit: length(benefit) = 1")
+    if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
+    if (length(increase) > 1)   stop("Invalid increase: length(increase) = 1")
+
     if (defer < 0)      stop("Invalid defer: defer > 0")
     if (benefit < 0)    stop("Invalid benefit: benefit > 0")
     if (loading < 0)    stop("Invalid loading: loading > 0")
@@ -138,6 +146,11 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 #' pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
 create_policy_PA <- function(benefit, size, interest, loading) {
 
+    if (length(size) > 1)       stop("Invalid size: length(size) = 1")
+    if (length(benefit) > 1)    stop("Invalid benefit: length(benefit) = 1")
+    if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
+    if (length(interest) > 1)   stop("Invalid interest: length(interest) = 1")
+
     if (size < 0)       stop("Invalid size: size > 0")
     if (benefit < 0)    stop("Invalid benefit: benefit > 0")
     if (loading < 0)    stop("Invalid loading: loading > 0")
@@ -174,9 +187,14 @@ create_policy_PA <- function(benefit, size, interest, loading) {
 #' rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)
 create_policy_RM <- function(value, LVR, trans_cost, margin) {
 
-    if (value < 0) stop("Invalid value: value > 0")
-    if (margin < 0) stop("Invalid margin: margin > 0")
-    if (LVR < 0 | LVR > 1) stop("Invalid LVR: 0 <= LVR <= 1")
+    if (length(LVR) > 1)        stop("Invalid LVR: length(LVR) = 1")
+    if (length(value) > 1)      stop("Invalid value: length(value) = 1")
+    if (length(margin) > 1)     stop("Invalid margin: length(margin) = 1")
+    if (length(trans_cost) > 1) stop("Invalid trans_cost: length(t_cost) = 1")
+
+    if (value < 0)          stop("Invalid value: value > 0")
+    if (margin < 0)         stop("Invalid margin: margin > 0")
+    if (LVR < 0 | LVR > 1)  stop("Invalid LVR: 0 <= LVR <= 1")
     if (trans_cost < 0 | trans_cost > 1) stop("Invalid trans_cost: 0 < LVR < 1")
 
     pol <- data.frame(name = c("RM"),
@@ -212,7 +230,12 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' @export create_policy_VA
 #' @examples
 #' va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
-create_policy_VA <- function(value, length, prop, g_fee, s_fee) {
+create_policy_VA <- function(value, length, prop, g_fee) {
+
+    if (length(prop) > 1)       stop("Invalid prop: length(prop) = 1")
+    if (length(g_fee) > 1)      stop("Invalid g_fee: length(g_fee) = 1")
+    if (length(length) > 1)     stop("Invalid length: length(length) = 1")
+    if (length(prop) > 1)       stop("Invalid prop: length(prop) = 1")
 
     if (g_fee < 0)              stop("Invalid g_fee: g_fee > 0")
     if (value < 0)              stop("Invalid value: value > 0")
@@ -223,8 +246,7 @@ create_policy_VA <- function(value, length, prop, g_fee, s_fee) {
                       value = c(value),
                       length = c(length),
                       prop = c(prop),
-                      g_fee = c(g_fee),
-                      s_fee = c(s_fee))
+                      g_fee = c(g_fee))
 
     return(pol)
 }

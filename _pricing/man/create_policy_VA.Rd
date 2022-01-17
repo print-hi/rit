@@ -4,7 +4,7 @@
 \alias{create_policy_VA}
 \title{Variable Annuity - Policy Object Generator}
 \usage{
-create_policy_VA(value, length, prop, g_fee, s_fee)
+create_policy_VA(value, length, prop, g_fee)
 }
 \arguments{
 \item{value}{Initial Account value (single upfront premium)}
