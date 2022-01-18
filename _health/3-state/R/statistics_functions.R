@@ -143,16 +143,17 @@ hfl <- function(init_age, init_state, trans_probs) {
 
   # we sum up probabilities of being disabled in each state
   # this is similar to curtate life expectation
-  probs <- c()
-  for (i in 1:(110-init_age)) {
-    prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs, end_state = 0)
-    probs <- append(probs, prob)
+  SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+  healthy_lifetimes <- rep(0, nrow(SP))
+  for (i in 1:nrow(SP)) {
+    row_val <- SP[i,]
+    if (init_state == 0) {
+      healthy_lifetimes[i] <- sum(row_val == 0) + 0.5
+    } else {
+      healthy_lifetimes[i] <- sum(row_val == 0)
+    }
   }
-  if (init_state == 0) {
-    return(sum(probs) + 0.5) # extra half year of disabled at the start
-  } else {
-    return(sum(probs))
-  }
+  return(c('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
 }
 
 #' Heatlhy Future Lifetime (Frailty Model)
