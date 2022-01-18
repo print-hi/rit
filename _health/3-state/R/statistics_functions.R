@@ -18,7 +18,7 @@
 #' \code{\link[tshm]{get_trans_probs}}.
 #'
 #' @return
-#' numeric output for average future lifetime
+#' numeric output for average and standard deviation of future lifetime
 #'
 #' @export
 #'
@@ -33,14 +33,17 @@ afl <- function(init_age, init_state, trans_probs) {
     return('Error: init_age outside bounds of allowable age values')
   }
 
-  # we calculate survival probs for each age and sum
-  probs <- c()
-  for (i in 1:(110-init_age)) {
-    prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs)
-    probs <- append(probs, prob)
+  # simulate path
+  SP <- simulate_path(init_age, init_state, trans_probs)
+  # count time at death
+  future_lifetimes <- c()
+  for (i in 1:nrow(SP)) {
+    row_val = SP[i, ]
+    future_lifetimes <- append(future_lifetimes, which(row_val == -1)[1]-1-0.5) # assume transition happens mid year
   }
-  return(sum(probs) + 0.5)
+  return(c('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
 }
+
 
 
 

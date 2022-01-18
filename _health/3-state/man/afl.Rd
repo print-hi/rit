@@ -15,7 +15,7 @@ afl(init_age, init_state, trans_probs)
 \code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-numeric output for average future lifetime
+numeric output for average and standard deviation of future lifetime
 }
 \description{
 Calculates the average future life time given initial state and age of an
