@@ -36,10 +36,10 @@ afl <- function(init_age, init_state, trans_probs) {
   # simulate path
   SP <- simulate_path(init_age, init_state, trans_probs)
   # count time at death
-  future_lifetimes <- c()
+  future_lifetimes <- rep(0, nrow(SP))
   for (i in 1:nrow(SP)) {
     row_val = SP[i, ]
-    future_lifetimes <- append(future_lifetimes, which(row_val == -1)[1]-1-0.5) # assume transition happens mid year
+    future_lifetimes[i] <- which(row_val == -1)[1]-1-0.5 # assume transition happens mid year
   }
   return(c('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
 }
@@ -73,7 +73,7 @@ afl <- function(init_age, init_state, trans_probs) {
 #'
 #'
 #' @return
-#' numeric output for expected future lifetime
+#' numeric output for expected future lifetime and standard deviation of future lifetime
 #'
 #' @export
 #'
