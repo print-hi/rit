@@ -78,7 +78,7 @@ afl <- function(init_age, init_state, trans_probs) {
 #' @export
 #'
 #' @examples
-aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
+aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
@@ -96,14 +96,17 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
     return('Error: Please input an integer for n.')
   }
 
-  afls <- c()
-  for (. in 1:n) {
+  future_lifetimes <- rep(0, n*10000)
+  for (x in 1:n) {
     # simulate new frailty path for each iteration
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    future_lifetime <- tshm::afl(init_age, init_state, TP)
-    afls <- append(afls, future_lifetime)
+    SP <- tshm::simulate_path(init_age, init_state, TP)
+    for (i in 1:nrow(SP)) {
+      row_val <- SP[i, ]
+      future_lifetimes[(x-1)*10000+i] <- which(row_val == -1)[1]-1-0.5
+    }
   }
-  return(mean(afls))
+  return(c('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
 }
 
 
