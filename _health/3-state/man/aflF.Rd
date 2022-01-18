@@ -4,7 +4,7 @@
 \alias{aflF}
 \title{Average future lifetime (Frailty Model)}
 \usage{
-aflF(init_age, init_state, female, year, param_file, n = 5000)
+aflF(init_age, init_state, female, year, param_file, n = 1000)
 }
 \arguments{
 \item{init_age}{integer between 65 and 110 indicating initial age of individual}
@@ -20,7 +20,7 @@ aflF(init_age, init_state, female, year, param_file, n = 5000)
 \item{n}{integer denoting number of unique latent factor simulations}
 }
 \value{
-numeric output for expected future lifetime
+numeric output for expected future lifetime and standard deviation of future lifetime
 }
 \description{
 Performs the same function as the \code{\link[tshm]{afl}}, but simulates a number of
