@@ -104,6 +104,27 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
 }
 
 
+#' Healthy Future lifetime
+#'
+#' Calculates the future lifetime spent in the healthy state.
+#' NOTE: USE \code{\link[tshm]{hflF}} FOR FRAILTY MODEL.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#'
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#'
+#' @param trans_probs
+#' list of transition probability matrices; ideally generated from
+#' \code{\link[tshm]{get_trans_probs}}.
+#'
+#' @return
+#' Numeric output denoting the average time spent in healthy state.
+#'
+#' @export
+#'
+#' @examples
 hfl <- function(init_age, init_state, trans_probs) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -128,6 +149,36 @@ hfl <- function(init_age, init_state, trans_probs) {
   }
 }
 
+#' Heatlhy Future Lifetime (Frailty Model)
+#'
+#' Performs the same function as \code{\link[tshm]{hfl}}, but simulates unique latent factor
+#' paths in the process.
+#' NOTE: USE \code{\link[tshm]{hfl}} for static and trend models.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#'
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#'
+#' @param female
+#' 0 for male, 1 for female
+#'
+#' @param year
+#' integer denoting current year
+#'
+#' @param param_file
+#' string for file path containing parameters of cox regression model
+#'
+#' @param n
+#' integer denoting number of simulations
+#'
+#' @return
+#' Numeric output denoting the average time spent in healthy state.
+#'
+#' @export
+#'
+#' @examples
 hflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
