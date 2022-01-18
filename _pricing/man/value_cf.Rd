@@ -4,7 +4,7 @@
 \alias{value_cf}
 \title{Title}
 \usage{
-value_cf(policy, cashflows)
+value_cf(policy, cashflows = NULL)
 }
 \arguments{
 \item{cashflows}{}

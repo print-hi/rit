@@ -20,14 +20,21 @@ get_sdf <- function(n = 1000, period = 100) {
 #' @export value_cf
 #'
 #' @examples
-value_cf <- function(policy, cashflows) {
+value_cf <- function(policy, cashflows = NULL) {
 
+    # For complex policies, would be faster to simulate_cf once
+    # and pass in as a parameter
+    if (is.null(cashflows)) cashflows <- simulate_cf(policy)
+
+    # Calculate price of policy for each path
     paths <- get_path_prices(cashflows)
 
+    # Produce statistics and plots for policy price
     stat <- get_price_stats(paths)
     dist <- plot_convergence(paths)
     conv <- plot_distribution(paths)
 
+    # Maps 'colname' attribute to formatted title for output text
     attr_mapping <- list(
         AP          = "Account Based Policy",
         CA          = "Care Annuity",
@@ -54,21 +61,24 @@ value_cf <- function(policy, cashflows) {
         s_fee       = "Surr. Fee   "
     )
 
-
+    # Format introduction for output text
     msg <- c("========= Policy Details =========",
              paste("Type        :", attr_mapping[[policy$name[1]]]),
              "----------------------------------")
 
+    # Format attribute elements of policy into output text
     for (i in colnames(policy)) {
         if (i != "name") {
             msg <- c(msg, paste(attr_mapping[[i]], ": ", policy[i], sep = ""))
         }
     }
 
+    # Function for consistent formatting for numeric (financial) variables
     formatted <- function(x) {
         formatC(as.numeric(x), format="f", digits=2, big.mark=",")
     }
 
+    # Format summary statistics
     msg <- c(msg, "",
              "======= Summary Statistics =======",
              paste("Mean        : $", formatted(stat$mean), sep = ""),
@@ -85,11 +95,12 @@ value_cf <- function(policy, cashflows) {
              paste("Kurtosis    : ", formatted(stat$kurtosis), sep = ""),
              "==================================")
 
+    # Print output text
     writeLines(msg)
 
+    # Create policy class object
     x <- list(paths = paths, stats = stat, conv = conv, dist = dist)
-
-    ret <- structure(x, class = "cf")
+    ret <- structure(x, class = "policy")
 
     return(ret)
 }
@@ -146,6 +157,7 @@ get_path_prices <- function(cashflows) {
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 get_price_stats <- function(prices) {
 
+    # Calculate and organise summary statistics into list
     stats <- list(mean = mean(prices),
                   var = var(prices),
                   sd = sqrt(var(prices)),
@@ -177,14 +189,19 @@ get_price_stats <- function(prices) {
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 plot_convergence <- function(prices) {
 
+    # Create break point for 100 points
     breaks <- seq((length(prices))/100, length(prices), (length(prices))/100)
-    expected <- rep(0, length(breaks))
 
+    # If less than 100 points, break point for each price
+    if (length(prices) < 100) breaks <- seq(1, length(prices))
+
+    # Record cumulative mean up until each break point
+    expected <- rep(0, length(breaks))
     for (i in seq(1, length(breaks))) expected[i] <- mean(prices[1:breaks[i]])
 
+    # Format plot
     title <- paste("Convergence of Policy Valuation (", length(prices),
                    " paths)", sep = "")
-
     plot(x = breaks, y = expected, ylab = "Value", xlab = "Number of Paths",
          main = title)
 
@@ -209,9 +226,9 @@ plot_convergence <- function(prices) {
 #' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
 plot_distribution <- function(prices) {
 
+    # Format histogram plot
     title <- paste("Distribution of Policy Valuation (", length(prices),
                    " paths)", sep = "")
-
     hist(x = prices, breaks = 20, ylab = "Frequency", xlab = "Value",
          main = title)
 
