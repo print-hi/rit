@@ -366,16 +366,17 @@ time_to_disabled <- function(init_age, trans_probs) {
   }
 
   # create a simulation
-  simulated_path <- tshm::simulate_path(init_age, 0, trans_probs, cohort = 5000)
+  simulated_path <- tshm::simulate_path(init_age, 0, trans_probs)
 
-  first_time <- c()
+  first_time <- rep(0, nrow(simulated_path))
   for (i in 1:nrow(simulated_path)) {
     row_val <-simulated_path[i, ]
     if (1 %in% row_val) {
-      first_time <- append(first_time, match(1, row_val)-0.5)
+      first_time[i] <- which(row_val == 1)[1]-1-0.5
     }
   }
-  return(mean(first_time))
+  first_time <- first_time[first_time != 0]
+  return(c('mean' = mean(first_time), 'sd' = sd(first_time)))
 }
 
 
