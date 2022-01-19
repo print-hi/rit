@@ -112,7 +112,8 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
 #' Healthy Future lifetime
 #'
-#' Calculates the future lifetime spent in the healthy state.
+#' Calculates the expected future lifetime spent and its standard deviation
+#' in the healthy state.
 #' NOTE: USE \code{\link[tshm]{hflF}} FOR FRAILTY MODEL.
 #'
 #' @param init_age
@@ -126,7 +127,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' \code{\link[tshm]{get_trans_probs}}.
 #'
 #' @return
-#' Numeric output denoting the average time spent in healthy state.
+#' Numeric output of expected time and standard deviation of time spent in healthy state.
 #'
 #' @export
 #'

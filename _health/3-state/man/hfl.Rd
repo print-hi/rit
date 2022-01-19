@@ -15,9 +15,10 @@ hfl(init_age, init_state, trans_probs)
 \code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-Numeric output denoting the average time spent in healthy state.
+Numeric output of expected time and standard deviation of time spent in healthy state.
 }
 \description{
-Calculates the future lifetime spent in the healthy state.
+Calculates the expected future lifetime spent and its standard deviation
+in the healthy state.
 NOTE: USE \code{\link[tshm]{hflF}} FOR FRAILTY MODEL.
 }
