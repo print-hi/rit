@@ -4,7 +4,7 @@
 \alias{afldF}
 \title{Average future lifetime in disabled state (frailty model)}
 \usage{
-afldF(init_age, init_state, female, year, param_file, n = 5000)
+afldF(init_age, init_state, female, year, param_file, n = 1000)
 }
 \arguments{
 \item{init_age}{integer between 65 and 110 denoting initial age of individual}
@@ -20,7 +20,7 @@ afldF(init_age, init_state, female, year, param_file, n = 5000)
 \item{n}{integer representing number of unique latent factors to simulate}
 }
 \value{
-numeric output for average time spent in disabled state
+numeric output for average time spent and standard deviation of time in disabled state
 }
 \description{
 Performs the same function as \code{\link[tshm]{afld}}, but it requires inputs

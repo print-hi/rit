@@ -264,7 +264,7 @@ afld <- function(init_age, init_state, trans_probs) {
   for (i in 1:nrow(SP)) {
     row_val <- SP[i, ]
     if (init_state == 1) {
-      disabled_lifetime[i] <- sum(row_val == 1) -0.5 # transition happens mid year
+      disabled_lifetime[i] <- sum(row_val == 1) - 0.5 # transition happens mid year
     } else {
       disabled_lifetime[i] <- sum(row_val == 1)
     }
@@ -295,12 +295,12 @@ afld <- function(init_age, init_state, trans_probs) {
 #' integer representing number of unique latent factors to simulate
 #'
 #' @return
-#' numeric output for average time spent in disabled state
+#' numeric output for average time spent and standard deviation of time in disabled state
 #'
 #' @export
 #'
 #' @examples
-afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
+afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
@@ -318,16 +318,21 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 5000) {
     return('Error: Please input an integer for n.')
   }
 
-  # we simulate average time spent in disabled state for n different latent
-  # factor simulations:
-  avg_disabled_times <- c()
-  for(. in 1:n) {
-    # simulate transition probabilities and life time paths
-    TP <- get_trans_probs('F', param_file, init_age, female, year)
-    disabled_time <- tshm::afld(init_age, init_state, TP)
-    avg_disabled_times <- append(avg_disabled_times, disabled_time)
+  disabled_lifetime <- rep(0, n*10000)
+  # simulate n unique latent factors
+  for (x in 1:n) {
+    TP <- tshm::get_trans_probs('F', 'US_params_new.xlsx', init_age, female, year)
+    SP <- tshm::simulate_path(init_age, init_state, TP)
+    for (i in 1:nrow(SP)) {
+      row_val <- SP[i,]
+      if (init_state == 1) {
+        disabled_lifetime[(x-1)*10000+i] <- sum(row_val == 1) - 0.5
+      } else {
+        disabled_lifetime[(x-1)*10000+i] <- sum(row_val == 1)
+      }
+    }
   }
-  return(mean(avg_disabled_times))
+  return(c('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
 }
 
 
