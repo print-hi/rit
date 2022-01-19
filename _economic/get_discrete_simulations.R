@@ -6,14 +6,15 @@
 #' @param num_years Number of years to forecast, counting from 2021-01-01. Default is 5 years, recommended period is less than 10 years. 
 #' @param num_paths Number of simulation paths. Default is 10000 paths. 
 #' @param frequency One of "year", "quarter", and "month". Default is "quarter", which is the simulation frequency for the Vector Autoregression model. Linear interpolation will be used if the required frequency is higher, whereas arithmetic average will be used if the frequency is lower.   
-#' @param perc_change If the outputs are expressed in terms of percentage change. Default FALSE 
+#' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
+#' @param return_noise If the white noises of the model is returned. Default is FALSE. 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for each economic variable. 
 #' @export
 #'
 #' @examples get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year")
 #' 
-get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE) {
+get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
     
     ################
     # error messages 
@@ -24,8 +25,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
     } else if (!frequency %in% c("year", "quarter", "month")) { 
         stop ("Frequency must be one of 'year', 'quarter', and 'month'. ")
         
-    } else if (!is.logical(perc_change)) {
-        stop ("Percentage change must be logical. ")
+    } else if (!is.logical(perc_change) | !is.logical(return_noise)) {
+        stop ("perc_change and return_noise must be logical. ")
         
     } else {
         ########################################################
@@ -74,6 +75,9 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         # step-by-step simulations 
         # white noise
         noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1), nrow = length(intercept))
+        noise = lapply(split(as.list(noise), 1:num_paths), as.data.frame)
+        names(noise) = path_index
+        
         # whole path (inputs/outputs are both stationary)
         var_path = function (num_pred, noise_index) {
             path = as.data.frame(matrix(NA, nrow = num_pred, ncol = length(var_names)))
@@ -185,6 +189,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         # output units 
         if (isTRUE(perc_change)) {
             output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        }
+        
+        if (isTRUE(return_noise)) {
+            
         }
         
         return (output)
