@@ -18,8 +18,7 @@ afl(init_age, init_state, trans_probs)
 numeric output for average and standard deviation of future lifetime
 }
 \description{
-Calculates the average future life time given initial state and age of an
-individual. This is calculated using the curtate expected life time, which is
-essentially a sum survival probabilities.
+Calculates the average future life time and its standard deviation
+given initial state and age of an individual by simulating life time paths.
 NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 }

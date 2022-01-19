@@ -2,9 +2,8 @@
 
 #' Average future lifetime
 #'
-#' Calculates the average future life time given initial state and age of an
-#' individual. This is calculated using the curtate expected life time, which is
-#' essentially a sum survival probabilities.
+#' Calculates the average future life time and its standard deviation
+#' given initial state and age of an individual by simulating life time paths.
 #' NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 #'
 #' @param init_age
@@ -182,7 +181,8 @@ hfl <- function(init_age, init_state, trans_probs) {
 #' integer denoting number of simulations
 #'
 #' @return
-#' Numeric output denoting the average time spent in healthy state.
+#' Numeric output denoting the average time spent in healthy state and its
+#' standard deviation.
 #'
 #' @export
 #'
@@ -225,9 +225,9 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
 #' Average future lifetime in disabled state
 #'
-#' Calculates the average future lifetime spent in disabled state using a similar
-#' idea to the curtate expected life. Function sums up transition probability into
-#' disabled state for each year.
+#' Calculates the average future lifetime spent in disabled state and the standard
+#' deviation by simulating life time paths given a list of transition probability
+#' matrices.
 #' NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODELS. USE
 #' \code{\link[tshm]{afldF}} FOR FRAILTY MODEL.
 #'
@@ -242,7 +242,8 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' \code{\link[tshm]{get_trans_probs}}.
 #'
 #' @return
-#' numeric output for average future lifetime in disabled state
+#' numeric output for average future lifetime in disabled state and its standard
+#' deviation.
 #'
 #' @export
 #'
@@ -257,21 +258,22 @@ afld <- function(init_age, init_state, trans_probs) {
     return('Error: init_age outside bounds of allowable age values')
   }
 
-  # we sum up probabilities of being disabled in each state
-  # this is similar to curtate life expectation
-  probs <- c()
-  for (i in 1:(110-init_age)) {
-    prob <- tshm::surv_prob(init_state, init_age, init_age+i, trans_probs, end_state = 1)
-    probs <- append(probs, prob)
+  # simulate path and count disabled time
+  SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+  disabled_lifetime <- rep(0, nrow(SP))
+  for (i in 1:nrow(SP)) {
+    row_val <- SP[i, ]
+    if (init_state == 1) {
+      disabled_lifetime[i] <- sum(row_val == 1) -0.5 # transition happens mid year
+    } else {
+      disabled_lifetime[i] <- sum(row_val == 1)
+    }
   }
-  if (init_state == 0) {
-    return(sum(probs))
-  } else {
-    return(sum(probs) + 0.5) # extra half year of disabled at the start
-  }
+  return(c('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
 }
 
-#' Average future lifetime in disabled state (frailty moded)
+
+#' Average future lifetime in disabled state (frailty model)
 #'
 #' Performs the same function as \code{\link[tshm]{afld}}, but it requires inputs
 #' to simulate latent factor in the frailty model. This allows it to simulate the

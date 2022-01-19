@@ -15,12 +15,13 @@ afld(init_age, init_state, trans_probs)
 \code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-numeric output for average future lifetime in disabled state
+numeric output for average future lifetime in disabled state and its standard
+deviation.
 }
 \description{
-Calculates the average future lifetime spent in disabled state using a similar
-idea to the curtate expected life. Function sums up transition probability into
-disabled state for each year.
+Calculates the average future lifetime spent in disabled state and the standard
+deviation by simulating life time paths given a list of transition probability
+matrices.
 NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODELS. USE
 \code{\link[tshm]{afldF}} FOR FRAILTY MODEL.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/statistics_functions.R
 \name{afldF}
 \alias{afldF}
-\title{Average future lifetime in disabled state (frailty moded)}
+\title{Average future lifetime in disabled state (frailty model)}
 \usage{
 afldF(init_age, init_state, female, year, param_file, n = 5000)
 }

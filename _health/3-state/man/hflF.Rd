@@ -4,7 +4,7 @@
 \alias{hflF}
 \title{Heatlhy Future Lifetime (Frailty Model)}
 \usage{
-hflF(init_age, init_state, female, year, param_file, n = 5000)
+hflF(init_age, init_state, female, year, param_file, n = 1000)
 }
 \arguments{
 \item{init_age}{integer between 65 and 110 denoting initial age of individual}
@@ -20,7 +20,8 @@ hflF(init_age, init_state, female, year, param_file, n = 5000)
 \item{n}{integer denoting number of simulations}
 }
 \value{
-Numeric output denoting the average time spent in healthy state.
+Numeric output denoting the average time spent in healthy state and its
+standard deviation.
 }
 \description{
 Performs the same function as \code{\link[tshm]{hfl}}, but simulates unique latent factor
