@@ -149,7 +149,7 @@ hfl <- function(init_age, init_state, trans_probs) {
   for (i in 1:nrow(SP)) {
     row_val <- SP[i,]
     if (init_state == 0) {
-      healthy_lifetimes[i] <- sum(row_val == 0) + 0.5
+      healthy_lifetimes[i] <- sum(row_val == 0) - 0.5 # transition happens in middle of period
     } else {
       healthy_lifetimes[i] <- sum(row_val == 0)
     }
@@ -187,7 +187,7 @@ hfl <- function(init_age, init_state, trans_probs) {
 #' @export
 #'
 #' @examples
-hflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
+hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
@@ -205,13 +205,20 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 5000) {
     return('Error: Please input an integer for n.')
   }
 
-  hfls <- c()
-  for (. in 1:n) {
+  healthy_lifetimes <- rep(0, n*10000)
+  for (x in 1:n) {
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    healthy_life <- tshm::hfl(init_age, init_state, TP)
-    hfls <- append(hfls, healthy_life)
+    SP <- tshm::simulate_path(init_age, init_state, TP)
+    for (i in 1:nrow(SP)) {
+      row_val <- SP[i,]
+      if (init_state == 0) {
+        healthy_lifetimes[(x-1)*10000+i] <- sum(row_val == 0) - 0.5
+      } else {
+        healthy_lifetimes[(x-1)*10000+i] <- sum(row_val == 0)
+      }
+    }
   }
-  return(mean(hfls))
+  return(c('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
 }
 
 
