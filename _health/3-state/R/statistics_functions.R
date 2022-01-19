@@ -354,7 +354,8 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' \code{\link[tshm]{get_trans_probs}}.
 #'
 #' @return
-#' numeric denoting the average time until indiviudal becomes disabled
+#' numeric denoting the average time until individual becomes disabled and its
+#' standard deviation.
 #'
 #' @export
 #'

@@ -13,7 +13,8 @@ time_to_disabled(init_age, trans_probs)
 \code{\link[tshm]{get_trans_probs}}.}
 }
 \value{
-numeric denoting the average time until indiviudal becomes disabled
+numeric denoting the average time until individual becomes disabled and its
+standard deviation.
 }
 \description{
 Uses simulation to produce an average time until a healthy individual becomes disabled
