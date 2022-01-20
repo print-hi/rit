@@ -257,7 +257,8 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #'
 #' Calculates the average future lifetime spent in disabled state and the standard
 #' deviation by simulating life time paths given a list of transition probability
-#' matrices.
+#' matrices. Function uses either list of transition probability matrices, or a
+#' simulated path. If both are provided, then the simulated path will be used.
 #' NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODELS. USE
 #' \code{\link[tshm]{afldF}} FOR FRAILTY MODEL.
 #'
