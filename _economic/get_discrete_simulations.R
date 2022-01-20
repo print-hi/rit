@@ -9,10 +9,10 @@
 #' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
 #' @param return_noise If the white noises of the model is returned. Default is FALSE. 
 #'
-#' @return A list containing 10 data frames for the simulated trajectories for each economic variable. 
+#' @return A list containing 10 data frames for the simulated trajectories for each economic variable, and a list of white noises in the VAR model. 
 #' @export
 #'
-#' @examples get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year")
+#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year", return_noise = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
 #' 
 get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
     
@@ -75,7 +75,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         # step-by-step simulations 
         # white noise
         noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1), nrow = length(intercept))
-        noise = lapply(split(as.list(noise), 1:num_paths), as.data.frame)
+        noise = lapply(seq(from = 1, to = num_paths * num_pred, by = num_pred), function (x) {noise[, x:(x+num_pred-1)]})
+        noise = lapply(noise, function(x) {row.names(x) = var_names; colnames(x) = as.character(time_index[-1]); return (x)})
         names(noise) = path_index
         
         # whole path (inputs/outputs are both stationary)
@@ -87,7 +88,7 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
             # simulate for num_pred steps 
             new_init = init_stat
             for (i in 1:num_pred) {
-                e = as.vector(noise[,noise_index[i]])
+                e = as.vector(noise[[noise_index]][,i])
                 new = intercept + coef %*% new_init + as.matrix(chol(covres)) %*% e
                 path[i,] = new
                 new_init = new
@@ -100,12 +101,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         var_sim_stationary = function (num_pred, num_paths) {
             
             # loops thru the series (separate lists)
-            v_path = list()
-            noise_index = 1:num_pred
-            for (path in 1:num_paths) {
-                v_path[[path]] = var_path(num_pred, noise_index)
-                noise_index = noise_index + num_pred
-            }
+            v_path = replicate(n = num_paths, 
+                               expr = {data.frame(matrix(NA, nrow = num_pred, ncol = length(intercept)))},
+                               simplify = F)
+            v_path = lapply(1:num_paths, function (x) {var_path(num_pred, x)})
             
             # reorganise the results 
             stat = replicate(n = length(var_names), 
@@ -113,18 +112,9 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
                              simplify = F)
             names(stat) = var_names
             
-            stat$zcp3m_yield = lapply(v_path, function (x) {x[,1]})
-            stat$zcp10y_spread = lapply(v_path, function (x) {x[,2]})
-            stat$home_index = lapply(v_path, function (x) {x[,3]})
-            stat$rental_yield = lapply(v_path, function (x) {x[,4]})
-            stat$GDP = lapply(v_path, function (x) {x[,5]})
-            stat$CPI = lapply(v_path, function (x) {x[,6]})
-            stat$ASX200 = lapply(v_path, function (x) {x[,7]})
-            stat$AUD = lapply(v_path, function (x) {x[,8]})
-            
+            stat = lapply(1:length(intercept), function (y) { lapply(1:num_paths, function (x) {v_path[[x]][,y]}) })
             stat = lapply(stat, function(x){x = as.data.frame(x)})
-            stat = lapply(stat, function(x){row.names(x) = time_index[-1]; x})
-            stat = lapply(stat, function(x){colnames(x) = path_index; x})
+            stat = lapply(stat, function(x){row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
             return (stat)
         }
         stat = var_sim_stationary(num_pred, num_paths)
@@ -155,7 +145,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         sim = lapply(sim, function (x) {x = as.data.frame(x)})
         sim = lapply(sim, function (x) {row.names(x) = time_index; x})
         names(sim) = sim_var_names
-        rm(stat, noise)
         
         ###############
         # Adj frequency
@@ -165,18 +154,17 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
             
             qtr2month = function (x) {
                 # transforms quarterly data to monthly data 
-                qtr_data = zoo(x, time_index)
-                month_data = zoo (NA, time_index_month)
+                qtr_data = zoo::zoo (x, time_index)
+                month_data = zoo::zoo (NA, time_index_month)
                 data = merge (qtr_data, month_data)
                 data$month_data = na.approx(data$qtr_data, rule=12)
                 return (as.vector(data$month_data))
             }
             output = lapply(sim, function (x) apply(x, 2, qtr2month))
-            output = lapply(output, function(x) {row.names(x) = as.character(time_index_month); x})
-            output = lapply(output, function(x) {x = x[-nrow(x), ]}) # remove the last row (Jan 01)
+            output = lapply(output, function(x) { row.names(x) = as.character(time_index_month); return (x[-nrow(x), ]) })
             
         } else if (frequency == "quarter") {
-            output = lapply(sim, function(x) {x = x[-nrow(x), ]}) # remove the last row (Jan 01)
+            output = lapply(sim, function(x) {x = x[-nrow(x), ]}) # remove the last row (1 Jan)
             
         } else if (frequency == "year") {
             time_index_year = seq(from = init_qtr, length.out = num_years, by = "year")
@@ -192,7 +180,9 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         }
         
         if (isTRUE(return_noise)) {
-            
+            noise = lapply(noise, function(x) {as.data.frame(t(x))})
+            output[[length(sim_var_names) + 1]] = noise
+            names(output)[length(sim_var_names) + 1] = "noise"
         }
         
         return (output)
