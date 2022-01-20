@@ -4,7 +4,7 @@
 \alias{time_to_disabledF}
 \title{Time until onset of disability (Frailty model)}
 \usage{
-time_to_disabledF(init_age, female, year, param_file, n = 2500)
+time_to_disabledF(init_age, female, year, param_file, n = 1000)
 }
 \arguments{
 \item{init_age}{integer between 65 and 110}
@@ -18,7 +18,8 @@ time_to_disabledF(init_age, female, year, param_file, n = 2500)
 \item{n}{integer denoting number of simulations to make}
 }
 \value{
-numeric denoting the average time until indiviudal becomes disabled
+numeric denoting the average time until individual becomes disabled, and its
+standard deviation.
 }
 \description{
 Function serves the same purpose as \code{\link[tshm]{time_to_disabled}}, but it is for

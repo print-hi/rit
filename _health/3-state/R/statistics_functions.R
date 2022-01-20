@@ -403,12 +403,13 @@ time_to_disabled <- function(init_age, trans_probs) {
 #' integer denoting number of simulations to make
 #'
 #' @return
-#' numeric denoting the average time until indiviudal becomes disabled
+#' numeric denoting the average time until individual becomes disabled, and its
+#' standard deviation.
 #'
 #' @export
 #'
 #' @examples
-time_to_disabledF <- function(init_age, female, year, param_file, n = 2500) {
+time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     return('Error: Please enter an age between 65 and 110.')
@@ -423,13 +424,19 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 2500) {
   }
 
   # create n unique latent factor paths
-  ttds <- c() # vector to contain each time to disabled
-  for (. in 1:n) {
+  first_time <- rep(0, n*10000)
+  for (x in 1:n) {
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    ttd <- tshm::time_to_disabled(init_age, TP)
-    ttds <- append(ttds, ttd)
+    SP <- tshm::simulate_path(init_age, 0, TP)
+    for (i in nrow(SP)) {
+      row_val <- SP[i,]
+      if (1 %in% row_val) {
+        first_time[(x-1)*10000+i] <- which(row_val == 1)[1]-1-0.5
+      }
+    }
   }
-  return(mean(ttds))
+  first_time <- first_time[first_time != 0]
+  return(c('mean' = mean(first_time), 's_dev' = sd(first_time)))
 }
 
 
