@@ -632,7 +632,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_year = get_discrete_simulations(num_years, num_paths, "year", TO)
+sim_paths_year = get_discrete_simulations(num_years, num_paths, "year", F)
 Sys.time() - start.time
 stopCluster(cl)
 
@@ -735,6 +735,7 @@ for (i in 2:(num_paths - 1)) {
     plot_data_forecast = c(all_data_original_year$unemploy_nsw, sim_paths_year$unemployment_rate[,i])
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
+
 #########################################################################################################################
 # annual data############################################################################################################
 all_data_original_year = cbind(all_data_original, lending, unemploy_nsw)
@@ -990,7 +991,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_month = get_discrete_simulations(num_years, num_paths, "month", T)
+sim_paths_month = get_discrete_simulations(num_years, num_paths, "month", perc_change = T, return_noise = T)
 Sys.time() - start.time
 stopCluster(cl)
 
