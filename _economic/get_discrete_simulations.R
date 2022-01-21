@@ -5,7 +5,7 @@
 #' 
 #' @param num_years Number of years to forecast, counting from 2021-01-01. Default is 5 years, recommended period is less than 10 years. 
 #' @param num_paths Number of simulation paths. Default is 10000 paths. 
-#' @param frequency One of "year", "quarter", and "month". Default is "quarter", which is the simulation frequency for the Vector Autoregression model. Linear interpolation will be used if the required frequency is higher, whereas arithmetic average will be used if the frequency is lower.   
+#' @param frequency One of "year", "quarter", and "month". Default is "quarter". Linear interpolation will be used if the required frequency is "year", whereas arithmetic average will be used if the frequency is "month".   
 #' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
 #' @param return_noise If the white noises of the model is returned. Default is FALSE. 
 #'
