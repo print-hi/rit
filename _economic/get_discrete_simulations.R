@@ -12,9 +12,9 @@
 #' @return A list containing 10 data frames for the simulated trajectories for each economic variable, and a list of white noises in the VAR model. 
 #' @export
 #'
-#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year"). To obtain all trajectories of Australia 3-month zero-coupon yields. 
+#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year", return_noise = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
 #' 
-get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE) {
+get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
     
     ################
     # error messages 
@@ -25,8 +25,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
     } else if (!frequency %in% c("year", "quarter", "month")) { 
         stop ("Frequency must be one of 'year', 'quarter', and 'month'. ")
         
-    } else if (!is.logical(perc_change)) {
-        stop ("perc_change must be logical. ")
+    } else if (!is.logical(perc_change) | !is.logical(return_noise)) {
+        stop ("perc_change and return_noise must be logical. ")
         
     } else {
         ########################################################
@@ -119,7 +119,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         }
         stat = var_sim_stationary(num_pred, num_paths)
         
-        
         ################################################
         # convert forecasted variables -> original units 
         diff_inv = function (x, init) {
@@ -146,7 +145,6 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         sim = lapply(sim, function (x) {x = as.data.frame(x)})
         sim = lapply(sim, function (x) {row.names(x) = time_index; x})
         names(sim) = sim_var_names
-        rm(noise, stat)
         
         ###############
         # Adj frequency
@@ -179,6 +177,12 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         # output units 
         if (isTRUE(perc_change)) {
             output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        }
+        
+        if (isTRUE(return_noise)) {
+            noise = lapply(noise, function(x) {as.data.frame(t(x))})
+            output[[length(sim_var_names) + 1]] = noise
+            names(output)[length(sim_var_names) + 1] = "noise"
         }
         
         return (output)
