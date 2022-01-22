@@ -159,10 +159,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
                 return (as.vector(data$month_data))
             }
             output = lapply(sim, function (x) apply(x, 2, qtr2month))
-            output = lapply(output, function(x) { row.names(x) = as.character(time_index_month); return (x[-nrow(x), ]) })
+            output = lapply(output, function(x) { row.names(x) = as.character(time_index_month); return (x) })
             
         } else if (frequency == "quarter") {
-            output = lapply(sim, function(x) {x = x[-nrow(x), ]}) # remove the last row (1 Jan)
+            output = sim
             
         } else if (frequency == "year") {
             time_index_year = seq(from = init_qtr, length.out = num_years, by = "year")
