@@ -113,8 +113,7 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
             names(stat) = var_names
             
             stat = lapply(1:length(intercept), function (y) { lapply(1:num_paths, function (x) {v_path[[x]][,y]}) })
-            stat = lapply(stat, function(x){x = as.data.frame(x)})
-            stat = lapply(stat, function(x){row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
+            stat = lapply(stat, function(x){x = as.data.frame(x); row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
             return (stat)
         }
         stat = var_sim_stationary(num_pred, num_paths)
@@ -142,8 +141,7 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         sim[[8]] = apply(stat[[8]], 2, function (x) {index2grow_inv(x, init_orig[8])}) # AUD
         sim[[9]] = sim[[1]] + 2.825 # mortage_rate
         sim[[10]] = sim[[2]] + 4.956 # unemployment_rate 
-        sim = lapply(sim, function (x) {x = as.data.frame(x)})
-        sim = lapply(sim, function (x) {row.names(x) = time_index; x})
+        sim = lapply(sim, function (x) {x = as.data.frame(x); row.names(x) = time_index; return (x)})
         names(sim) = sim_var_names
         
         ###############
