@@ -77,8 +77,11 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
       return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10))
     } else {
       # now t doesnt have to be an integer, so we use linear interpolation to get v(t)
-      v_t <- v[floor(t)]*(ceiling(t)-t) + v[ceiling(t)]*(t-floor(t))
-
+      if (t != floor(t)) {
+        v_t <- v[floor(t)]*(ceiling(t)-t) + v[ceiling(t)]*(t-floor(t))
+      } else {
+        v_t <- v[t]
+      }
       # now we return hazard rate output
       return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10 +
                    a*v_t))
