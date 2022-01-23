@@ -26,11 +26,15 @@
 get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please enter 1 or 0 for female. ')
+    stop('invalid gender')
+  }
+
+  if (year != floor(year)) {
+    stop('year must be an integer')
   }
 
   # extract parameter values from parameter file
@@ -52,7 +56,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
       v[i] <- v[i-1] + rnorm(1)
     }
   } else {
-    return('model_type Error: Please enter a valid model type from {S, T, F}')
+    stop('invalid model type')
   }
 
   # Get parameters for each of the 4 transition types

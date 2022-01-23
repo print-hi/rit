@@ -25,11 +25,11 @@
 simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+    stop('invalid state, 0 for healthy and 1 for disabled')
   }
 
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   # create empty matrix to contain simulated population

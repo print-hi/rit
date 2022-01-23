@@ -31,15 +31,15 @@
 afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (is.null(trans_probs) & is.null(simulated_path)) {
-    return('Either transition probability matrices or simulated path must be provided.')
+    stop('no transition probability matrices or simulated paths were provided')
   }
 
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
@@ -95,19 +95,19 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (init_state != 0 & init_state != 1) {
-    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please input 0 or 1 to indicate female.')
+    stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
-    return('Error: Please input an integer for n.')
+    stop('non integer value of n')
   }
 
   future_lifetimes <- rep(0, n*10000)
@@ -154,15 +154,15 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (is.null(trans_probs) & is.null(simulated_path)) {
-    return('Either transition probability matrices or simulated path must be provided.')
+    stop('no transition probability matrices or simulated paths were provided')
   }
 
   # generate simulation path, or just take it from input
@@ -220,19 +220,19 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (init_state != 0 & init_state != 1) {
-    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please input 0 or 1 to indicate female.')
+    stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
-    return('Error: Please input an integer for n.')
+    stop('non integer value of n')
   }
 
   healthy_lifetimes <- rep(0, n*10000)
@@ -285,17 +285,16 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (is.null(trans_probs) & is.null(simulated_path)) {
-    return('Either transition probability matrices or simulated path must be provided.')
+    stop('no transition probability matrices or simulated paths were provided')
   }
-
 
   # simulate path and count disabled time
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
@@ -350,19 +349,19 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
 afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (init_state != 0 & init_state != 1) {
-    return('Error: Please input 0 (healthy) or 1 (disabled) for initial state.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please input 0 or 1 to indicate female.')
+    stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
-    return('Error: Please input an integer for n.')
+    stop('non integer value of n')
   }
 
   disabled_lifetime <- rep(0, n*10000)
@@ -413,11 +412,11 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (is.null(trans_probs) & is.null(simulated_path)) {
-    return('Either transition probability matrices or simulated path must be provided.')
+    stop('no transition probability matrices or simulated paths were provided')
   }
 
   # simulate path or just use path given
@@ -473,15 +472,15 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
 time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please input 0 or 1 to indicate female.')
+    stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
-    return('Error: Please input an integer for n.')
+    stop('non integer value of n')
   }
 
   # create n unique latent factor paths
@@ -525,12 +524,16 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
 #' @examples
 survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
+  if (init_state != 0 & init_state != 1) {
+    stop('invalid state, use 0 for healthy and 1 for disabled')
+  }
+
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (is.null(trans_probs) & is.null(simulated_path)) {
-    return('Either transition probability matrices or simulated path must be provided.')
+    stop('no transition probability matrices or simulated paths were provided')
   }
 
   # simulate path or just use path given
@@ -616,15 +619,19 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
 survival_statsF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
+  }
+
+  if (init_state != 0 & init_state != 1) {
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (female != 0 & female != 1) {
-    return('Error: Please input 0 or 1 to indicate female.')
+    stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
-    return('Error: Please input an integer for n.')
+    stop('non integer value of n')
   }
 
   # empty vectors to hold row datas

@@ -25,25 +25,25 @@
 surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
-    return('Please enter a valid initial state: 0 for healthy, 1 for disabled.')
+    stop('invalid state, use 0 for healthy and 1 for disabled')
   }
 
   if (!is.null(end_state)) {
     if (end_state != 0 & end_state !=1) {
-      return('Please enter a valid end state: default NULL for alive, 1 for healthy, 2 for disabled.')
+      stop('invalid end state, use 0 for healthy and 1 for disabled')
     }
   }
 
   if (init_age >= target_age) {
-    return('Error: Initial age is greater than or equal to target age')
+    stop('initial age is greater than or equal to target age')
   }
 
   if (init_age<65 | init_age>110) {
-    return('Error: init_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   if (target_age < 65 | target_age > 110) {
-    return('Error: end_age outside bounds of allowable age values')
+    stop('invalid age')
   }
 
   # we multiply probability matrices in the trans_probs to get transition rates

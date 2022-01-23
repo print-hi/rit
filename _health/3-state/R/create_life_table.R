@@ -24,11 +24,15 @@
 create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (init_state != 0 & init_state != 1) {
-    return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
+    stop('invalid state, enter 0 for healthy, 1 for disabled')
+  }
+
+  if (cohort != floor(cohort)) {
+    stop('cohort must be integer value')
   }
 
   # create first row
