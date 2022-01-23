@@ -48,7 +48,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
   } else if (is.null(trans_probs)) {
     SP <- simulated_path
   } else {
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
   # count time at death
   future_lifetimes <- rep(0, nrow(SP))
@@ -172,7 +172,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
     SP <- simulated_path
   } else {
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
   healthy_lifetimes <- rep(0, nrow(SP))
   for (i in 1:nrow(SP)) {
@@ -304,7 +304,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
     SP <- simulated_path
   } else {
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
 
   disabled_lifetime <- rep(0, nrow(SP))
@@ -427,7 +427,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
     SP <- simulated_path
   } else {
     # simulate path
-    SP <- tshm::simulate_path(init_age, 0, trans_probs)
+    SP <- tshm::simulate_path(init_age, 0, trans_probs, 50000)
   }
 
   first_time <- rep(0, nrow(SP))
@@ -518,7 +518,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     SP <- simulated_path
   } else {
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
 
   # empty vectors to hold row datas
@@ -563,6 +563,9 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     return(stats_df)
   }
 }
+
+
+
 
 
 
