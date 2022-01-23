@@ -501,6 +501,73 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
 }
 
 
+survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
+  # screening for errors
+  if (init_age<65 | init_age>110) {
+    return('Error: init_age outside bounds of allowable age values')
+  }
+
+  if (is.null(trans_probs) & is.null(simulated_path)) {
+    return('Either transition probability matrices or simulated path must be provided.')
+  }
+
+  # simulate path or just use path given
+  if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    SP <- simulated_path
+  } else if (is.null(trans_probs)) {
+    SP <- simulated_path
+  } else {
+    # simulate path
+    SP <- tshm::simulate_path(init_age, init_state, trans_probs)
+  }
+
+  # empty vectors to hold row datas
+  total_lifetime <- rep(0, nrow(SP))
+  healthy_lifetime <- rep(0, nrow(SP))
+  disabled_lifetime <- rep(0, nrow(SP))
+  first_disabled <- rep(0, nrow(SP))
+
+  for (i in 1:nrow(SP)) {
+    # extract relevant data from rows
+    row_val <- SP[i, ]
+    if (init_state == 0) {
+      total_lifetime[i] <- which(row_val == -1)[1] - 1.5
+      healthy_lifetime[i] <- sum(row_val == 0) - 0.5
+      disabled_lifetime[i] <- sum(row_val == 1)
+      first_disabled[i] <- which(row_val == 1)[1] - 1.5
+    } else {
+      total_lifetime[i] <- which(row_val == -1)[1] - 1.5
+      healthy_lifetime[i] <- sum(row_val == 0)
+      disabled_lifetime[i] <- sum(row_val == 1) - 0.5
+    }
+  }
+  if (init_state == 0) {
+    means <- c(mean(total_lifetime), mean(healthy_lifetime), mean(disabled_lifetime),
+              mean(first_disabled, na.rm = TRUE))
+    sds <- c(sd(total_lifetime), sd(healthy_lifetime), sd(disabled_lifetime),
+            sd(first_disabled, na.rm = TRUE))
+    stats_df <- data.frame(
+      'stats' = c('total_life', 'healthy_life', 'disabled_life', 'onset_disability'),
+      'mean' = means,
+      's_dev' = sds
+    )
+    return(stats_df)
+  } else {
+    means <- c(mean(total_lifetime), mean(healthy_lifetime), mean(disabled_lifetime))
+    sds <- c(sd(total_lifetime), sd(healthy_lifetime), sd(disabled_lifetime))
+    stats_df <- data.frame(
+      'stats' = c('total_life', 'healthy_life', 'disabled_life'),
+      'mean' = means,
+      's_dev' = sds
+    )
+    return(stats_df)
+  }
+}
+
+
+
+
+
 
 
 
