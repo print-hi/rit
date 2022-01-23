@@ -56,7 +56,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
     row_val = SP[i, ]
     future_lifetimes[i] <- which(row_val == -1)[1]-1-0.5 # assume transition happens mid year
   }
-  return(c('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
+  return(list('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
 }
 
 
@@ -120,7 +120,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
       future_lifetimes[(x-1)*10000+i] <- which(row_val == -1)[1]-1-0.5
     }
   }
-  return(c('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
+  return(list('mean' = mean(future_lifetimes), 's.dev' = sd(future_lifetimes)))
 }
 
 
@@ -183,7 +183,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
       healthy_lifetimes[i] <- sum(row_val == 0)
     }
   }
-  return(c('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
+  return(list('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
 }
 
 #' Heatlhy Future Lifetime (Frailty Model)
@@ -248,7 +248,7 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
       }
     }
   }
-  return(c('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
+  return(list('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
 }
 
 
@@ -316,7 +316,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
       disabled_lifetime[i] <- sum(row_val == 1)
     }
   }
-  return(c('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
+  return(list('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
 }
 
 
@@ -379,7 +379,7 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
       }
     }
   }
-  return(c('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
+  return(list('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
 }
 
 
@@ -438,7 +438,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
     }
   }
   first_time <- first_time[first_time != 0]
-  return(c('mean' = mean(first_time), 'sd' = sd(first_time)))
+  return(list('mean' = mean(first_time), 'sd' = sd(first_time)))
 }
 
 
@@ -497,7 +497,7 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
     }
   }
   first_time <- first_time[first_time != 0]
-  return(c('mean' = mean(first_time), 's_dev' = sd(first_time)))
+  return(list('mean' = mean(first_time), 's_dev' = sd(first_time)))
 }
 
 
