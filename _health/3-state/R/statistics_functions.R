@@ -501,6 +501,28 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
 }
 
 
+#' Survival Statistics
+#'
+#' Produces statistics including: total expected lifetime, healthy lifetime,
+#' disabled lifetime, onset of disability (if initial state is healthy). It uses
+#' either transition probability matrices or a simulated paths.
+#' NOTE: USE \code{\link[tshm]{survival_statsF}} FOR FRAILTY MODEL.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#' @param trans_probs
+#' list of transition probability matrices, generated from \code{\link[tshm]{get_trans_probs}}.
+#' @param simulated_path
+#' matrix containing lifetime path simulations from \code{\link[tshm]{simulate_paths}} function.
+#'
+#' @return
+#' dataframe output containing mean and standard deviation of different statistics
+#'
+#' @export
+#'
+#' @examples
 survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_age<65 | init_age>110) {
@@ -565,6 +587,93 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
 }
 
 
+
+#' Survival Statistics (Frailty Model)
+#'
+#' Produces statistics including: total expected lifetime, healthy lifetime,
+#' disabled lifetime, onset of disability (if initial state is healthy). It uses
+#' either transition probability matrices or a simulated paths.
+#'
+#' @param init_age
+#' integer between 65 and 110 denoting initial age of individual
+#' @param init_state
+#' 0 for healthy, 1 for disabled
+#' @param female
+#' 0 for male, 1 for female
+#' @param year
+#' integer denoting current year
+#' @param param_file
+#' string for file path containing parameters of cox regression model
+#' @param n
+#' integer denoting number of latent factor simulations
+#'
+#' @return
+#' dataframe output containing mean and standard deviation of different statistics
+#'
+#' @export
+#'
+#' @examples
+survival_statsF <- function(init_age, init_state, female, year, param_file, n = 1000) {
+  # flagging errors
+  if (init_age < 65 | init_age > 110) {
+    return('Error: Please enter an age between 65 and 110.')
+  }
+
+  if (female != 0 & female != 1) {
+    return('Error: Please input 0 or 1 to indicate female.')
+  }
+
+  if (n != as.integer(n)) {
+    return('Error: Please input an integer for n.')
+  }
+
+  # empty vectors to hold row datas
+  total_lifetime <- rep(0, n*10000)
+  healthy_lifetime <- rep(0, n*10000)
+  disabled_lifetime <- rep(0, n*10000)
+  first_disabled <- rep(0, n*10000)
+
+  for (x in 1:n) {
+    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
+    SP <- tshm::simulate_path(init_age, init_state, TP)
+
+    for (i in 1:nrow(SP)) {
+      row_val <- SP[i,]
+      if (init_state == 0) {
+        total_lifetime[(x-1)*10000+i] <- which(row_val == -1)[1] - 1.5
+        healthy_lifetime[(x-1)*10000+i] <- sum(row_val == 0) - 0.5
+        disabled_lifetime[(x-1)*10000+i] <- sum(row_val == 1)
+        first_disabled[(x-1)*10000+i] <- which(row_val == 1)[1] - 1.5
+      } else {
+        total_lifetime[(x-1)*10000+i] <- which(row_val == -1)[1] - 1.5
+        healthy_lifetime[(x-1)*10000+i] <- sum(row_val == 0)
+        disabled_lifetime[(x-1)*10000+i] <- sum(row_val == 1) - 0.5
+      }
+    }
+  }
+
+  if (init_state == 0) {
+    means <- c(mean(total_lifetime), mean(healthy_lifetime), mean(disabled_lifetime),
+               mean(first_disabled, na.rm = TRUE))
+    sds <- c(sd(total_lifetime), sd(healthy_lifetime), sd(disabled_lifetime),
+             sd(first_disabled, na.rm = TRUE))
+    stats_df <- data.frame(
+      'stats' = c('total_life', 'healthy_life', 'disabled_life', 'onset_disability'),
+      'mean' = means,
+      's_dev' = sds
+    )
+    return(stats_df)
+  } else {
+    means <- c(mean(total_lifetime), mean(healthy_lifetime), mean(disabled_lifetime))
+    sds <- c(sd(total_lifetime), sd(healthy_lifetime), sd(disabled_lifetime))
+    stats_df <- data.frame(
+      'stats' = c('total_life', 'healthy_life', 'disabled_life'),
+      'mean' = means,
+      's_dev' = sds
+    )
+    return(stats_df)
+  }
+}
 
 
 
