@@ -47,8 +47,8 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
 
     # we also need to simulate v
     # we will simulate 300 time points, which will be sufficient until year 2297
-    v <- rep(0, 300)
-    for (i in 2:300) {
+    v <- rep(0, 301)
+    for (i in 2:301) {
       v[i] <- v[i-1] + rnorm(1)
     }
   } else {
@@ -74,16 +74,11 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
 
     # give hazard rate output
     if (model_type != 'F') {
-      return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10))
+      return(exp(b + gamma_age*(floor(target_age)-65)/10 + gamma_gender*female + gamma_time*floor(t)/10))
     } else {
-      # now t doesnt have to be an integer, so we use linear interpolation to get v(t)
-      if (t != floor(t)) {
-        v_t <- v[floor(t)]*(ceiling(t)-t) + v[ceiling(t)]*(t-floor(t))
-      } else {
-        v_t <- v[t]
-      }
+      v_t <- v[floor(t)+1]
       # now we return hazard rate output
-      return(exp(b + gamma_age*(target_age-65)/10 + gamma_gender*female + gamma_time*t/10 +
+      return(exp(b + gamma_age*(floor(target_age)-65)/10 + gamma_gender*female + gamma_time*floor(t)/10 +
                    a*v_t))
     }
   }
@@ -98,6 +93,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
     trans1 <- append(trans1, integral$value)
   }
 
+
   # transition 2 rates
   trans2 <- c()
   for (i in init_age:109) {
@@ -107,6 +103,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
     trans2 <- append(trans2, integral$value)
   }
 
+
   # transition 3 rates
   trans3 <- c()
   for (i in init_age:109) {
@@ -115,6 +112,7 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
                           gamma_gender = gamma_gender3, gamma_time = gamma_time3, a = a3, v = v)
     trans3 <- append(trans3, integral$value)
   }
+
 
   # transition 4 rates
   trans4 <- c()
