@@ -23,4 +23,4 @@ Uses:
 * application in insurance and pricing
 
 
-![flowchart](https://github.com/print-hi/retirement-toolkit/blob/healthy-state-3state/_health/3-state/inst/images/3_state_flowchart.png)
+![flowchart](https://github.com/print-hi/retirement-toolkit/blob/healthy-state-3state/_health/3-state/inst/images/3_state_flowchart.jpeg)
