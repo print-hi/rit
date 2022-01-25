@@ -385,8 +385,8 @@ forex_inv = function (x, init) {
 
 ##########
 # forecast 
-num_years = 100
-num_paths = 10000
+num_years = 10
+num_paths = 10
 
 ########################################################################################################################
 # qtrly data############################################################################################################
@@ -401,7 +401,7 @@ sim_paths_qtr = get_discrete_simulations(num_years, num_paths, "quarter")
 
 Sys.time() - start.time
 stopCluster(cl)
-sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-1,]})
+sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-c(1,nrow(x)),]})
 
 ############
 # zcp3 month
@@ -442,10 +442,10 @@ for (i in 2:(num_paths - 1)) {
 ##############
 # rental yield 
 # simulations 
-plot_data_forecast = c(all_data_original$rental_yield, sim_paths_qtr$rental_yield[,1])
-plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-0.025, 0.15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
+plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,1])
+plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-2.5, 15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original$rental_yield, sim_paths_qtr$rental_yield[,i])
+    plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,i])
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ################
@@ -517,6 +517,7 @@ sim_paths_qtr = get_discrete_simulations(num_years, num_paths, "quarter",T)
 
 Sys.time() - start.time
 stopCluster(cl)
+sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-nrow(x),]})
 
 ############
 # zcp3 month
@@ -675,10 +676,10 @@ for (i in 2:(num_paths - 1)) {
 ##############
 # rental yield 
 # simulations 
-plot_data_forecast = c(all_data_original_year$rental_yield, sim_paths_year$rental_yield[,1])
-plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-0.025, 0.15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
+plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,1])
+plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-2.5, 15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$rental_yield, sim_paths_year$rental_yield[,i])
+    plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,i])
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 ################
@@ -877,7 +878,7 @@ set.seed(1)
 sim_paths_month = get_discrete_simulations(num_years, num_paths, "month")
 Sys.time() - start.time
 stopCluster(cl)
-sim_paths_month = lapply(sim_paths_month, function (x) {x = x[-1,]})
+sim_paths_month = lapply(sim_paths_month, function (x) {x = x[-c(1,nrow(x)),]})
 
 ############
 # zcp3 month
@@ -918,10 +919,10 @@ for (i in 2:(num_paths - 1)) {
 ##############
 # rental yield 
 # simulations 
-plot_data_forecast = c(all_data_original_month$rental_yield, sim_paths_month$rental_yield[,1])
-plot(forecast_date_month, plot_data_forecast, "l", ylim = c(-0.025, 0.15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
+plot_data_forecast = c(all_data_original_month$rental_yield*100, sim_paths_month$rental_yield[,1])
+plot(forecast_date_month, plot_data_forecast, "l", ylim = c(-2.5, 15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_month$rental_yield, sim_paths_month$rental_yield[,i])
+    plot_data_forecast = c(all_data_original_month$rental_yield*100, sim_paths_month$rental_yield[,i])
     lines(forecast_date_month, plot_data_forecast, col = "grey")
 }
 ################
@@ -991,9 +992,10 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_month = get_discrete_simulations(num_years, num_paths, "month", perc_change = T, return_noise = T)
+sim_paths_month = get_discrete_simulations(num_years, num_paths, "month", perc_change = T, return_noise = F)
 Sys.time() - start.time
 stopCluster(cl)
+sim_paths_month = lapply(sim_paths_month, function (x) {x = x[-nrow(x),]})
 
 ############
 # zcp3 month
