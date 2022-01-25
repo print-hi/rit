@@ -9,7 +9,7 @@ get_trans_probs(model_type, param_file, init_age, female, year)
 \arguments{
 \item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
 
-\item{param_file}{File containing cox regression parameters for all models.}
+\item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
 \item{init_age}{integer denoting age of policy holder}
 

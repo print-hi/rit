@@ -13,7 +13,7 @@ time_to_disabledF(init_age, female, year, param_file, n = 1000)
 
 \item{year}{integer denoting current year}
 
-\item{param_file}{string for file path containing parameters of cox regression model}
+\item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
 \item{n}{integer denoting number of simulations to make}
 }

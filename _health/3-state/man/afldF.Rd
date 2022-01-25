@@ -15,7 +15,7 @@ afldF(init_age, init_state, female, year, param_file, n = 1000)
 
 \item{year}{integer for current year}
 
-\item{param_file}{string for file path containing parameters of cox regression model}
+\item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
 \item{n}{integer representing number of unique latent factors to simulate}
 }

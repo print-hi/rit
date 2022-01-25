@@ -15,7 +15,7 @@ aflF(init_age, init_state, female, year, param_file, n = 1000)
 
 \item{year}{integer indicating current year}
 
-\item{param_file}{string name of file containing all the parameters of the model}
+\item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
 \item{n}{integer denoting number of unique latent factor simulations}
 }

@@ -80,7 +80,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #' integer indicating current year
 #'
 #' @param param_file
-#' string name of file containing all the parameters of the model
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #'
 #' @param n
 #' integer denoting number of unique latent factor simulations
@@ -205,7 +205,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #' integer denoting current year
 #'
 #' @param param_file
-#' string for file path containing parameters of cox regression model
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #'
 #' @param n
 #' integer denoting number of simulations
@@ -336,7 +336,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
 #' @param year
 #' integer for current year
 #' @param param_file
-#' string for file path containing parameters of cox regression model
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #' @param n
 #' integer representing number of unique latent factors to simulate
 #'
@@ -457,7 +457,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
 #' integer denoting current year
 #'
 #' @param param_file
-#' string for file path containing parameters of cox regression model
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #'
 #' @param n
 #' integer denoting number of simulations to make
@@ -606,7 +606,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
 #' @param year
 #' integer denoting current year
 #' @param param_file
-#' string for file path containing parameters of cox regression model
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #' @param n
 #' integer denoting number of latent factor simulations
 #'

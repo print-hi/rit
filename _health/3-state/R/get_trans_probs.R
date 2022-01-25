@@ -8,7 +8,7 @@
 #' @param model_type
 #' string that selects model type; S for Static, T for Trend and F for Frailty
 #' @param param_file
-#' File containing cox regression parameters for all models.
+#' string for file path of parameter file OR a tibble/dataframe of parameters
 #' @param init_age
 #' integer denoting age of policy holder
 #' @param female
@@ -38,7 +38,11 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   }
 
   # extract parameter values from parameter file
-  param_list <- readxl::read_excel(param_file)
+  if (is.character(param_file)) {
+    param_list <- readxl::read_excel(param_file)
+  } else {
+    param_list <- param_file
+  }
 
   if (model_type == 'S') {
     params <- param_list[1:5, ]
