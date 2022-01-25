@@ -24,3 +24,9 @@ Uses:
 
 
 ![flowchart](https://github.com/print-hi/retirement-toolkit/blob/healthy-state-3state/_health/3-state/inst/images/3_state_flowchart.jpeg)
+
+Currently the parameters from the following studies are included in the package:
+
+1. US Health and Retirement Study (US_HRS)
+
+2. China Chinese Longitudinal Healthy Longevity Survey (china_CLHLS) 
