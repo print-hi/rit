@@ -23,4 +23,4 @@ Uses:
 * application in insurance and pricing
 
 
-![plot](/inst/images/3_state_flowchart.png?raw=true)
+![Alt text](/inst/images/3_state_flowchart.png?raw=true)
