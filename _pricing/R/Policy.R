@@ -20,9 +20,9 @@ create_policy_AP <- function(balance, expenses) {
     if (length(balance) > 1)    stop("Invalid balance: length(balance) = 1")
     if (length(expenses) > 1)   stop("Invalid expenses: length(balance) = 1")
 
-    if (balance < 0)        stop("Invalid balance: balance > 0")
-    if (expenses < 0)       stop("Invalid expenses: expenses > 0")
-    if (balance < expenses) stop("Invalid expenses: expenses < balance")
+    if (balance < 0)            stop("Invalid balance: balance > 0")
+    if (expenses < 0)           stop("Invalid expenses: expenses > 0")
+    if (balance < expenses)     stop("Invalid expenses: expenses < balance")
 
     pol <- data.frame(name = c("AP"),
                       bal = c(balance),
@@ -112,10 +112,10 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
     if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
     if (length(increase) > 1)   stop("Invalid increase: length(increase) = 1")
 
-    if (defer < 0)      stop("Invalid defer: defer > 0")
-    if (benefit < 0)    stop("Invalid benefit: benefit > 0")
-    if (loading < 0)    stop("Invalid loading: loading > 0")
-    if (increase < 0)   stop("Invalid increase: increase > 0")
+    if (defer < 0)              stop("Invalid defer: defer > 0")
+    if (benefit < 0)            stop("Invalid benefit: benefit > 0")
+    if (loading < 0)            stop("Invalid loading: loading > 0")
+    if (increase < 0)           stop("Invalid increase: increase > 0")
 
     pol <- data.frame(name = c("LA"),
                       benefit = c(benefit),
@@ -155,10 +155,10 @@ create_policy_PA <- function(benefit, size, interest, loading) {
     if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
     if (length(interest) > 1)   stop("Invalid interest: length(interest) = 1")
 
-    if (size < 0)       stop("Invalid size: size > 0")
-    if (benefit < 0)    stop("Invalid benefit: benefit > 0")
-    if (loading < 0)    stop("Invalid loading: loading > 0")
-    if (interest < 0)   stop("Invalid interest: interest > 0")
+    if (size < 0)               stop("Invalid size: size > 0")
+    if (benefit < 0)            stop("Invalid benefit: benefit > 0")
+    if (loading < 0)            stop("Invalid loading: loading > 0")
+    if (interest < 0)           stop("Invalid interest: interest > 0")
 
     pol <- data.frame(name = c("PA"),
                       benefit = c(benefit),
@@ -197,10 +197,11 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
     if (length(margin) > 1)     stop("Invalid margin: length(margin) = 1")
     if (length(trans_cost) > 1) stop("Invalid trans_cost: length(t_cost) = 1")
 
-    if (value < 0)          stop("Invalid value: value > 0")
-    if (margin < 0)         stop("Invalid margin: margin > 0")
-    if (LVR < 0 | LVR > 1)  stop("Invalid LVR: 0 <= LVR <= 1")
-    if (trans_cost < 0 | trans_cost > 1) stop("Invalid trans_cost: 0 < LVR < 1")
+    if (value < 0)              stop("Invalid value: value > 0")
+    if (margin < 0)             stop("Invalid margin: margin > 0")
+    if (LVR < 0 | LVR > 1)      stop("Invalid LVR: 0 <= LVR <= 1")
+    if (trans_cost < 0)         stop("Invalid trans_cost: 0 < LVR < 1")
+    if (trans_cost > 1)         stop("Invalid trans_cost: 0 < LVR < 1")
 
     pol <- data.frame(name = c("RM"),
                       value = c(value),
