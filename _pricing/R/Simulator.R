@@ -1,6 +1,10 @@
+###############################################################################
+###### MAIN SIMULATION WRAPPER
+
 #' Policy Cashflow Simulator
 #'
 #' Simulate cash flows using Monte-Carlo methods for various policies
+#'
 #' @name simulate_cf
 #' @param policy
 #' Policy type to simulate:
@@ -69,6 +73,23 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000) {
 ###############################################################################
 ###### POLICY SCENARIO FUNCTION
 
+#' Scenario Generator
+#'
+#' Generates and encapsulates scenario data for a given policy
+#'
+#' @param policy
+#' Policy object containing necessary parameters (see create_policy_ )
+#' @param age
+#' Initial age of policyholder in years
+#' @param seed
+#' Seed for random generator
+#' @param n
+#' Number of paths to simulate (Monte-Carlo method)
+#' @return
+#' Matrix of cash flow vectors for each simulated path
+#'
+#' @return
+#' Data frame containing all variables generated using other modules
 get_policy_scenario <- function(policy, age, seed, n) {
 
     if (policy$name[1] == "AP") {

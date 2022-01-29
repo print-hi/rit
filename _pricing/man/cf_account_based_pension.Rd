@@ -2,16 +2,20 @@
 % Please edit documentation in R/Cashflow.R
 \name{cf_account_based_pension}
 \alias{cf_account_based_pension}
-\title{Title}
+\title{Account Based Pension - Cashflow Simulator}
 \usage{
 cf_account_based_pension(policy, state, data)
 }
 \arguments{
-\item{data}{}
+\item{policy}{Policy object containing necessary parameters (see create_policy_AP)}
+
+\item{state}{State vector containing state values for entire duration}
+
+\item{data}{Data frame containing all variables generated using other modules}
 }
 \value{
-
+Vector of cashflows for at each time point
 }
 \description{
-Title
+Simulate cash flows for Account Based Pension
 }

@@ -2,16 +2,18 @@
 # --------------------------- Account Based Pension -------------------------- #
 # ---------------------------------------------------------------------------- #
 
-#' Title
+#' Account Based Pension - Cashflow Simulator
 #'
+#' Simulate cash flows for Account Based Pension
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_AP)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_account_based_pension <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -64,16 +66,17 @@ cf_account_based_pension <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
-#' Title
+#' Care Annuity - Cashflow Simulator
 #'
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_CA)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_care_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -124,16 +127,17 @@ cf_care_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
-#' Title
+#' Life Annuity - Cashflow Simulator
 #'
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_LA)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_life_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -167,16 +171,17 @@ cf_life_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
-#' Title
+#' Pooled Annuity - Cashflow Simulator
 #'
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_PA)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_pooled_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -249,16 +254,17 @@ cf_pooled_annuity <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
-#' Title
+#' Reverse Mortgage - Cashflow Simulator
 #'
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_RM)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_reverse_mortgage <- function(policy, state, data) {
 
     # Extract relevant policy variables
@@ -302,16 +308,17 @@ cf_reverse_mortgage <- function(policy, state, data) {
 # ---------------------------------------------------------------------------- #
 
 
-#' Title
+#' Variable Annuity - Cashflow Simulator
 #'
 #' @param policy
+#' Policy object containing necessary parameters (see create_policy_VA)
 #' @param state
+#' State vector containing state values for entire duration
 #' @param data
+#' Data frame containing all variables generated using other modules
 #'
 #' @return
-#' @export
-#'
-#' @examples
+#' Vector of cashflows for at each time point
 cf_variable_annuity <- function(policy, state, data) {
 
     # Extract relevant policy variables

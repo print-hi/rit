@@ -2,16 +2,20 @@
 % Please edit documentation in R/Cashflow.R
 \name{cf_care_annuity}
 \alias{cf_care_annuity}
-\title{Title}
+\title{Care Annuity - Cashflow Simulator}
 \usage{
 cf_care_annuity(policy, state, data)
 }
 \arguments{
-\item{data}{}
+\item{policy}{Policy object containing necessary parameters (see create_policy_CA)}
+
+\item{state}{State vector containing state values for entire duration}
+
+\item{data}{Data frame containing all variables generated using other modules}
 }
 \value{
-
+Vector of cashflows for at each time point
 }
 \description{
-Title
+Care Annuity - Cashflow Simulator
 }

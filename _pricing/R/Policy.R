@@ -5,6 +5,7 @@
 #' Account Based Pension - Policy Object Generator
 #'
 #' Generates policy object for Account Based Pension policies
+#'
 #' @param balance
 #' Initial balance of Pension account
 #' @param expenses
@@ -38,6 +39,7 @@ create_policy_AP <- function(balance, expenses) {
 #' Care Annuity - Policy Object Generator
 #'
 #' Generates policy object for Care Annuity policies
+#'
 #' @param benefit
 #' Annual benefit for each policy (vector)
 #' @param increase
@@ -89,6 +91,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 #' Life Annuity - Policy Object Generator
 #'
 #' Generates policy object for Life Annuity  policies
+#'
 #' @param benefit
 #' Annual benefit for policy
 #' @param defer
@@ -131,6 +134,7 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 #' Pooled Annuity - Policy Object Generator
 #'
 #' Generates policy object for Pooled Annuity policies
+#'
 #' @param benefit
 #' Initial annual benefit for policy
 #' @param size
@@ -172,6 +176,7 @@ create_policy_PA <- function(benefit, size, interest, loading) {
 #' Reverse Mortgage - Policy Object Generator
 #'
 #' Generates policy object for Reverse Mortgage policies
+#'
 #' @param value
 #' Initial value of property
 #' @param margin
@@ -214,6 +219,7 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' Variable Annuity - Policy Object Generator
 #'
 #' Generates policy object for Variable Annuity policies
+#'
 #' @param value
 #' Initial Account value (single upfront premium)
 #' @param length

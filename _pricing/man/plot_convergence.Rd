@@ -4,7 +4,7 @@
 \alias{plot_convergence}
 \title{Valuation via cashflows}
 \usage{
-plot_convergence(prices)
+plot_convergence(prices, seed = 9999)
 }
 \arguments{
 \item{cashflows}{Matrix of simulated cashflow paths}

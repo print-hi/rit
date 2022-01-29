@@ -1,37 +1,39 @@
-# ------------------------------------------------------------------------
-# ---- Economic Scenario Generator Module
+###############################################################################
+###### CF: Class Definition
 
-# Temporary helper function, should link to economic module
-get_sdf <- function(n = 1000, period = 100) {
-    interest <- as.matrix(read.csv("R/data/sdf.csv", header = FALSE))
-    colnames(interest) <- NULL
-    rownames(interest) <- NULL
-    return(interest)
-}
 
-# ------------------------------------------------------------------------
-# ---- CF: Class Definition
-
-#' Title
+#' Valuation of Policy
 #'
+#' Conducts valuation of a given policy, providing summary statistics and
+#' convergence / distribution plots
+#'
+#' @param policy
+#' Policy object containing necessary parameters (see create_policy_)
 #' @param cashflows
-#'
+#' (Optional) Matrix of cashflows (see simulate_cf), if 'cashflows' is not
+#' provided, function will simulate cashflows for policy
+#' @param seed
+#' Seed choice for random sampling
 #' @return
-#' @export value_cf
-#'
+#' 'pol_value' object: contains summary summary statistics and
+#' convergence + distribution plots
+#' @export value_policy
 #' @examples
-value_cf <- function(policy, cashflows = NULL) {
+#' value <- value_policy(policy_object)
+value_policy <- function(policy, cashflows = NULL, seed = 9999) {
 
     # For complex policies, would be faster to simulate_cf once
     # and pass in as a parameter
     if (is.null(cashflows)) cashflows <- simulate_cf(policy)
+
+    if (!is.matrix(cashflows)) stop("Invalid Cashflow object")
 
     # Calculate price of policy for each path
     paths <- get_path_prices(cashflows)
 
     # Produce statistics and plots for policy price
     stat <- get_price_stats(paths)
-    dist <- plot_convergence(paths)
+    dist <- plot_convergence(paths, seed)
     conv <- plot_distribution(paths)
 
     # Maps 'colname' attribute to formatted title for output text
@@ -58,7 +60,8 @@ value_cf <- function(policy, cashflows = NULL) {
         length      = "Length      ",
         prop        = "Prop        ",
         g_fee       = "Guar. Fee   ",
-        s_fee       = "Surr. Fee   "
+        s_fee       = "Surr. Fee   ",
+        margin      = "Margin      "
     )
 
     # Format introduction for output text
@@ -90,6 +93,8 @@ value_cf <- function(policy, cashflows = NULL) {
              paste("P_0.25      : $", formatted(stat$quantile[1]), sep = ""),
              paste("P_0.50      : $", formatted(stat$median), sep = ""),
              paste("P_0.75      : $", formatted(stat$quantile[3]), sep = ""),
+             paste("P_0.95      : $", formatted(stat$quantile[4]), sep = ""),
+             paste("P_0.99      : $", formatted(stat$quantile[5]), sep = ""),
              "----------------------------------",
              paste("Skewness    : ", formatted(stat$skew), sep = ""),
              paste("Kurtosis    : ", formatted(stat$kurtosis), sep = ""),
@@ -100,25 +105,34 @@ value_cf <- function(policy, cashflows = NULL) {
 
     # Create policy class object
     x <- list(paths = paths, stats = stat, conv = conv, dist = dist)
-    ret <- structure(x, class = "policy")
+    ret <- structure(x, class = "pol_value")
 
     return(ret)
 }
 
+###############################################################################
+###### Economic Scenario Generator Module
 
-#' Valuation via cashflows
+# Temporary helper function, should link to economic module
+get_sdf <- function(n = 1000, period = 100) {
+    interest <- as.matrix(read.csv("R/data/sdf.csv", header = FALSE))
+    colnames(interest) <- NULL
+    rownames(interest) <- NULL
+    return(interest)
+}
+
+###############################################################################
+###### HELPER FUNCTIONS
+
+#' Valuation of Cashflows
 #'
-#' Simulate cash flows using Monte-Carlo methods for various policies
+#' Calculates value of a policy using a provided set of cashflows
+#'
 #' @name get_path_prices
 #' @param cashflows
 #' Matrix of simulated cashflow paths
-#' @param ret_paths
-#' If ret_paths = TRUE, vector of prices for each path is returned
 #' @return
-#' Value of policy
-#' @export get_path_prices
-#' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
+#' Policy price
 get_path_prices <- function(cashflows) {
 
     # For debugging purposes
@@ -142,20 +156,19 @@ get_path_prices <- function(cashflows) {
 
 }
 
-#' Valuation via cashflows
+#' Calculates statistics for Cashflows
 #'
-#' Simulate cash flows using Monte-Carlo methods for various policies
+#' Calculates general statistics for a provided set of cashflows
+#'
 #' @name get_price_stats
 #' @param cashflows
 #' Matrix of simulated cashflow paths
-#' @param ret_paths
-#' If ret_paths = TRUE, vector of prices for each path is returned
 #' @return
-#' Value of policy
-#' @export get_price_stats
-#' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
+#' List of statistics
 get_price_stats <- function(prices) {
+
+    # Percentiles to calculate
+    probs = c(.25, .5, .75, .95, .99)
 
     # Calculate and organise summary statistics into list
     stats <- list(mean = mean(prices),
@@ -166,28 +179,25 @@ get_price_stats <- function(prices) {
                   skew = skewness(prices),
                   kurtosis = kurtosis(prices),
                   median = median(prices),
-                  quantile = quantile(prices, probs = c(.25, .5, .75)))
+                  quantile = quantile(prices, probs = probs))
 
     # Otherwise, return expected value
     return(stats)
 
 }
 
-
-#' Valuation via cashflows
+#' Plots Convergence of Cashflows
 #'
-#' Simulate cash flows using Monte-Carlo methods for various policies
+#' Plots a convergence value for a provided set of cashflows
+#'
 #' @name plot_convergence
 #' @param cashflows
 #' Matrix of simulated cashflow paths
-#' @param convergence
-#' If convergence = TRUE, plots convergence of price
+#' @param seed
+#' Seed choice for random sampling
 #' @return
-#' Value of policy
-#' @export plot_convergence
-#' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
-plot_convergence <- function(prices) {
+#' Convergence Plot
+plot_convergence <- function(prices, seed = 9999) {
 
     # Create break point for 100 points
     breaks <- seq((length(prices))/100, length(prices), (length(prices))/100)
@@ -195,42 +205,45 @@ plot_convergence <- function(prices) {
     # If less than 100 points, break point for each price
     if (length(prices) < 100) breaks <- seq(1, length(prices))
 
+    # Set seed value for random sampling
+    set.seed(seed)
+
     # Record cumulative mean up until each break point
     expected <- rep(0, length(breaks))
-    for (i in seq(1, length(breaks))) expected[i] <- mean(prices[1:breaks[i]])
+    for (i in seq(1, length(breaks))) {
+        expected[i] <- mean(sample(prices, size = breaks[i]), replace = F)
+    }
 
     # Format plot
     title <- paste("Convergence of Policy Valuation (", length(prices),
                    " paths)", sep = "")
     plot(x = breaks, y = expected, ylab = "Value", xlab = "Number of Paths",
          main = title)
-
+    abline(h = expected[length(expected)], lty=2)
     p <- recordPlot()
 
     return(p)
 
 }
 
-#' Valuation via cashflows
+#' Plot Distribution of Cashflows
 #'
-#' Simulate cash flows using Monte-Carlo methods for various policies
+#' Plots a histogram for a provided set of cashflows
+#'
 #' @name plot_distribution
 #' @param cashflows
 #' Matrix of simulated cashflow paths
 #' @param convergence
 #' If convergence = TRUE, plots convergence of price
 #' @return
-#' Value of policy
-#' @export plot_distribution
-#' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
+#' Distribution Plot
 plot_distribution <- function(prices) {
 
     # Format histogram plot
     title <- paste("Distribution of Policy Valuation (", length(prices),
                    " paths)", sep = "")
     hist(x = prices, breaks = 20, ylab = "Frequency", xlab = "Value",
-         main = title)
+         main = title, labels = TRUE)
 
     p <- recordPlot()
 

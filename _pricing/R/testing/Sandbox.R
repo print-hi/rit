@@ -21,31 +21,9 @@ cf_va <- simulate_cf(va)
 # ------------------------------------------------------------------------
 # ---- Valuation
 
-val_ap <- value_cf(cf_ap)
-val_ca <- value_cf(cf_ca)
-val_la <- value_cf(cf_la)
-val_pa <- value_cf(cf_pa)
-val_rm <- value_cf(cf_rm)
-val_va <- value_cf(cf_va)
-
-paths_ap <- value_cf(cf_ap, TRUE)
-paths_ca <- value_cf(cf_ca, TRUE)
-paths_la <- value_cf(cf_la, TRUE)
-paths_pa <- value_cf(cf_pa, TRUE)
-paths_rm <- value_cf(cf_rm, TRUE)
-paths_va <- value_cf(cf_va, TRUE)
-
-plot_cf(cf_ap)
-plot_cf(cf_ca)
-plot_cf(cf_la)
-plot_cf(cf_pa)
-plot_cf(cf_rm)
-plot_cf(cf_va)
-
-plot_cf(cf_ap, TRUE)
-plot_cf(cf_ca, TRUE)
-plot_cf(cf_la, TRUE)
-plot_cf(cf_pa, TRUE)
-plot_cf(cf_rm, TRUE)
-plot_cf(cf_va, TRUE)
-
+val_ap <- value_policy(ap)
+val_ca <- value_policy(ca)
+val_la <- value_policy(la)
+val_pa <- value_policy(pa)
+val_rm <- value_policy(rm)
+val_va <- value_policy(va)
