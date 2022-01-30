@@ -1,4 +1,4 @@
-#' get_discrete_simulations
+#' get_var_simulations
 #'
 #' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
 #' Simulations are based on a Vector Autoregression model. 
@@ -14,7 +14,7 @@
 #'
 #' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year", return_noise = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
 #' 
-get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
+get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
     
     ################
     # error messages 

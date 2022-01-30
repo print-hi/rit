@@ -37,7 +37,7 @@ get_sdf = function (num_years = 5, num_paths = 10000, frequency = "quarter") {
         ##############
         # VAR dynamics 
         # get VAR simulations on the original units
-        zt = get_discrete_simulations(num_years, num_paths, return_noise = T)[-c(9,10)]
+        zt = get_var_simulations(num_years, num_paths, return_noise = T)[-c(9,10)]
         noise = zt$noise
         zt = zt[-9]
         zt = lapply(1:8, function (x) {zt[[x]] = rbind(init_orig_2020q3[x], init_orig_2020q4[x], zt[[x]])})
