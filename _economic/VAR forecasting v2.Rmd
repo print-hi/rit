@@ -1314,99 +1314,13 @@ abline(h = 0, lty = 2)
 ```{r}
 ##########
 # forecast 
-num_pred = 40
+full_forecast = predict(full_var, n.ahead = 40, interval = "prediction", ci = 0.9)
+forecast_date = c(all_data_original$Date[-1], as.yearqtr(seq(as.Date("2021-04-01"), by="quarter", length.out = 40)))
+
+source("VAR_simulation.R")
+
 num_paths = 10
-full_forecast = predict(full_var, n.ahead = num_pred, interval = "prediction", ci = 0.9)
-forecast_date = c(all_data_original$Date[-1], as.yearqtr(seq(as.Date("2021-04-01"), by="quarter", length.out = num_pred)))
-
-var_step = function (intercept, coef, initial) {
-    # function to simulate one step 
-    # all inputs are for stationary series 
-    
-    e = rnorm(length(intercept), 0, 1)
-    return (intercept + coef %*% initial + as.matrix(chol(summ_full_var$covres)) %*% e)
-}
-var_path = function (intercept, coef, num_pred = 20) {
-    # function to simulate a whole path
-    # num_pred: number of quarters ahead (excluding initial)
-    # all inputs are for stationary series 
-
-    # initialise
-    init_qtr = as.Date("2021-04-01")
-    initial = as.numeric(all_data_stationary[111,])
-    output = as.data.frame(matrix(NA, nrow = num_pred, ncol = length(all_var_names)))
-    row.names(output) = as.yearqtr(seq(from = init_qtr, length.out = num_pred, by = "quarter"))
-    colnames(output) = all_var_names 
-    
-    # simulate for num_pred steps 
-    new_init = initial
-    for (i in 1:num_pred) {
-        new = var_step(intercept, coef, new_init)
-        output[i,] = new
-        new_init = new
-    }
-    return (output)
-}
-
-
-var_sim_stationary = function (intercept, coef, num_pred = 20, num_paths = 1000) {
-    # function to simulate num_paths
-    # each output[[i]] is trajectories of the ith variable
-    # all inputs & outputs are for stationary series 
-    
-    ############
-    # initialise 
-    init_qtr = as.Date("2021-04-01")
-    stat1 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat2 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat3 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat4 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat5 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat6 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat7 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat8 = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
-    stat = list (stat1, stat2, stat3, stat4, stat5, stat6, stat7, stat8)
-    
-    ###################
-    # stationary scales 
-    # loops thru the series (separate lists)
-    for (var in 1:length(intercept)) {
-        row.names(stat[[var]]) = as.yearqtr(seq(from = init_qtr, length.out = num_pred, by = "quarter"))
-        colnames(stat[[var]]) = paste("trajectory_", 1:num_paths, sep = "")
-
-        # loops thru the trajectories
-        for (path in 1:num_paths) {
-            stat[[var]][,path] = var_path(intercept, coef, num_pred)[,var]
-        }
-    }
-
-    names(stat) = all_var_names
-    return (stat)
-}
-
-var_sim_original = function (intercept, coef, num_pred = 20, num_paths = 1000) {
-    # stationary scales 
-    stat = var_sim_stationary(intercept, coef, num_pred, num_paths)
-    
-    # original scales
-    output = stat
-    last_index = nrow(all_data_original)
-    
-    for (path in 1:num_paths) {
-        output[[1]][,path] = zcp3m_inv(stat[[1]][,path], all_data_original$zcp3m[last_index])
-        output[[2]][,path] = zcp10y_inv(stat[[2]][,path], output[[1]][,path])
-        output[[3]][,path] = home_value_inv(stat[[3]][,path], all_data_original$home_index[last_index])
-        output[[4]][,path] = rental_inv(stat[[4]][,path], all_data_original$rental_yield[last_index])
-        output[[5]][,path] = gdp_inv(stat[[5]][,path], all_data_original$GDP[last_index])
-        output[[6]][,path] = cpi_inv(stat[[6]][,path], all_data_original$CPI[last_index])
-        output[[7]][,path] = asx_inv(stat[[7]][,path], all_data_original$ASX200[last_index])
-        output[[8]][,path] = forex_inv(stat[[8]][,path], all_data_original$forex[last_index])
-    }
-    names(output) = all_var_names
-    return (output)
-}
-sim_paths = var_sim_original(intercept = as.numeric(coef_mat$Coeff), coef = as.matrix(coef_mat[,-1]), num_pred = num_pred, num_paths = num_paths)
-sim_paths_stationary = var_sim_stationary(intercept = as.numeric(coef_mat$Coeff), coef = as.matrix(coef_mat[,-1]), num_pred = num_pred, num_paths = num_paths)
+sim_paths = get_var_simulations(num_years = 10, num_paths = 10)
 ```
 
 ### Plots (original scale)
@@ -1603,10 +1517,10 @@ lines(forecast_date, plot_data_lower, lty = 2)
 ###########
 # AUD index 
 # simulations 
-plot_data_forecast = c(all_data_original$forex[-1], sim_paths$forex[,1])
+plot_data_forecast = c(all_data_original$forex[-1], sim_paths$AUD[,1])
 plot(forecast_date, plot_data_forecast, "l", ylim = c(48, 100), main = TeX("AUD"), ylab = "Index Value", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original$forex[-1], sim_paths$forex[,i])
+    plot_data_forecast = c(all_data_original$forex[-1], sim_paths$AUD[,i])
     lines(forecast_date, plot_data_forecast, col = "grey")
 }
 # central 
@@ -1627,8 +1541,16 @@ lines(forecast_date, plot_data_lower, lty = 2)
 
 ```{r}
 ##########################
-# plots on original scales 
+# plots on stationary scales 
 par(mfrow = c(3,3))
+
+sim_paths_stationary = sim_paths
+sim_paths_stationary$zcp3m_yield = sim_paths$zcp3m_yield - dplyr::lag(sim_paths$zcp3m_yield, n = 1)
+sim_paths_stationary$home_index = log(sim_paths$home_index) - log(dplyr::lag(sim_paths$home_index, n = 1))
+sim_paths_stationary$rental_yield = sim_paths$rental_yield - dplyr::lag(sim_paths$rental_yield, n = 1)
+sim_paths_stationary$GDP = log(sim_paths$GDP) - log(dplyr::lag(sim_paths$GDP, n = 1))
+sim_paths_stationary$CPI = log(sim_paths$CPI) - log(dplyr::lag(sim_paths$CPI, n = 1))
+sim_paths_stationary$ASX200 = log(sim_paths$ASX200) - log(dplyr::lag(sim_paths$ASX200, n = 1))
 
 ############
 # zcp3 month
@@ -1792,8 +1714,6 @@ lines(forecast_date, plot_data_lower*100, lty = 2)
   
 * `NSW unemployment rate` is Granger-caused by 5 other variables. 
 
-![](granger_causality.PNG) 
-![](instant_causality.PNG) 
 
 ```{r}
 # find p values 
