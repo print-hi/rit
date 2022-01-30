@@ -1,11 +1,11 @@
 #' get_discrete_simulations
 #'
-#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields (in %), (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate (in %), (10) New South Wales unemployment rate (in %). 
+#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
 #' Simulations are based on a Vector Autoregression model. 
 #' 
 #' @param num_years Number of years to forecast, counting from 2021-01-01. Default is 5 years, recommended period is less than 10 years. 
 #' @param num_paths Number of simulation paths. Default is 10000 paths. 
-#' @param frequency One of "year", "quarter", and "month". Default is "quarter". Linear interpolation will be used if the required frequency is "year", whereas arithmetic average will be used if the frequency is "month".   
+#' @param frequency One of "year", "quarter", and "month". Default is "quarter", which is the simulation frequency for the Vector Autoregression model. Linear interpolation will be used if the required frequency is higher, whereas arithmetic average will be used if the frequency is lower.   
 #' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
 #' @param return_noise If the white noises of the model is returned. Default is FALSE. 
 #'
@@ -113,7 +113,8 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
             names(stat) = var_names
             
             stat = lapply(1:length(intercept), function (y) { lapply(1:num_paths, function (x) {v_path[[x]][,y]}) })
-            stat = lapply(stat, function(x){x = as.data.frame(x); row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
+            stat = lapply(stat, function(x){x = as.data.frame(x)})
+            stat = lapply(stat, function(x){row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
             return (stat)
         }
         stat = var_sim_stationary(num_pred, num_paths)
@@ -134,14 +135,15 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
         sim[[1]] = apply(stat[[1]], 2, function (x) {diff_inv(x, init_orig[1])}) # zcp3m_yield 
         sim[[2]] = rbind(init_orig[2], stat[[2]]) # zcp10y_spread: not changed 
         sim[[3]] = apply(stat[[3]], 2, function (x) {index2grow_inv(x, init_orig[3])}) # home_index
-        sim[[4]] = apply(stat[[4]], 2, function (x) {diff_inv(x, init_orig[4]) * 100}) # rental_yield 
+        sim[[4]] = apply(stat[[4]], 2, function (x) {diff_inv(x, init_orig[4])}) # rental_yield 
         sim[[5]] = apply(stat[[5]], 2, function (x) {index2grow_inv(x, init_orig[5])}) # GDP
         sim[[6]] = apply(stat[[6]], 2, function (x) {index2grow_inv(x, init_orig[6])}) # CPI
         sim[[7]] = apply(stat[[7]], 2, function (x) {index2grow_inv(x, init_orig[7])}) # ASX200
         sim[[8]] = apply(stat[[8]], 2, function (x) {index2grow_inv(x, init_orig[8])}) # AUD
         sim[[9]] = sim[[1]] + 2.825 # mortage_rate
         sim[[10]] = sim[[2]] + 4.956 # unemployment_rate 
-        sim = lapply(sim, function (x) {x = as.data.frame(x); row.names(x) = time_index; return (x)})
+        sim = lapply(sim, function (x) {x = as.data.frame(x)})
+        sim = lapply(sim, function (x) {row.names(x) = time_index; x})
         names(sim) = sim_var_names
         
         ###############
@@ -159,10 +161,10 @@ get_discrete_simulations = function (num_years = 5, num_paths = 10000, frequency
                 return (as.vector(data$month_data))
             }
             output = lapply(sim, function (x) apply(x, 2, qtr2month))
-            output = lapply(output, function(x) { row.names(x) = as.character(time_index_month); return (x) })
+            output = lapply(output, function(x) { row.names(x) = as.character(time_index_month); return (x[-nrow(x), ]) })
             
         } else if (frequency == "quarter") {
-            output = sim
+            output = lapply(sim, function(x) {x = x[-nrow(x), ]}) # remove the last row (1 Jan)
             
         } else if (frequency == "year") {
             time_index_year = seq(from = init_qtr, length.out = num_years, by = "year")
