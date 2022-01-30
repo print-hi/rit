@@ -240,17 +240,19 @@ var_names = c(&quot;zcp3m_yield&quot;, &quot;zcp10y_spread&quot;, &quot;home_ind
 
 #######################
 # import interest rates 
-zcp_old = read_excel(&quot;ZCP_till2008.xls&quot;)[-c(1:10), -2]
-zcp_new = read_excel(&quot;ZCP_from2008.xls&quot;)[-c(1:10), -2]
-names(zcp_old) = maturities
-names(zcp_new) = maturities
-zcp = rbind(zcp_old, zcp_new)
-rm(zcp_old, zcp_new)
-
-# cleaning 
-zcp = zcp %&gt;% mutate_if(is.character, as.numeric)
-zcp$Date = as.Date(zcp$Date, origin = &quot;1899-12-30&quot;)
-zcp = clean_names(zcp)
+zcp = read.csv(&quot;zcp.csv&quot;)
+zcp$date = as.Date(zcp$date)
+# zcp_old = read_excel(&quot;ZCP_till2008.xls&quot;)[-c(1:10), -2]
+# zcp_new = read_excel(&quot;ZCP_from2008.xls&quot;)[-c(1:10), -2]
+# names(zcp_old) = maturities
+# names(zcp_new) = maturities
+# zcp = rbind(zcp_old, zcp_new)
+# rm(zcp_old, zcp_new)
+# 
+# # cleaning 
+# zcp = zcp %&gt;% mutate_if(is.character, as.numeric)
+# zcp$Date = as.Date(zcp$Date, origin = &quot;1899-12-30&quot;)
+# zcp = clean_names(zcp)
 
 # match the time window 
 zcp = zcp %&gt;% filter(date &lt;= end_date &amp; date &gt;= start_pc_date)
@@ -269,8 +271,6 @@ all_data = read.csv(&quot;all_data.csv&quot;)[,-1]
 all_data = as.matrix(t(all_data))
 row.names(all_data) = var_names
 colnames(all_data) = as.character(time_names_past)
-all_data[1,] = all_data[1,] / 100
-all_data[2,] = all_data[2,] / 100
 
 ##############
 # VAR Dynamics
@@ -414,27 +414,67 @@ get_sse = function (lambda_list) {
 
 #################################
 # minimise for lambda_0, lambda_1
-# lambda_list = list(lambda0_1=0, lambda0_2=0, lambda0_3=0, lambda0_4=0, lambda0_5=0, lambda0_6=0, lambda0_7=0, lambda0_8=0,
-#                    lambda1_11=0, lambda1_12=0, lambda1_13=0, lambda1_14=0, lambda1_15=0, lambda1_16=0, lambda1_17=0, lambda1_18=0,
-#                    lambda1_21=0, lambda1_22=0, lambda1_23=0, lambda1_24=0,  lambda1_25=0, lambda1_26=0, lambda1_27=0, lambda1_28=0, 
-#                    lambda1_31=0, lambda1_32=0, lambda1_33=0, lambda1_34=0, lambda1_35=0, lambda1_36=0,  lambda1_37=0, lambda1_38=0, 
-#                    lambda1_41=0, lambda1_42=0, lambda1_43=0, lambda1_44=0, lambda1_45=0, lambda1_46=0, lambda1_47=0, lambda1_48=0, 
-#                    lambda1_51=0, lambda1_52=0, lambda1_53=0, lambda1_54=0, lambda1_55=0, lambda1_56=0, lambda1_57=0, lambda1_58=0, 
-#                    lambda1_61=0, lambda1_62=0, lambda1_63=0, lambda1_64=0, lambda1_65=0, lambda1_66=0, lambda1_67=0, lambda1_68=0, 
-#                    lambda1_71=0, lambda1_72=0, lambda1_73=0, lambda1_74=0,  lambda1_75=0, lambda1_76=0, lambda1_77=0, lambda1_78=0, 
-#                    lambda1_81=0, lambda1_82=0, lambda1_83=0, lambda1_84=0, lambda1_85=0, lambda1_86=0,  lambda1_87=0, lambda1_88=0)
-# 
-# optim_ctrl = list(maxit = 1000)
-# cl &lt;- makeCluster(detectCores())
-# registerDoParallel(cl)
-# lambdas = optim(lambda_list, get_sse, control = optim_ctrl)
-# stopCluster(cl)
-# lambdas
+lambda_list = list(lambda0_1=0, lambda0_2=0, lambda0_3=0, lambda0_4=0, lambda0_5=0, lambda0_6=0, lambda0_7=0, lambda0_8=0,
+                   lambda1_11=0, lambda1_12=0, lambda1_13=0, lambda1_14=0, lambda1_15=0, lambda1_16=0, lambda1_17=0, lambda1_18=0,
+                   lambda1_21=0, lambda1_22=0, lambda1_23=0, lambda1_24=0,  lambda1_25=0, lambda1_26=0, lambda1_27=0, lambda1_28=0,
+                   lambda1_31=0, lambda1_32=0, lambda1_33=0, lambda1_34=0, lambda1_35=0, lambda1_36=0,  lambda1_37=0, lambda1_38=0,
+                   lambda1_41=0, lambda1_42=0, lambda1_43=0, lambda1_44=0, lambda1_45=0, lambda1_46=0, lambda1_47=0, lambda1_48=0,
+                   lambda1_51=0, lambda1_52=0, lambda1_53=0, lambda1_54=0, lambda1_55=0, lambda1_56=0, lambda1_57=0, lambda1_58=0,
+                   lambda1_61=0, lambda1_62=0, lambda1_63=0, lambda1_64=0, lambda1_65=0, lambda1_66=0, lambda1_67=0, lambda1_68=0,
+                   lambda1_71=0, lambda1_72=0, lambda1_73=0, lambda1_74=0,  lambda1_75=0, lambda1_76=0, lambda1_77=0, lambda1_78=0,
+                   lambda1_81=0, lambda1_82=0, lambda1_83=0, lambda1_84=0, lambda1_85=0, lambda1_86=0,  lambda1_87=0, lambda1_88=0)
+
+optim_ctrl = list(maxit = 1000)
+cl &lt;- makeCluster(detectCores())
+registerDoParallel(cl)
+lambdas = optim(lambda_list, get_sse, control = optim_ctrl)
+stopCluster(cl)
+lambdas</code></pre>
+<pre><code>## $par
+##    lambda0_1    lambda0_2    lambda0_3    lambda0_4    lambda0_5    lambda0_6 
+## -0.030086873 -0.012627043 -0.017927114  0.024543921 -0.014126561 -0.013161025 
+##    lambda0_7    lambda0_8   lambda1_11   lambda1_12   lambda1_13   lambda1_14 
+## -0.033932861 -0.029803303 -0.006766755  0.001901722  0.003756198  0.006151668 
+##   lambda1_15   lambda1_16   lambda1_17   lambda1_18   lambda1_21   lambda1_22 
+##  0.001160804  0.000818340  0.003632838  0.005106584  0.008740091  0.003297340 
+##   lambda1_23   lambda1_24   lambda1_25   lambda1_26   lambda1_27   lambda1_28 
+##  0.005144938  0.007689653  0.004942281  0.011657277  0.007776157  0.011177285 
+##   lambda1_31   lambda1_32   lambda1_33   lambda1_34   lambda1_35   lambda1_36 
+## -0.003999265  0.001886492  0.003453334 -0.005177457  0.007227629 -0.008830469 
+##   lambda1_37   lambda1_38   lambda1_41   lambda1_42   lambda1_43   lambda1_44 
+##  0.002905251  0.012058203  0.015989418  0.015897509  0.017901252  0.011338143 
+##   lambda1_45   lambda1_46   lambda1_47   lambda1_48   lambda1_51   lambda1_52 
+##  0.005461493  0.010487692  0.009088337  0.010111793 -0.003195645  0.004885277 
+##   lambda1_53   lambda1_54   lambda1_55   lambda1_56   lambda1_57   lambda1_58 
+##  0.005680378 -0.001230780  0.007732412  0.007873976  0.002163744 -0.015364545 
+##   lambda1_61   lambda1_62   lambda1_63   lambda1_64   lambda1_65   lambda1_66 
+## -0.001641123  0.010352169  0.001727884  0.000642188 -0.001922217  0.009540976 
+##   lambda1_67   lambda1_68   lambda1_71   lambda1_72   lambda1_73   lambda1_74 
+##  0.001395707  0.012007866 -0.024483746 -0.014744395 -0.004395825  0.049782154 
+##   lambda1_75   lambda1_76   lambda1_77   lambda1_78   lambda1_81   lambda1_82 
+## -0.005731233 -0.003867528 -0.005220052  0.016684184 -0.032789081 -0.006885515 
+##   lambda1_83   lambda1_84   lambda1_85   lambda1_86   lambda1_87   lambda1_88 
+##  0.008398771  0.002207839 -0.001599557 -0.005808259  0.003002279  0.018058228 
+## 
+## $value
+## [1] 0.0693812
+## 
+## $counts
+## function gradient 
+##     1001       NA 
+## 
+## $convergence
+## [1] 1
+## 
+## $message
+## NULL</code></pre>
+<pre class="r"><code>lambda_0 = matrix(lambdas$par[1:8], nrow = 8)
+lambda_1 = matrix(lambdas$par[-c(1:8)], nrow = 8, ncol = 8, byrow = T)
 # 
 # save(lambdas, file = &quot;lambdas.RData&quot;)
 # load(&quot;lambdas.RData&quot;)
-lambda_0 = as.matrix(read.csv(&quot;lambda_0.csv&quot;)[,-1])
-lambda_1 = as.matrix(read.csv(&quot;lambda_1.csv&quot;)[,-1])</code></pre>
+# lambda_0 = as.matrix(read.csv(&quot;lambda_0.csv&quot;)[,-1])
+# lambda_1 = as.matrix(read.csv(&quot;lambda_1.csv&quot;)[,-1])</code></pre>
 </div>
 <div id="model---fitted-s_t" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Model - fitted s_t</h1>
@@ -446,17 +486,17 @@ lambda_1 = as.matrix(read.csv(&quot;lambda_1.csv&quot;)[,-1])</code></pre>
 # for (i in 3:112) {
 #   zt_fitted[,i] = intercept + coef1 %*% zt_fitted[,i-1] + coef2 %*% zt_fitted[,i-2]
 # }
-zt_fitted = read.csv(&quot;all_data_fitted.csv&quot;)[,-1]
-row.names(zt_fitted) = var_names
-colnames(zt_fitted) = time_names_past
-zt_fitted[1:2,] = zt_fitted[1:2,] / 100
-
-###########
-# fitted st
-lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% zt_fitted[,x]}, simplify = T)
-st_fit = sapply(1:112, function (x) {exp(-zt_fitted[1,x] - 1/2 * sum(lambda_t[,x]^2))})
-plot(time_names_past, st_fit * 100, &quot;l&quot;, main = &quot;Fitted SDFs&quot;, xlab = &quot;&quot;, ylab = &quot;&quot;)</code></pre>
-<p><img src="data:image/png;base64,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" width="672" /></p>
+# 
+# zt_fitted = read.csv(&quot;all_data_fitted.csv&quot;)[,-1]
+# row.names(zt_fitted) = var_names
+# colnames(zt_fitted) = time_names_past
+# zt_fitted[1:2,] = zt_fitted[1:2,] / 100
+# 
+# ###########
+# # fitted st
+# lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% zt_fitted[,x]}, simplify = T)
+# st_fit = sapply(1:112, function (x) {exp(-zt_fitted[1,x] - 1/2 * sum(lambda_t[,x]^2))})
+# plot(time_names_past, st_fit * 100, &quot;l&quot;, main = &quot;Fitted SDFs&quot;, xlab = &quot;&quot;, ylab = &quot;&quot;)</code></pre>
 </div>
 <div id="model---historical-s_t" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Model - historical s_t</h1>

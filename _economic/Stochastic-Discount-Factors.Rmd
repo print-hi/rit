@@ -73,17 +73,19 @@ var_names = c("zcp3m_yield", "zcp10y_spread", "home_index_growth", "rental_yield
 
 #######################
 # import interest rates 
-zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), -2]
-zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), -2]
-names(zcp_old) = maturities
-names(zcp_new) = maturities
-zcp = rbind(zcp_old, zcp_new)
-rm(zcp_old, zcp_new)
-
-# cleaning 
-zcp = zcp %>% mutate_if(is.character, as.numeric)
-zcp$Date = as.Date(zcp$Date, origin = "1899-12-30")
-zcp = clean_names(zcp)
+zcp = read.csv("zcp.csv")
+zcp$date = as.Date(zcp$date)
+# zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), -2]
+# zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), -2]
+# names(zcp_old) = maturities
+# names(zcp_new) = maturities
+# zcp = rbind(zcp_old, zcp_new)
+# rm(zcp_old, zcp_new)
+# 
+# # cleaning 
+# zcp = zcp %>% mutate_if(is.character, as.numeric)
+# zcp$Date = as.Date(zcp$Date, origin = "1899-12-30")
+# zcp = clean_names(zcp)
 
 # match the time window 
 zcp = zcp %>% filter(date <= end_date & date >= start_pc_date)
@@ -102,8 +104,6 @@ all_data = read.csv("all_data.csv")[,-1]
 all_data = as.matrix(t(all_data))
 row.names(all_data) = var_names
 colnames(all_data) = as.character(time_names_past)
-all_data[1,] = all_data[1,] / 100
-all_data[2,] = all_data[2,] / 100
 
 ##############
 # VAR Dynamics
@@ -249,27 +249,29 @@ get_sse = function (lambda_list) {
 
 #################################
 # minimise for lambda_0, lambda_1
-# lambda_list = list(lambda0_1=0, lambda0_2=0, lambda0_3=0, lambda0_4=0, lambda0_5=0, lambda0_6=0, lambda0_7=0, lambda0_8=0,
-#                    lambda1_11=0, lambda1_12=0, lambda1_13=0, lambda1_14=0, lambda1_15=0, lambda1_16=0, lambda1_17=0, lambda1_18=0,
-#                    lambda1_21=0, lambda1_22=0, lambda1_23=0, lambda1_24=0,  lambda1_25=0, lambda1_26=0, lambda1_27=0, lambda1_28=0, 
-#                    lambda1_31=0, lambda1_32=0, lambda1_33=0, lambda1_34=0, lambda1_35=0, lambda1_36=0,  lambda1_37=0, lambda1_38=0, 
-#                    lambda1_41=0, lambda1_42=0, lambda1_43=0, lambda1_44=0, lambda1_45=0, lambda1_46=0, lambda1_47=0, lambda1_48=0, 
-#                    lambda1_51=0, lambda1_52=0, lambda1_53=0, lambda1_54=0, lambda1_55=0, lambda1_56=0, lambda1_57=0, lambda1_58=0, 
-#                    lambda1_61=0, lambda1_62=0, lambda1_63=0, lambda1_64=0, lambda1_65=0, lambda1_66=0, lambda1_67=0, lambda1_68=0, 
-#                    lambda1_71=0, lambda1_72=0, lambda1_73=0, lambda1_74=0,  lambda1_75=0, lambda1_76=0, lambda1_77=0, lambda1_78=0, 
-#                    lambda1_81=0, lambda1_82=0, lambda1_83=0, lambda1_84=0, lambda1_85=0, lambda1_86=0,  lambda1_87=0, lambda1_88=0)
-# 
-# optim_ctrl = list(maxit = 1000)
-# cl <- makeCluster(detectCores())
-# registerDoParallel(cl)
-# lambdas = optim(lambda_list, get_sse, control = optim_ctrl)
-# stopCluster(cl)
-# lambdas
+lambda_list = list(lambda0_1=0, lambda0_2=0, lambda0_3=0, lambda0_4=0, lambda0_5=0, lambda0_6=0, lambda0_7=0, lambda0_8=0,
+                   lambda1_11=0, lambda1_12=0, lambda1_13=0, lambda1_14=0, lambda1_15=0, lambda1_16=0, lambda1_17=0, lambda1_18=0,
+                   lambda1_21=0, lambda1_22=0, lambda1_23=0, lambda1_24=0,  lambda1_25=0, lambda1_26=0, lambda1_27=0, lambda1_28=0,
+                   lambda1_31=0, lambda1_32=0, lambda1_33=0, lambda1_34=0, lambda1_35=0, lambda1_36=0,  lambda1_37=0, lambda1_38=0,
+                   lambda1_41=0, lambda1_42=0, lambda1_43=0, lambda1_44=0, lambda1_45=0, lambda1_46=0, lambda1_47=0, lambda1_48=0,
+                   lambda1_51=0, lambda1_52=0, lambda1_53=0, lambda1_54=0, lambda1_55=0, lambda1_56=0, lambda1_57=0, lambda1_58=0,
+                   lambda1_61=0, lambda1_62=0, lambda1_63=0, lambda1_64=0, lambda1_65=0, lambda1_66=0, lambda1_67=0, lambda1_68=0,
+                   lambda1_71=0, lambda1_72=0, lambda1_73=0, lambda1_74=0,  lambda1_75=0, lambda1_76=0, lambda1_77=0, lambda1_78=0,
+                   lambda1_81=0, lambda1_82=0, lambda1_83=0, lambda1_84=0, lambda1_85=0, lambda1_86=0,  lambda1_87=0, lambda1_88=0)
+
+optim_ctrl = list(maxit = 1000)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+lambdas = optim(lambda_list, get_sse, control = optim_ctrl)
+stopCluster(cl)
+lambdas
+lambda_0 = matrix(lambdas$par[1:8], nrow = 8)
+lambda_1 = matrix(lambdas$par[-c(1:8)], nrow = 8, ncol = 8, byrow = T)
 # 
 # save(lambdas, file = "lambdas.RData")
 # load("lambdas.RData")
-lambda_0 = as.matrix(read.csv("lambda_0.csv")[,-1])
-lambda_1 = as.matrix(read.csv("lambda_1.csv")[,-1])
+# lambda_0 = as.matrix(read.csv("lambda_0.csv")[,-1])
+# lambda_1 = as.matrix(read.csv("lambda_1.csv")[,-1])
 ```
 
 # Model - fitted s_t
@@ -283,16 +285,17 @@ lambda_1 = as.matrix(read.csv("lambda_1.csv")[,-1])
 # for (i in 3:112) {
 #   zt_fitted[,i] = intercept + coef1 %*% zt_fitted[,i-1] + coef2 %*% zt_fitted[,i-2]
 # }
-zt_fitted = read.csv("all_data_fitted.csv")[,-1]
-row.names(zt_fitted) = var_names
-colnames(zt_fitted) = time_names_past
-zt_fitted[1:2,] = zt_fitted[1:2,] / 100
-
-###########
-# fitted st
-lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% zt_fitted[,x]}, simplify = T)
-st_fit = sapply(1:112, function (x) {exp(-zt_fitted[1,x] - 1/2 * sum(lambda_t[,x]^2))})
-plot(time_names_past, st_fit * 100, "l", main = "Fitted SDFs", xlab = "", ylab = "")
+# 
+# zt_fitted = read.csv("all_data_fitted.csv")[,-1]
+# row.names(zt_fitted) = var_names
+# colnames(zt_fitted) = time_names_past
+# zt_fitted[1:2,] = zt_fitted[1:2,] / 100
+# 
+# ###########
+# # fitted st
+# lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% zt_fitted[,x]}, simplify = T)
+# st_fit = sapply(1:112, function (x) {exp(-zt_fitted[1,x] - 1/2 * sum(lambda_t[,x]^2))})
+# plot(time_names_past, st_fit * 100, "l", main = "Fitted SDFs", xlab = "", ylab = "")
 ```
 
 # Model - historical s_t
