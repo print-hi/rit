@@ -81,11 +81,11 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 prob_plots <- function(init_state, init_age, trans_probs) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
-    return('Error: Please enter an age between 65 and 110.')
+    stop('invalid age')
   }
 
   if (init_state != 0 & init_state != 1) {
-    return('Error: please input 0 (healthy) or 1 (disabled) for initial state.')
+    stop('invalid state; enter 0 for healthy, 1 for disabled')
   }
 
   # create 3 different probabilities:
@@ -101,8 +101,8 @@ prob_plots <- function(init_state, init_age, trans_probs) {
   }
   for (target in (init_age+1):110) {
     alive_probs <- append(alive_probs, surv_prob(init_state, init_age, target, trans_probs))
-    healthy_probs <- append(healthy_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 1))
-    disabled_probs <- append(disabled_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 2))
+    healthy_probs <- append(healthy_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 0))
+    disabled_probs <- append(disabled_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 1))
   }
 
   # create age axis
@@ -122,7 +122,7 @@ prob_plots <- function(init_state, init_age, trans_probs) {
     geom_line(aes(color = Type)) +
     scale_color_manual(labels = c('Alive', 'Disabled', 'Healthy'),
                        values = c('darkolivegreen2', 'lightcoral', 'skyblue1')) +
-    title(main = 'Probability of Surviving to each Different State')
+    ggtitle('Probability of Surviving to each Different State')
 
   return(surv_plot)
 }
