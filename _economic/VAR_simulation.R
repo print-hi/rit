@@ -1,4 +1,4 @@
-#' get_var_simulations
+#' get_discrete_simulations
 #'
 #' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
 #' Simulations are based on a Vector Autoregression model. 

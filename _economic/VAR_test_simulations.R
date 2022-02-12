@@ -397,11 +397,11 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_qtr = get_discrete_simulations(num_years, num_paths, "quarter")
+sim_paths_qtr = get_var_simulations(num_years, num_paths, "quarter")
 
 Sys.time() - start.time
 stopCluster(cl)
-sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-c(1,nrow(x)),]})
+sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-1,]})
 
 ############
 # zcp3 month
@@ -442,10 +442,10 @@ for (i in 2:(num_paths - 1)) {
 ##############
 # rental yield 
 # simulations 
-plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,1])
+plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-2.5, 15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,i])
+    plot_data_forecast = c(all_data_original$rental_yield*100, sim_paths_qtr$rental_yield[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ################
