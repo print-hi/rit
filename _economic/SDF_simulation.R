@@ -11,7 +11,7 @@
 #'
 #' @examples get_sdf(num_years = 10, frequency = "year"). 
 #' 
-get_sdf = function (num_years = 5, num_paths = 10000, frequency = "quarter") {
+get_sdf_simulation = function (num_years = 5, num_paths = 10000, frequency = "quarter") {
     
     ################
     # error messages
@@ -124,6 +124,6 @@ get_sdf = function (num_years = 5, num_paths = 10000, frequency = "quarter") {
             row.names(output) = as.character(time_index_year)
         }
         
-        return (output)
+        return (as.data.frame(output))
     }
 }
