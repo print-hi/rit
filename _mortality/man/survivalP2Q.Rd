@@ -8,29 +8,36 @@ survivalP2Q(StP, method, lambda)
 }
 \arguments{
 \item{StP}{vector, matrix or 3D array of the survival function under the P-measure with
-survival time (on the rows) and calendar year (on the columns)}
+survival time (on the rows) and calendar year (on the columns) and simulation
+number (3rd dimension)}
 
 \item{method}{character string representing the distortion risk measure to be used. See "Details".}
 
 \item{lambda}{parameter associated with the distortion risk measure}
 }
 \value{
-the transformed survival function under the Q-measure
+the transformed survival function under the specified Q-measure
 }
 \description{
 Transforms the survival function from the real world P-measure to the risk-neutral
-Q-measure according to the specified distortion risk measure
+Q-measure according to the specified risk-neutral principles.
 }
 \details{
-The distortion risk measures and their strings are as follows
+The risk-neutral principles and their corresponding strings are as follows:
 \itemize{
 \item "wang": Wang Transform
 \item "ph": Proportional Hazard Transform
 \item "dp": Dual-power Transform
+\item "gp": Gini Principle
 \item "dadp": Denneberg's Absolute Deviation Principle
 \item "exp": Exponential Transform
 \item "log": Logarithmic Transform
+\item "canon": Univariate Canonical Valuation
+\item "esscher": Esscher Transform
 }
+
+The first seven principles are distortion risk measures and act on the survival function.
+The last two principles act on the probability density function.
 }
 \examples{
 

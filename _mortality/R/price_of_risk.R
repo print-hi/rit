@@ -25,7 +25,7 @@
 #' @examples
 #'
 q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
-
+  # TODO: Check target_age is in ages
 
   if (is.null(years)) {
     col_names <- colnames(qx)
@@ -62,26 +62,33 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
 #' Survival Function Transformation
 #'
 #' Transforms the survival function from the real world P-measure to the risk-neutral
-#' Q-measure according to the specified distortion risk measure
+#' Q-measure according to the specified risk-neutral principles.
 #'
-#' The distortion risk measures and their strings are as follows
+#' The risk-neutral principles and their corresponding strings are as follows:
 #' * "wang": Wang Transform
 #' * "ph": Proportional Hazard Transform
 #' * "dp": Dual-power Transform
+#' * "gp": Gini Principle
 #' * "dadp": Denneberg's Absolute Deviation Principle
 #' * "exp": Exponential Transform
 #' * "log": Logarithmic Transform
+#' * "canon": Univariate Canonical Valuation
+#' * "esscher": Esscher Transform
+#'
+#' The first seven principles are distortion risk measures and act on the survival function.
+#' The last two principles act on the probability density function.
 #'
 #' @param StP
 #' vector, matrix or 3D array of the survival function under the P-measure with
-#' survival time (on the rows) and calendar year (on the columns)
+#' survival time (on the rows) and calendar year (on the columns) and simulation
+#' number (3rd dimension)
 #' @param method
 #' character string representing the distortion risk measure to be used. See "Details".
 #' @param lambda
 #' parameter associated with the distortion risk measure
 #'
 #' @return
-#' the transformed survival function under the Q-measure
+#' the transformed survival function under the specified Q-measure
 #' @export
 #'
 #' @examples
@@ -90,7 +97,7 @@ survivalP2Q <- function(StP, method, lambda) {
 
   # TODO: make sure values only between 0 and 1
 
-  # Defining distortion functions
+  # Defining survival function distortion functions
   wang <- function(x, lam) {
     if (lam < 0) stop("invalid lambda value")
     return(1 - stats::pnorm(stats::qnorm(1 - x) - lam))
@@ -126,25 +133,57 @@ survivalP2Q <- function(StP, method, lambda) {
     return(log(1 + lam * x) / log(1 + lam))
   }
 
-  type <- c("wang", "ph", "dp", "gp", "dadp", "exp", "log")
+  survival_type <- c("wang", "ph", "dp", "gp", "dadp", "exp", "log")
+  pdf_type <- type <- c("canon", "esscher")
 
-  if (!is.element(method, type)) stop("invalid method type")
-  else if (method == "wang") distort <- wang
-  else if (method == "ph") distort <- ph
-  else if (method == "dp") distort <- dp
-  else if (method == "gp") distort <- gp
-  else if (method == "dadp") distort <- dadp
-  else if (method == "exp") distort <- exp_tfm
-  else if (method == "log") distort <- log_tfm
+  if (is.element(method, survival_type)) {
+    if (method == "wang") distort <- wang
+    else if (method == "ph") distort <- ph
+    else if (method == "dp") distort <- dp
+    else if (method == "gp") distort <- gp
+    else if (method == "dadp") distort <- dadp
+    else if (method == "exp") distort <- exp_tfm
+    else if (method == "log") distort <- log_tfm
 
-  distort(StP, lambda)
+    return(distort(StP, lambda))
+  } else if (is.element(method, pdf_type)) {
+    # Risk-adjusted pdf is identical for univariate canonical valuation and
+    # esscher transform
+
+
+    pdfP2Q <- function(StP_mat) {
+      # Calculating pdf
+      ftP <- rbind(0, diff(1 - StP_mat))
+      # TODO: Check if ftP need to sum up to 1?
+      stopifnot(nrow(StP_mat) == nrow(ftP))
+
+      # Canonical valuation
+      time <- 0:(nrow(StP_mat) - 1)
+      num <- exp(lambda * time) * ftP
+      denom <- apply(num, 2, sum)
+      ftQ <- num / outer(rep(1, nrow(StP_mat)), denom)
+      StQ_mat <- 1 - apply(ftQ, 2, cumsum)
+
+      return(StQ_mat)
+    }
+
+    # Treating vectors, matrices and arrays differently
+    if (is.vector(StP)) {
+      StQ <- pdfP2Q(as.matrix(StP))
+    } else if (is.matrix(StP)) {
+      StQ <- pdfP2Q(StP)
+    } else if (is.array(StP)) {
+      StQ <- arr_apply(StP, pdfP2Q)
+    }
+
+    stopifnot(dim(StP) == dim(StQ))
+    dimnames(StQ) <- dimnames(StP)
+
+    return(StQ)
+
+  } else {
+    stop("invalid method type")
+  }
 
 }
 
-pdfP2Q <- function(StP, method, lambda) {
-
-  type <- c("canon", "esscher")
-
-  if (!is.element(method, type)) stop("invalid input for conversion")
-
-}
