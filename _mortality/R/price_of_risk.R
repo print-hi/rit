@@ -1,39 +1,36 @@
-
-#' Convert death probabilities to survival rates
+#' Convert death probabilities to survival function
 #'
 #' Converts 1-year death probabilities to the associated survival function.
+#'
+#' The survival function has survival time (starting from 0) on the rows.
+#'
 #' @param qx
 #' vector, matrix or 3D array of 1-year death probabilities with age
-#' (on the rows) and calendar year (on the columns)
-#'
+#' (on the rows) and calendar year (on the columns) and simulation
+#' number (3rd dimension)
 #' @param ages
 #' vector of ages for `qx`
-#'
 #' @param target_age
 #' age for which the survival function is to be calculated at. If not provided,
 #' the survival function will be calculated for the smallest age supplied in `ages`
-#'
 #' @param years
 #' optional vector of years for `qx`. If not supplied, then the column names
 #' of `qx` will be preserved
 #'
 #' @return
-#' survival rates in the same format as `qx`
+#' associated survival function as a 3D array if `qx` is an array, or as a matrix otherwise
 #'
 #' @export
 #'
 #' @examples
 #'
 q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
-  # TODO: Check target_age is in ages
-
-  if (is.null(years)) {
-    col_names <- colnames(qx)
-  }
-
   if(is.null(target_age)) {
     target_age <- ages[1]
+  } else if (!is.element(target_age, ages)) {
+    stop("invalid target_age")
   }
+
 
   # Converting to 1-year survival probabilities
   if(target_age == ages[1]) {
@@ -52,11 +49,56 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
   }
 
   rownames(St) <- as.character(0:(ages[length(ages)] - target_age + 1))
-  colnames(St) <- if (is.null(years)) col_names else as.character(years)
+  colnames(St) <- if (is.null(years)) colnames(qx) else as.character(years)
 
   return(list(surv = St, age = target_age))
 
 }
+
+#' Convert survival function to death probabilities
+#'
+#' Converts the survival function to the associated 1-year death probabilities.
+#'
+#' @param surv
+#' vector, matrix or 3D array of the survival function with survival time starting from 0
+#' (on the rows) and calendar year (on the columns) and simulation number (3rd dimension)
+#' @param ages
+#' vector of desired ages for the resulting 1-year death probabilities
+#' @param years
+#' optional vector of years for `surv`. If not supplied, then the column names
+#' of `surv` will be preserved
+#'
+#' @return
+#' associated 1-year death probabilities in the same format as `surv`
+#' @export
+#'
+#' @examples
+#'
+survival2q <- function(surv, ages, years = NULL) {
+
+  if(!is.null(ages)) {
+    stopifnot(length(ages) == NROW(surv) - 1)
+  }
+
+  if(!is.null(years)) {
+    stopifnot(length(years) == NCOL(surv))
+  }
+
+  px <- tail(surv, -1) / head(surv, -1)
+  qx <- 1 - px
+
+
+  if (!is.vector(qx)) {
+    rownames(qx) <- as.character(ages)
+    colnames(qx) <- if (is.null(years)) colnames(surv) else as.character(years)
+  }
+
+
+  return(qx)
+
+}
+
+
 
 
 #' Survival Function Transformation
@@ -154,7 +196,7 @@ survivalP2Q <- function(StP, method, lambda) {
     pdfP2Q <- function(StP_mat) {
       # Calculating pdf
       ftP <- rbind(0, diff(1 - StP_mat))
-      # TODO: Check if ftP need to sum up to 1?
+      # ftP will sum up to 1 if survival function starts from 1 and ends at 0
       stopifnot(nrow(StP_mat) == nrow(ftP))
 
       # Canonical valuation

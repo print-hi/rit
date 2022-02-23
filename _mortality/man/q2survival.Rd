@@ -2,13 +2,14 @@
 % Please edit documentation in R/price_of_risk.R
 \name{q2survival}
 \alias{q2survival}
-\title{Convert death probabilities to survival rates}
+\title{Convert death probabilities to survival function}
 \usage{
 q2survival(qx, ages, target_age = NULL, years = NULL)
 }
 \arguments{
 \item{qx}{vector, matrix or 3D array of 1-year death probabilities with age
-(on the rows) and calendar year (on the columns)}
+(on the rows) and calendar year (on the columns) and simulation
+number (3rd dimension)}
 
 \item{ages}{vector of ages for \code{qx}}
 
@@ -19,10 +20,13 @@ the survival function will be calculated for the smallest age supplied in \code{
 of \code{qx} will be preserved}
 }
 \value{
-survival rates in the same format as \code{qx}
+associated survival function as a 3D array if \code{qx} is an array, or as a matrix otherwise
 }
 \description{
 Converts 1-year death probabilities to the associated survival function.
+}
+\details{
+The survival function has survival time (starting from 0) on the rows.
 }
 \examples{
 
