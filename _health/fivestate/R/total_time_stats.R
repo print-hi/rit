@@ -19,7 +19,7 @@ total_time_stats=function(simulated_path, state){
   total_time=matrix(nrow=nrow(simulated_path),ncol=1)
   if (state==0){
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==0){
+      if (simulated_path[i,1]==0){
       total_time[i,]= length(which(simulated_path[i,] == 0))-0.5
       }else{
       total_time[i,]= length(which(simulated_path[i,] == 0))
@@ -28,7 +28,7 @@ total_time_stats=function(simulated_path, state){
   }
   if(state==1){
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==1){
+      if (simulated_path[i,1]==1){
       total_time[i,]= length(which(simulated_path[i,] == 1))-0.5
       }else{
       total_time[i,]= length(which(simulated_path[i,] == 1))
@@ -37,7 +37,7 @@ total_time_stats=function(simulated_path, state){
   }
   if(state==2){
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==2){
+      if (simulated_path[i,1]==2){
       total_time[i,]= length(which(simulated_path[i,] == 2))-0.5
       }else{
       total_time[i,]= length(which(simulated_path[i,] == 2))
@@ -47,7 +47,7 @@ total_time_stats=function(simulated_path, state){
   if(state==3){
     total_time=matrix(nrow=nrow(simulated_path),ncol=1)
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==3){
+      if (simulated_path[i,1]==3){
       total_time[i,]= length(which(simulated_path[i,] == 3))-0.5
       }else{
       total_time[i,]= length(which(simulated_path[i,] == 3))
@@ -56,7 +56,7 @@ total_time_stats=function(simulated_path, state){
   }
   if(state==-1){
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==-1){
+      if (simulated_path[i,1]==-1){
       total_time[i,]= length(which(simulated_path[i,] == -1))-1
       }else{
       total_time[i,]= length(which(simulated_path[i,] == -1))-0.5
@@ -65,7 +65,7 @@ total_time_stats=function(simulated_path, state){
   }
   if(state==4){
     for (i in 1:nrow(simulated_path)){
-      if (simulated_path[1,1]==-1){
+      if (simulated_path[i,1]==-1){
       total_time[i,]= length(which(simulated_path[i,] != -1))
       }else{
       total_time[i,]= length(which(simulated_path[i,] != -1))-0.5
