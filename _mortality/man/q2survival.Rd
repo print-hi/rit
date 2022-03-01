@@ -4,7 +4,7 @@
 \alias{q2survival}
 \title{Convert death probabilities to survival function}
 \usage{
-q2survival(qx, ages, target_age = NULL, years = NULL)
+q2survival(qx, ages, init_age = NULL, years = NULL)
 }
 \arguments{
 \item{qx}{vector, matrix or 3D array of 1-year death probabilities with age
@@ -13,7 +13,7 @@ number (3rd dimension)}
 
 \item{ages}{vector of ages for \code{qx}}
 
-\item{target_age}{age for which the survival function is to be calculated at. If not provided,
+\item{init_age}{initial age for which the survival function is to be calculated at. If not provided,
 the survival function will be calculated for the smallest age supplied in \code{ages}}
 
 \item{years}{optional vector of years for \code{qx}. If not supplied, then the column names

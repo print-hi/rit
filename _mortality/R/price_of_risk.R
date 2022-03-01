@@ -10,8 +10,8 @@
 #' number (3rd dimension)
 #' @param ages
 #' vector of ages for `qx`
-#' @param target_age
-#' age for which the survival function is to be calculated at. If not provided,
+#' @param init_age
+#' initial age for which the survival function is to be calculated at. If not provided,
 #' the survival function will be calculated for the smallest age supplied in `ages`
 #' @param years
 #' optional vector of years for `qx`. If not supplied, then the column names
@@ -24,19 +24,19 @@
 #'
 #' @examples
 #'
-q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
-  if(is.null(target_age)) {
-    target_age <- ages[1]
-  } else if (!is.element(target_age, ages)) {
-    stop("invalid target_age")
+q2survival <- function(qx, ages, init_age = NULL, years = NULL) {
+  if(is.null(init_age)) {
+    init_age <- ages[1]
+  } else if (!is.element(init_age, ages)) {
+    stop("invalid initial age")
   }
 
 
   # Converting to 1-year survival probabilities
-  if(target_age == ages[1]) {
+  if(init_age == ages[1]) {
     px <- 1 - qx
   } else {
-    px <- 1 - utils::tail(qx, ages[1] - target_age)
+    px <- 1 - utils::tail(qx, ages[1] - init_age)
   }
 
   # Calculating survival function
@@ -48,10 +48,10 @@ q2survival <- function(qx, ages, target_age = NULL, years = NULL) {
     St <- arr_apply(px, function(x) rbind(1, apply(x, 2, cumprod)))
   }
 
-  rownames(St) <- as.character(0:(ages[length(ages)] - target_age + 1))
+  rownames(St) <- as.character(0:(ages[length(ages)] - init_age + 1))
   colnames(St) <- if (is.null(years)) colnames(qx) else as.character(years)
 
-  return(list(surv = St, age = target_age))
+  return(list(surv = St, age = init_age))
 
 }
 
@@ -194,13 +194,16 @@ survivalP2Q <- function(StP, method, lambda) {
 
 
     pdfP2Q <- function(StP_mat) {
+
+      time <- 0:(nrow(StP_mat) - 1)
       # Calculating pdf
       ftP <- rbind(0, diff(1 - StP_mat))
+      rownames(ftP) <- as.character(time)
       # ftP will sum up to 1 if survival function starts from 1 and ends at 0
       stopifnot(nrow(StP_mat) == nrow(ftP))
 
       # Canonical valuation
-      time <- 0:(nrow(StP_mat) - 1)
+
       num <- exp(lambda * time) * ftP
       denom <- apply(num, 2, sum)
       ftQ <- num / outer(rep(1, nrow(StP_mat)), denom)
