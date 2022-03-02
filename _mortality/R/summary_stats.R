@@ -208,5 +208,3 @@ summarise_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 
 
 
-
-
