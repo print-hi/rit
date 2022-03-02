@@ -121,3 +121,101 @@ cohort2period <- function(cohort_rates, ages) {
 }
 
 
+#' Summarise Curtate Future Lifetime Statistics
+#'
+#' Produces expected value and variance of curtate future lifetime for a life table.
+#'
+#' @param qx
+#' vector, matrix or 3D array of 1-year death probabilities with age
+#' (on the rows) and calendar year (on the columns) and simulation
+#' number (3rd dimension)
+#' @param ages
+#' vector of ages for `qx`
+#' @param init_age
+#' initial age for which the curtate future lifetime is to be calculated at. If not provided,
+#' the summary statistics will be calculated for the smallest age supplied in `ages`
+#' @param years
+#' optional vector of years for `qx`. If not supplied, then the column names
+#' of `qx` will be preserved
+#'
+#' @return
+#' expected value and variance of curtate future lifetime as a 3D array
+#' if `qx` is an array, or as a matrix otherwise
+#' @export
+#'
+#' @examples
+#'
+summarise_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
+  if(is.null(init_age)) {
+    init_age <- ages[1]
+  } else if (!is.element(init_age, ages)) {
+    stop("invalid initial age")
+  }
+
+  # Converting to 1-year survival probabilities
+  if(init_age == ages[1]) {
+    px <- 1 - qx
+  } else {
+    px <- 1 - utils::tail(qx, ages[1] - init_age)
+  }
+
+  # Calculating kpx
+  if (is.vector(px)) {
+    kpx <- matrix(cumprod(px))
+  } else if (is.matrix(px)) {
+    kpx <- apply(px, 2, cumprod)
+  } else if (is.array(px)) {
+    kpx <- arr_apply(px, function(x) apply(x, 2, cumprod))
+  }
+
+  # Changing dim names
+  stopifnot(dim(px) == dim(kpx))
+  colnames(kpx) <- colnames(px)
+  k <- 1:nrow(kpx)
+  rownames(kpx) <- as.character(k)
+
+  summarise_cfl_mat <- function(kpx_mat) {
+    # Expected curtate future lifetime
+    exp_cfl <- apply(kpx_mat, 2, sum)
+    # Assumes kpx has been given until terminal age
+
+    rownames(exp_cfl) <- NULL
+    # 2nd moment of curtate future lifetime
+    moment_2 <- apply(2 * k * kpx_mat, 2, sum) - exp_cfl
+
+    # Variance of curtate future lifetime
+    var_cfl <- moment_2 - (exp_cfl)^2
+
+    # Years on columns, stats on rows
+    result_mat <- rbind(exp_cfl, var_cfl)
+
+    return(result_mat)
+  }
+
+  # kpx should be matrix or array, note that is.array(A) = TRUE where A is matrix
+  stopifnot(is.array(kpx))
+  if (is.matrix(kpx)) {
+    result <- summarise_cfl_mat(kpx)
+  } else {
+    result <- arr_apply(kpx, summarise_cfl_mat)
+  }
+
+  colnames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
+
+  return(result)
+
+}
+
+
+test_rates <- readRDS("G:/My Drive/CEPAR/Mortality Functions/Test Data/test_rates.rds")
+completed_rates <- DG(test_rates, 0:110, 86:130)
+q_test <- completed_rates[,,1]
+s_test <- q2survival(q_test, 0:130)
+s_test <- s_test$surv
+# Summing from t = 1
+apply(s_test, 2, sum) - head(s_test, 1)
+nrow(s_test)
+
+
+
+
