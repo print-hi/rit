@@ -8,12 +8,7 @@
 #' @name simulate_cf
 #' @param policy
 #' Policy type to simulate:
-#' `policy = "AP"` (Account Based Pension),
-#' `"RM"` (Reverse Mortgage),
-#' `"LA"` (Life Annuity),
-#' `"CA"` (Care Annuity),
-#' `"PA"` (Pooled Annuity),
-#' `"VA"` (Variable Annuity)
+#' `policy object created using a create_policy function
 #' @param age
 #' Initial age of policyholder in years
 #' @param sex
@@ -26,7 +21,8 @@
 #' Matrix of cash flow vectors for each simulated path
 #' @export simulate_cf
 #' @examples
-#' cf <- cashflow(policy = "VA", age = 65, sex = "M", n = 1000)
+#' ap <- create_policy_AP(400000, 60000)
+#' cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
 simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000) {
 
     # Set cash flow function based on input policy
