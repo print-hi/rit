@@ -20,11 +20,7 @@
 #' @export value_policy
 #' @examples
 #' value <- value_policy(policy_object)
-value_policy <- function(policy, cashflows = NULL, seed = 9999) {
-
-    # For complex policies, would be faster to simulate_cf once
-    # and pass in as a parameter
-    if (is.null(cashflows)) cashflows <- simulate_cf(policy)
+value_policy <- function(policy, cashflows, seed = 0) {
 
     if (!is.matrix(cashflows)) stop("Invalid Cashflow object")
 
@@ -105,7 +101,7 @@ value_policy <- function(policy, cashflows = NULL, seed = 9999) {
 
     # Create policy class object
     x <- list(paths = paths, stats = stat, conv = conv, dist = dist)
-    ret <- structure(x, class = "pol_value")
+    ret <- structure(x, class = "PolStats")
 
     return(ret)
 }
