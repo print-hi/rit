@@ -1,28 +1,59 @@
-#' Distribution of Survival Function
+
+
+#' The Survival Function
 #'
-#' Distribution of the Survival Function
+#' Distribution and quantile function  of the survival function.
 #'
 #' Linear interpolation is performed between the discrete points of the survival function
 #'
-#' @param surviv_rates
-#' vector of survival rates
+#' @param surviv_fun
+#' vector of survival function
 #' @param surviv_time
 #' vector of survival times
+#' @param surviv_prob
+#' vector of survival probabilities
 #'
-#' @return
-#' Distribution function
+#' @name surviv
+NULL
+
+#' @rdname surviv
 #'
 #' @export
-#'
-#' @examples
-#'
-psurviv <- function(surviv_rates, surviv_time) {
+psurviv <- function(surviv_fun, surviv_time) {
 
-  n <- length(surviv_rates)
+  n <- length(surviv_fun)
+
+  # Checking bounds
+  stopifnot(surviv_time >= 0)
+
   # Linear interpolation
-  surviv_fun <- stats::approxfun(0:(n - 1), surviv_rates)
+  surviv_fun_approx <- stats::approxfun(0:(n - 1), surviv_fun)
 
-  surviv_fun(surviv_time)
+  result <- surviv_fun_approx(surviv_time)
+  # Note: returns NA for surviv_time >= n - 1
+
+  return(result)
+
+}
+
+#' @rdname surviv
+#'
+#' @export
+qsurviv <- function(surviv_fun, surviv_prob) {
+
+  n <- length(surviv_fun)
+
+  # Checking bounds
+  stopifnot(surviv_prob >= 0, surviv_prob <= 1)
+
+  # Linear interpolation
+  surviv_fun_approx <- stats::approxfun(0:(n - 1), surviv_fun)
+
+  # Creating list of linearly interpolated functions shifted by element of surviv_prob
+  surviv_fun_list <- lapply(surviv_prob, function(p) stats::approxfun(0:(n - 1), surviv_fun - p))
+
+  # Use uniroot to determine quantile
+  sapply(surviv_fun_list, function(fn) uniroot(fn, c(0, (n - 1)))$root)
 
 }
 
@@ -205,6 +236,3 @@ summarise_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   return(result)
 
 }
-
-
-
