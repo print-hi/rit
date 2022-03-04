@@ -367,7 +367,7 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   disabled_lifetime <- rep(0, n*10000)
   # simulate n unique latent factors
   for (x in 1:n) {
-    TP <- tshm::get_trans_probs('F', 'US_params_new.xlsx', init_age, female, year)
+    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
     SP <- tshm::simulate_path(init_age, init_state, TP)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
