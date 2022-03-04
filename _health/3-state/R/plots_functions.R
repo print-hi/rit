@@ -75,7 +75,7 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 #'
 #' @export
 #'
-#' @import tidyr dplyr
+#' @import tidyr dplyr ggplot2
 #'
 #' @examples
 prob_plots <- function(init_state, init_age, trans_probs) {

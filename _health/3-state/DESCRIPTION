@@ -11,6 +11,7 @@ Description: What the package does (one paragraph).
 Depends:
     dplyr,
     ggplot2,
+    tidyr,
     R (>= 2.10)
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
