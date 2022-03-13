@@ -84,7 +84,7 @@ survival2q <- function(surv, ages, years = NULL) {
     stopifnot(length(years) == NCOL(surv))
   }
 
-  px <- utils::tail(surv, -1) / utils::head(surv, -1)
+  px <- ifelse(head(surv, -1) == 0, 0, utils::tail(surv, -1) / utils::head(surv, -1))
   qx <- 1 - px
 
 
