@@ -10,7 +10,7 @@ Generates simulated trajectories for Australian economic and financial variables
 
 * The continuous time ESG is based on an Arbitrage-Free Nelson Siegel model. 
 
-	* The R function `get_afns_simulation` returns the simulated trajectories for zero-coupon bond term structure.
+	* The R function `get_zcp_simulation` returns the simulated trajectories for zero-coupon bond term structure.
 
-	* The R function `get_gafns_simulation` returns the simulated trajectories for zero-coupon bond term structure, as well as the NSW house value indexes and S&P/ASX200 closing prices. 
+	* The R function `get_gzcp_simulation` returns the simulated trajectories for zero-coupon bond term structure, as well as the NSW house value indexes and S&P/ASX200 closing prices. 
 
