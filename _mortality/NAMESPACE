@@ -2,11 +2,11 @@
 
 export(CK)
 export(DG)
+export(exp_cfl)
 export(kannisto)
 export(psurviv)
 export(q2survival)
 export(qsurviv)
 export(rate2rate)
-export(summarise_cfl)
 export(survival2q)
 export(survivalP2Q)
