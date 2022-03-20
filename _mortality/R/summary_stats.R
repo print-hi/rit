@@ -154,7 +154,7 @@ cohort2period <- function(cohort_rates, ages) {
 
 #' Summarise Curtate Future Lifetime Statistics
 #'
-#' Produces expected value and variance of curtate future lifetime for a life table.
+#' Produces expected curtate future lifetime for a life table.
 #'
 #' @param qx
 #' vector, matrix or 3D array of 1-year death probabilities with age
@@ -170,13 +170,14 @@ cohort2period <- function(cohort_rates, ages) {
 #' of `qx` will be preserved
 #'
 #' @return
-#' expected value and variance of curtate future lifetime as a 3D array
-#' if `qx` is an array, or as a matrix otherwise
+#' expected curtate future lifetime as a matrix with calendar year (on the rows)
+#' and simulation number (on the columns).
+#'
 #' @export
 #'
 #' @examples
 #'
-summarise_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
+exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   if(is.null(init_age)) {
     init_age <- ages[1]
   } else if (!is.element(init_age, ages)) {
@@ -205,33 +206,22 @@ summarise_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   k <- 1:nrow(kpx)
   rownames(kpx) <- as.character(k)
 
-  summarise_cfl_mat <- function(kpx_mat) {
+  exp_cfl_mat <- function(kpx_mat) {
     # Expected curtate future lifetime
-    exp_cfl <- apply(kpx_mat, 2, sum)
     # Assumes kpx has been given until terminal age
 
-    rownames(exp_cfl) <- NULL
-    # 2nd moment of curtate future lifetime
-    moment_2 <- apply(2 * k * kpx_mat, 2, sum) - exp_cfl
-
-    # Variance of curtate future lifetime
-    var_cfl <- moment_2 - (exp_cfl)^2
-
-    # Years on columns, stats on rows
-    result_mat <- rbind(exp_cfl, var_cfl)
-
-    return(result_mat)
+    return(apply(kpx_mat, 2, sum))
   }
 
   # kpx should be matrix or array, note that is.array(A) = TRUE where A is matrix
   stopifnot(is.array(kpx))
   if (is.matrix(kpx)) {
-    result <- summarise_cfl_mat(kpx)
+    result <- as.matrix(exp_cfl_mat(kpx))
   } else {
-    result <- arr_apply(kpx, summarise_cfl_mat)
+    result <- arr_apply(kpx, exp_cfl_mat)
   }
 
-  colnames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
+  rownames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
 
   return(result)
 
