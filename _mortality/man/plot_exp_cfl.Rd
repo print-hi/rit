@@ -19,7 +19,7 @@ with simulation number (on the rows) and calendar year (on the columns)}
 \item{level}{desired confidence level with 95\% as default}
 }
 \value{
-
+returns \code{NULL}
 }
 \description{
 Plots historical and forecasted expected curtate future lifetime.

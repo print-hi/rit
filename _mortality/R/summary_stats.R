@@ -53,7 +53,7 @@ qsurviv <- function(surviv_fun, surviv_prob) {
   surviv_fun_list <- lapply(surviv_prob, function(p) stats::approxfun(0:(n - 1), surviv_fun - p))
 
   # Use uniroot to determine quantile
-  sapply(surviv_fun_list, function(fn) uniroot(fn, c(0, (n - 1)))$root)
+  sapply(surviv_fun_list, function(fn) stats::uniroot(fn, c(0, (n - 1)))$root)
 
 }
 
@@ -173,8 +173,6 @@ cohort2period <- function(cohort_rates, ages) {
 #' expected curtate future lifetime as a matrix if `qx` is a 3D array
 #' with simulation number (on the rows) and calendar year (on the columns).
 #' Returns a vector otherwise
-#' expected curtate future lifetime as a matrix with calendar year (on the rows)
-#' and simulation number (on the columns).
 #'
 #' @export
 #'
@@ -249,6 +247,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #' desired confidence level with 95% as default
 #'
 #' @return
+#' returns `NULL`
 #'
 #' @export
 #'
@@ -259,12 +258,12 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level
   # Calculating mean, upper and lower values of confidence interval for simulations
   # of expected curtate future lifetime
   exp_cfl_mean <- apply(exp_cfl_for, 2, mean)
-  exp_cfl_lower <- apply(exp_cfl_for, 2, quantile, 1 - level / 100)
-  exp_cfl_upper <- apply(exp_cfl_for, 2, quantile, level / 100)
+  exp_cfl_lower <- apply(exp_cfl_for, 2, stats::quantile, 1 - level / 100)
+  exp_cfl_upper <- apply(exp_cfl_for, 2, stats::quantile, level / 100)
 
   # Computing x and y limits of plot
   plot_ylim <- range(exp_cfl_hist, exp_cfl_mean, exp_cfl_lower, exp_cfl_upper, na.rm = TRUE)
-  plot_xlim <- c(years_hist[1], tail(years_for, 1))
+  plot_xlim <- c(years_hist[1], utils::tail(years_for, 1))
 
   # Initial plot of historical values
   plot(x = years_hist,
@@ -276,21 +275,82 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level
        ylab = "Expected Curtate Future Lifetime (Years)")
 
   # Preparing fanplot parameters
-  fan_col <- colorRampPalette(c("grey60", rgb(1, 1, 1)))
+  fan_col <- grDevices::colorRampPalette(c("grey60", grDevices::rgb(1, 1, 1)))
   fan_n <- 1
 
   # Adding confidence intervals
   fanplot::fan(rbind(exp_cfl_lower, exp_cfl_upper),
                data.type = "values",
                start = years_for[1],
-               anchor = tail(exp_cfl_hist, 1),
+               anchor = utils::tail(exp_cfl_hist, 1),
                probs = c(level / 200, 1 - level / 200),
                fan.col = fan_col, n.fan = fan_n + 1, ln = NULL)
 
   # Adding mean
-  lines(x = c(tail(years_hist, 1), years_for),
-        y = c(tail(exp_cfl_hist, 1), exp_cfl_mean))
+  graphics::lines(x = c(utils::tail(years_hist, 1), years_for),
+                  y = c(utils::tail(exp_cfl_hist, 1), exp_cfl_mean))
 
 }
 
+#' Plot Survival Function Forecasts
+#'
+#' Plots forecasted survival functions for a desired cohort.
+#'
+#' @param surv_fn_for
+#' 3D array of forecasted survival functions with survival time
+#' (on the rows) and calendar year (on the columns) and simulation
+#' number (3rd dimension)
+#' @param init_age
+#' initial age for which `surv_fn_for` was calculated at
+#' @param target_year
+#' year for which the survival function is plotted for
+#' @param level
+#' desired confidence level with 95% as default
+#'
+#' @return
+#' returns `NULL`
+#'
+#' @export
+#'
+#' @examples
+#'
+plot_surv_fn_for <- function(surv_fn_for, init_age, target_year, level = 95) {
+
+  # Extracting required variables from inputs
+  surv_time <- as.numeric(rownames(surv_fn_for))
+  surv_fn_for_cohort <- t(surv_fn_for[, as.character(target_year), ])
+
+  # Calculating mean, upper and lower values of confidence interval for simulations
+  # of survival function
+  surv_mean <- apply(surv_fn_for_cohort, 2, mean)
+  surv_lower <- apply(surv_fn_for_cohort, 2, stats::quantile, 1 - level / 100)
+  surv_upper <- apply(surv_fn_for_cohort, 2, stats::quantile, level / 100)
+
+  # Computing x and y limits of plot
+  plot_ylim <- range(surv_mean, surv_lower, surv_upper, na.rm = TRUE)
+  plot_xlim <- c(surv_time[1], utils::tail(surv_time, 1))
+
+  # Generating new plot
+  plot(NULL,
+       xlim = plot_xlim,
+       ylim = plot_ylim,
+       xlab = "Survival Time (Years)",
+       ylab = "Survival Probability",
+       main = paste("Age", init_age, "in Year", target_year))
+
+  # Preparing fanplot parameters
+  fan_col <- grDevices::colorRampPalette(c("grey60", grDevices::rgb(1, 1, 1)))
+  fan_n <- 1
+
+  # Adding confidence intervals
+  fanplot::fan(rbind(surv_lower, surv_upper),
+               data.type = "values",
+               start = surv_time[1],
+               probs = c(level / 200, 1 - level / 200),
+               fan.col = fan_col, n.fan = fan_n + 1, ln = NULL)
+
+  # Plot mean
+  graphics::lines(x = surv_time, y = surv_mean, type = 'l')
+
+}
 

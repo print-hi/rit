@@ -23,8 +23,6 @@ of \code{qx} will be preserved}
 expected curtate future lifetime as a matrix if \code{qx} is a 3D array
 with simulation number (on the rows) and calendar year (on the columns).
 Returns a vector otherwise
-expected curtate future lifetime as a matrix with calendar year (on the rows)
-and simulation number (on the columns).
 }
 \description{
 Produces expected curtate future lifetime for a life table.
