@@ -20,8 +20,9 @@ the summary statistics will be calculated for the smallest age supplied in \code
 of \code{qx} will be preserved}
 }
 \value{
-expected curtate future lifetime as a matrix with simulation number (on the rows)
-and calendar year (on the columns).
+expected curtate future lifetime as a matrix if \code{qx} is a 3D array
+with simulation number (on the rows) and calendar year (on the columns).
+Returns a vector otherwise
 }
 \description{
 Produces expected curtate future lifetime for a life table.

@@ -170,8 +170,9 @@ cohort2period <- function(cohort_rates, ages) {
 #' of `qx` will be preserved
 #'
 #' @return
-#' expected curtate future lifetime as a matrix with simulation number (on the rows)
-#' and calendar year (on the columns).
+#' expected curtate future lifetime as a matrix if `qx` is a 3D array
+#' with simulation number (on the rows) and calendar year (on the columns).
+#' Returns a vector otherwise
 #'
 #' @export
 #'
@@ -216,14 +217,76 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   # kpx should be matrix or array, note that is.array(A) = TRUE where A is matrix
   stopifnot(is.array(kpx))
   if (is.matrix(kpx)) {
-    result <- as.matrix(exp_cfl_mat(kpx))
+    result <- exp_cfl_mat(kpx)
+
+    return(result)
   } else {
     result <- arr_apply(kpx, exp_cfl_mat)
+    rownames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
+
+    return(t(result))
   }
 
-  rownames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
+}
 
-  return(t(result))
+#' Plot Curtate Future Lifetime Forecasts
+#'
+#' Plots historical and forecasted expected curtate future lifetime.
+#'
+#' @param exp_cfl_hist
+#' vector of expected curtate future lifetime for historical years
+#' @param years_hist
+#' vector of historical years
+#' @param exp_cfl_for
+#' matrix of expected curtate future lifetime for forecasted years
+#' with simulation number (on the rows) and calendar year (on the columns)
+#' @param years_for
+#' vector of forecasted years
+#' @param level
+#' desired confidence level with 95% as default
+#'
+#' @return
+#'
+#' @export
+#'
+#' @examples
+#'
+plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level = 95) {
+
+  # Calculating mean, upper and lower values of confidence interval for simulations
+  # of expected curtate future lifetime
+  exp_cfl_mean <- apply(exp_cfl_for, 2, mean)
+  exp_cfl_lower <- apply(exp_cfl_for, 2, quantile, 1 - level / 100)
+  exp_cfl_upper <- apply(exp_cfl_for, 2, quantile, level / 100)
+
+  # Computing x and y limits of plot
+  plot_ylim <- range(exp_cfl_hist, exp_cfl_mean, exp_cfl_lower, exp_cfl_upper, na.rm = TRUE)
+  plot_xlim <- c(years_hist[1], tail(years_for, 1))
+
+  # Initial plot of historical values
+  plot(x = years_hist,
+       y = exp_cfl_hist,
+       xlim = plot_xlim,
+       ylim = plot_ylim,
+       type = "l",
+       xlab = "Years",
+       ylab = "Expected Curtate Future Lifetime (Years)")
+
+  # Preparing fanplot parameters
+  fan_col <- colorRampPalette(c("grey60", rgb(1, 1, 1)))
+  fan_n <- 1
+
+  # Adding confidence intervals
+  fanplot::fan(rbind(exp_cfl_lower, exp_cfl_upper),
+               data.type = "values",
+               start = years_for[1],
+               anchor = tail(exp_cfl_hist, 1),
+               probs = c(level / 200, 1 - level / 200),
+               fan.col = fan_col, n.fan = fan_n + 1, ln = NULL)
+
+  # Adding mean
+  lines(x = c(tail(years_hist, 1), years_for),
+        y = c(tail(exp_cfl_hist, 1), exp_cfl_mean))
 
 }
 
