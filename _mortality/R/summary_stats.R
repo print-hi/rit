@@ -170,9 +170,14 @@ cohort2period <- function(cohort_rates, ages) {
 #' of `qx` will be preserved
 #'
 #' @return
+<<<<<<< HEAD
 #' expected curtate future lifetime as a matrix if `qx` is a 3D array
 #' with simulation number (on the rows) and calendar year (on the columns).
 #' Returns a vector otherwise
+=======
+#' expected curtate future lifetime as a matrix with calendar year (on the rows)
+#' and simulation number (on the columns).
+>>>>>>> d920b612790c17988a857f812da9946e42d2fb4d
 #'
 #' @export
 #'
@@ -228,6 +233,13 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   }
 
 }
+    result <- as.matrix(exp_cfl_mat(kpx))
+  } else {
+    result <- arr_apply(kpx, exp_cfl_mat)
+  }
+
+  rownames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
+>>>>>>> d920b612790c17988a857f812da9946e42d2fb4d
 
 #' Plot Curtate Future Lifetime Forecasts
 #'
