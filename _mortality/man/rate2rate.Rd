@@ -7,7 +7,7 @@
 rate2rate(rates, from, to)
 }
 \arguments{
-\item{rates}{matrix containing the rates}
+\item{rates}{vector, matrix or 3D array of mortality rates}
 
 \item{from}{character string representing the type of mortality rate to be converted
 from. Takes the following values: "central" for central death rates, "prob"
@@ -17,7 +17,7 @@ for 1-year death probabilities, "force" for force of mortality.}
 Takes the same values as the parameter \code{from}}
 }
 \value{
-matrix of the same size as \code{rates} containing the converted rates
+vector, matrix or 3D array of converted mortality rates
 }
 \description{
 Converts between central death rates, 1-year death probabilities and force of

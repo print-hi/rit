@@ -25,16 +25,16 @@ arr_apply <- function(X, FUN) {
 #' ages.
 #'
 #' @param rates
-#' matrix or vector of mortality rates with age (on the rows) and calendar year
-#' (on the columns). Vector is equivalent to a matrix with a single column
+#' vector, matrix or 3D array of mortality rates with age (on the rows) and
+#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
 #' @param ages
 #' vector of ages for `rates`
 #' @param old_ages
 #' vector of old ages for which `rates` is to be completed for
 #' @param type
-#' character string representing the type of mortality rate supplied. Takes the
-#' following values: "central" for central death rates, "prob" for 1-year death
-#' probabilities, "force" for force of mortality
+#' character string representing the type of mortality rate for input and output.
+#' Takes the following values: "central" for central death rates,
+#' "prob" for 1-year death probabilities, "force" for force of mortality
 #' @param closure_age
 #' maximum life span
 #' @param m_end
@@ -46,13 +46,14 @@ arr_apply <- function(X, FUN) {
 #' of `rates` will be preserved
 #'
 #' @return
-#' matrix of central death rates for all ages and calendar years
+#' completed mortality rates for all ages and old ages in the same format as
+#' `rates`
 #'
 #' @export
 #'
 #' @examples
 #'
-CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
+coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
 
   if (is.null(years)) {
     col_names <- colnames(rates)
@@ -80,7 +81,6 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
     old_kxy <- outer(rep(1, length(old_ages)), k_boundary) - outer(old_ages - boundary_age, sy)
     # Outer creates matrix of appropriate dimensions for element-wise matrix multiplication
 
-
     # Completion of old ages
     old_kxy_cumsum <- apply(old_kxy, 2, cumsum)
     old_mxy <- outer(rep(1, length(old_ages)), m_boundary) * exp(old_kxy_cumsum)
@@ -92,7 +92,15 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
     completed_mxy
   }
 
-  if (is.vector(mxy_arr) | is.matrix(mxy_arr)) {
+  # Ensure output is same format as input
+  if (is.vector(mxy_arr)) {
+    completed_mxy_vec <- as.vector(CK_mat(mxy_arr))
+    names(completed_mxy_vec) <- as.character(c(kept_ages, old_ages))
+
+    # Convert to required mortality rate
+    return(rate2rate(completed_mxy_vec, from = "central", to = type))
+
+  } else if (is.matrix(mxy_arr)) {
     completed_mxy_arr <- CK_mat(mxy_arr)
   } else if (is.array(mxy_arr)) {
     completed_mxy_arr <- arr_apply(mxy_arr, CK_mat)
@@ -101,7 +109,8 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
   rownames(completed_mxy_arr) <- as.character(c(kept_ages, old_ages))
   colnames(completed_mxy_arr) <- if (is.null(years)) col_names else as.character(years)
 
-  completed_mxy_arr
+  # Convert to required mortality rate
+  return(rate2rate(completed_mxy_arr, from = "central", to = type))
 
 }
 
@@ -111,16 +120,16 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
 #' old ages.
 #'
 #' @param rates
-#' matrix or vector of mortality rates with age (on the rows) and calendar year
-#' (on the columns). Vector is equivalent to a matrix with a single column
+#' vector, matrix or 3D array of mortality rates with age (on the rows) and
+#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
 #' @param ages
 #' vector of ages for `rates`
 #' @param old_ages
 #' vector of old ages for which `rates` is to be completed for
 #' @param type
-#' character string representing the type of mortality rate supplied. Takes the
-#' following values: "central" for central death rates, "prob" for 1-year death
-#' probabilities, "force" for force of mortality
+#' character string representing the type of mortality rate for input and output.
+#' Takes the following values: "central" for central death rates,
+#' "prob" for 1-year death probabilities, "force" for force of mortality
 #' @param closure_age
 #' maximum life span
 #' @param start_fit_age
@@ -132,14 +141,14 @@ CK <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end
 #' of `rates` will be preserved
 #'
 #' @return
-#' matrix of 1-year death probabilities for all ages and calendar years
+#' completed mortality rates for all ages and old ages in the same format as
+#' `rates`
 #'
 #' @export
 #'
 #' @examples
 #'
-DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
-
+denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
 
   if (is.null(years)) {
     col_names <- colnames(rates)
@@ -162,7 +171,6 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
     # Creating data frame to fit log-quadratic model
     input_df <- as.data.frame(qxy)
     df_fit <- input_df[ages >= start_fit_age, , drop = F]
-
 
     # Helper function to fit log-quadratic model on a vector
     DG_fit <- function(qx) {
@@ -202,7 +210,15 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 
   }
 
-  if (is.vector(qxy_arr) | is.matrix(qxy_arr)) {
+  # Ensure output is same format as input
+  if (is.vector(qxy_arr)) {
+    completed_qxy_vec <- as.vector(DG_mat(qxy_arr))
+    names(completed_qxy_vec) <- as.character(c(kept_ages, old_ages))
+
+    # Convert to required mortality rate
+    return(rate2rate(completed_qxy_vec, from = "prob", to = type))
+
+  } else if (is.matrix(qxy_arr)) {
     completed_qxy_arr <- DG_mat(qxy_arr)
   } else if (is.array(qxy_arr)) {
     completed_qxy_arr <- arr_apply(qxy_arr, DG_mat)
@@ -211,7 +227,8 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
   rownames(completed_qxy_arr) <- as.character(c(kept_ages, old_ages))
   colnames(completed_qxy_arr) <- if (is.null(years)) col_names else as.character(years)
 
-  completed_qxy_arr
+  # Convert to required mortality rate
+  return(rate2rate(completed_qxy_arr, from = "prob", to = type))
 
 }
 
@@ -220,8 +237,8 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 #' Implements the Kannisto method of age completion for old ages.
 #'
 #' @param rates
-#' matrix or vector of mortality rates with age (on the rows) and calendar year
-#' (on the columns). Vector is equivalent to a matrix with a single column
+#' vector, matrix or 3D array of mortality rates with age (on the rows) and
+#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
 #' @param ages
 #' vector of ages for `rates`
 #' @param old_ages
@@ -229,9 +246,9 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 #' @param fitted_ages
 #' vector of ages for which model is fitted on
 #' @param type
-#' character string representing the type of mortality rate supplied. Takes the
-#' following values: "central" for central death rates, "prob" for 1-year death
-#' probabilities, "force" for force of mortality
+#' character string representing the type of mortality rate for input and output.
+#' Takes the following values: "central" for central death rates,
+#' "prob" for 1-year death probabilities, "force" for force of mortality
 #' @param closure_age
 #' maximum life span
 #' @param years
@@ -239,7 +256,8 @@ DG <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fi
 #' of `rates` will be preserved
 #'
 #' @return
-#' matrix of force of mortality for all ages and calendar years
+#' completed mortality rates for all ages and old ages in the same format as
+#' `rates`
 #'
 #' @export
 #'
@@ -295,14 +313,20 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 
     # Enforce closure age constraint
     if (is.element(closure_age, old_ages)) {
-      completed_muxy[closure_age - ages[1] + 1, ] <- 20
+      completed_muxy[closure_age - ages[1] + 1, ] <- 30
     }
 
     completed_muxy
 
   }
 
-  if (is.vector(muxy_arr) | is.matrix(muxy_arr)) {
+  if (is.vector(muxy_arr)) {
+    completed_muxy_vec <- as.vector(kannisto_mat(muxy_arr))
+    names(completed_muxy_vec) <- as.character(c(kept_ages, old_ages))
+
+    # Convert to required mortality rate
+    return(rate2rate(completed_muxy_vec, from = "force", to = type))
+  } else if (is.matrix(muxy_arr)) {
     completed_muxy_arr <- kannisto_mat(muxy_arr)
   } else if (is.array(muxy_arr)) {
     completed_muxy_arr <- arr_apply(muxy_arr, kannisto_mat)
@@ -311,8 +335,10 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   rownames(completed_muxy_arr) <- as.character(c(kept_ages, old_ages))
   colnames(completed_muxy_arr) <- if (is.null(years)) col_names else as.character(years)
 
-  completed_muxy_arr
-
+  # Convert to required mortality rate
+  return(rate2rate(completed_muxy_arr, from = "force", to = type))
 
 
 }
+
+

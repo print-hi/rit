@@ -18,7 +18,7 @@ q2m <- function(rates) return(-log(1 - rates))
 #' \deqn{m_{xy}  = -log(1 - q_{xy})}
 #'
 #' @param rates
-#' matrix containing the rates
+#' vector, matrix or 3D array of mortality rates
 #' @param from
 #' character string representing the type of mortality rate to be converted
 #' from. Takes the following values: "central" for central death rates, "prob"
@@ -28,7 +28,7 @@ q2m <- function(rates) return(-log(1 - rates))
 #' Takes the same values as the parameter `from`
 #'
 #' @return
-#' matrix of the same size as `rates` containing the converted rates
+#' vector, matrix or 3D array of converted mortality rates
 #'
 #' @export
 #'

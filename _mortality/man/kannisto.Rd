@@ -15,8 +15,8 @@ kannisto(
 )
 }
 \arguments{
-\item{rates}{matrix or vector of mortality rates with age (on the rows) and calendar year
-(on the columns). Vector is equivalent to a matrix with a single column}
+\item{rates}{vector, matrix or 3D array of mortality rates with age (on the rows) and
+calendar year or cohort (on the columns) and simulation number (3rd dimension)}
 
 \item{ages}{vector of ages for \code{rates}}
 
@@ -24,9 +24,9 @@ kannisto(
 
 \item{fitted_ages}{vector of ages for which model is fitted on}
 
-\item{type}{character string representing the type of mortality rate supplied. Takes the
-following values: "central" for central death rates, "prob" for 1-year death
-probabilities, "force" for force of mortality}
+\item{type}{character string representing the type of mortality rate for input and output.
+Takes the following values: "central" for central death rates,
+"prob" for 1-year death probabilities, "force" for force of mortality}
 
 \item{closure_age}{maximum life span}
 
@@ -34,7 +34,8 @@ probabilities, "force" for force of mortality}
 of \code{rates} will be preserved}
 }
 \value{
-matrix of force of mortality for all ages and calendar years
+completed mortality rates for all ages and old ages in the same format as
+\code{rates}
 }
 \description{
 Implements the Kannisto method of age completion for old ages.
