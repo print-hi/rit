@@ -24,26 +24,11 @@ arr_apply <- function(X, FUN) {
 #' Implements the Coale and Kisker method of mortality rate completion for old
 #' ages.
 #'
-#' @param rates
-#' vector, matrix or 3D array of mortality rates with age (on the rows) and
-#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
-#' @param ages
-#' vector of ages for `rates`
-#' @param old_ages
-#' vector of old ages for which `rates` is to be completed for
-#' @param type
-#' character string representing the type of mortality rate for input and output.
-#' Takes the following values: "central" for central death rates,
-#' "prob" for 1-year death probabilities, "force" for force of mortality
-#' @param closure_age
-#' maximum life span
+#' @inheritParams complete_old_age
 #' @param m_end
 #' constant or vector specifying the central death rates at the final age for
 #' each calendar year. If supplied as a vector, vector length and number of
 #' columns for `rates` must be equal
-#' @param years
-#' optional vector of years for `rates`. If not supplied, then the column names
-#' of `rates` will be preserved
 #'
 #' @return
 #' completed mortality rates for all ages and old ages in the same format as
@@ -119,26 +104,11 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #' Implements the Denuit and Goderniaux method of mortality rate completion for
 #' old ages.
 #'
-#' @param rates
-#' vector, matrix or 3D array of mortality rates with age (on the rows) and
-#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
-#' @param ages
-#' vector of ages for `rates`
-#' @param old_ages
-#' vector of old ages for which `rates` is to be completed for
-#' @param type
-#' character string representing the type of mortality rate for input and output.
-#' Takes the following values: "central" for central death rates,
-#' "prob" for 1-year death probabilities, "force" for force of mortality
-#' @param closure_age
-#' maximum life span
+#' @inheritParams complete_old_age
 #' @param start_fit_age
 #' model is fitted to ages starting from this age
 #' @param smoothing
 #' logical value indicating if smoothing is to be applied
-#' @param years
-#' optional vector of years for `rates`. If not supplied, then the column names
-#' of `rates` will be preserved
 #'
 #' @return
 #' completed mortality rates for all ages and old ages in the same format as
@@ -236,24 +206,9 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #'
 #' Implements the Kannisto method of age completion for old ages.
 #'
-#' @param rates
-#' vector, matrix or 3D array of mortality rates with age (on the rows) and
-#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
-#' @param ages
-#' vector of ages for `rates`
-#' @param old_ages
-#' vector of old ages for which `rates` is to be completed for
+#' @inheritParams complete_old_age
 #' @param fitted_ages
 #' vector of ages for which model is fitted on
-#' @param type
-#' character string representing the type of mortality rate for input and output.
-#' Takes the following values: "central" for central death rates,
-#' "prob" for 1-year death probabilities, "force" for force of mortality
-#' @param closure_age
-#' maximum life span
-#' @param years
-#' optional vector of years for `rates`. If not supplied, then the column names
-#' of `rates` will be preserved
 #'
 #' @return
 #' completed mortality rates for all ages and old ages in the same format as
@@ -341,4 +296,56 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 
 }
 
+#' Mortality Rate Completion
+#'
+#' Completes mortality rates at old ages.
+#'
+#' @param rates
+#' vector, matrix or 3D array of mortality rates with age (on the rows) and
+#' calendar year or cohort (on the columns) and simulation number (3rd dimension)
+#' @param ages
+#' vector of ages for `rates`
+#' @param old_ages
+#' vector of old ages for which `rates` is to be completed for
+#' @param method
+#' character string representing the completion method to be used. Takes the
+#' following values: "CK" for Coale-Kisker, "DG" for Denuit and Goderniaux,
+#' "kannisto" for Kannisto
+#' @param type
+#' character string representing the type of mortality rate for input and output.
+#' Takes the following values: "central" for central death rates,
+#' "prob" for 1-year death probabilities, "force" for force of mortality
+#' @param closure_age
+#' maximum life span
+#' @param years
+#' optional vector of years for `rates`. If not supplied, then the column names
+#' of `rates` will be preserved
+#' @param ...
+#' additional arguments for the chosen completion method. See
+#' \code{\link{coale_kisker}}, \code{\link{denuit_goderniaux}}, \code{\link{kannisto}}
+#'
+#' @return
+#' completed mortality rates for all ages and old ages in the same format as
+#' `rates`
+#' @export
+#'
+#' @examples
+#'
+complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
+                             type = "prob", closure_age = 130, years = NULL, ...) {
+
+  valid_methods = c("CK", "DG", "kannisto")
+  if (!is.element(method, valid_methods)) stop("invalid completion method")
+
+  if (method == "CK") {
+    coale_kisker(rates = rates, ages = ages, old_ages = old_ages,
+                 type = type, closure_age = closure_age, years = years, ...)
+  } else if (method == "DG") {
+    denuit_goderniaux(rates = rates, ages = ages, old_ages = old_ages,
+                 type = type, closure_age = closure_age, years = years, ...)
+  } else if (method == "kannisto") {
+    kannisto(rates = rates, ages = ages, old_ages = old_ages,
+             type = type, closure_age = closure_age, years = years, ...)
+  }
+}
 
