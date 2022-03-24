@@ -45,6 +45,9 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
     px <- 1 - utils::tail(qx, ages[1] - init_age)
   }
 
+  # Deal with R numerical error
+  px[near(px, 0)] <- 0
+
   # Calculating survival function
   if (is.vector(px)) {
     St <- rbind(1, matrix(cumprod(px)))
