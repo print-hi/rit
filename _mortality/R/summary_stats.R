@@ -6,54 +6,51 @@
 #'
 #' Linear interpolation is performed between the discrete points of the survival function
 #'
-#' @param surviv_fun
+#' @param surv_fun
 #' vector of survival function
-#' @param surviv_time
+#' @param surv_time
 #' vector of survival times
-#' @param surviv_prob
+#' @param surv_prob
 #' vector of survival probabilities
 #'
-#' @name surviv
+#' @name surv
 NULL
 
-#' @rdname surviv
+#' @rdname surv
 #'
 #' @export
-psurviv <- function(surviv_fun, surviv_time) {
+psurv <- function(surv_fun, surv_time) {
 
-  n <- length(surviv_fun)
+  n <- length(surv_fun)
 
   # Checking bounds
-  stopifnot(surviv_time >= 0)
+  stopifnot(surv_time >= 0)
 
   # Linear interpolation
-  surviv_fun_approx <- stats::approxfun(0:(n - 1), surviv_fun)
+  surv_fun_approx <- stats::approxfun(0:(n - 1), surv_fun)
 
-  result <- surviv_fun_approx(surviv_time)
-  # Note: returns NA for surviv_time >= n - 1
+  result <- surv_fun_approx(surv_time)
+  # Note: returns NA for surv_time >= n - 1
 
   return(result)
 
 }
 
-#' @rdname surviv
+#' @rdname surv
 #'
 #' @export
-qsurviv <- function(surviv_fun, surviv_prob) {
+qsurv <- function(surv_fun, surv_prob) {
 
-  n <- length(surviv_fun)
+  n <- length(surv_fun)
 
   # Checking bounds
-  stopifnot(surviv_prob >= 0, surviv_prob <= 1)
+  stopifnot(surv_prob >= 0, surv_prob <= 1)
 
-  # Linear interpolation
-  surviv_fun_approx <- stats::approxfun(0:(n - 1), surviv_fun)
-
-  # Creating list of linearly interpolated functions shifted by element of surviv_prob
-  surviv_fun_list <- lapply(surviv_prob, function(p) stats::approxfun(0:(n - 1), surviv_fun - p))
+  # Creating list of linearly interpolated functions shifted by element of surv_prob
+  surv_fun_list <- lapply(surv_prob, function(p) stats::approxfun(0:(n - 1), surv_fun - p))
 
   # Use uniroot to determine quantile
-  sapply(surviv_fun_list, function(fn) stats::uniroot(fn, c(0, (n - 1)))$root)
+  sapply(surv_fun_list, function(fn) stats::uniroot(fn, c(0, (n - 1)))$root)
 
 }
 
@@ -61,10 +58,6 @@ qsurviv <- function(surviv_fun, surviv_prob) {
 period2cohort <- function(period_rates, ages) {
 
   # Requires years to be continuous increasing vector e.g. 2000:2017
-
-  # TODO: Cannot immediately switch from lifetable, need to convert into
-  # survival probabilities
-  # TODO: Return something suggesting it is cohort life table?
 
   p2c_mat <- function(p_rates) {
 
@@ -292,16 +285,16 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level
 
 }
 
-#' Plot Survival Function Forecasts
+#' Plot Survival Function Simulations
 #'
-#' Plots forecasted survival functions for a desired cohort.
+#' Plots simulated survival functions for a desired cohort.
 #'
-#' @param surv_fn_for
+#' @param surv_sim
 #' 3D array of forecasted survival functions with survival time
 #' (on the rows) and calendar year (on the columns) and simulation
 #' number (3rd dimension)
 #' @param init_age
-#' initial age for which `surv_fn_for` was calculated at
+#' initial age for which `surv_sim` was calculated at
 #' @param target_year
 #' year for which the survival function is plotted for
 #' @param level
@@ -314,17 +307,17 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level
 #'
 #' @examples
 #'
-plot_surv_fn_for <- function(surv_fn_for, init_age, target_year, level = 95) {
+plot_surv_sim <- function(surv_sim, init_age, target_year, level = 95) {
 
   # Extracting required variables from inputs
-  surv_time <- as.numeric(rownames(surv_fn_for))
-  surv_fn_for_cohort <- t(surv_fn_for[, as.character(target_year), ])
+  surv_time <- as.numeric(rownames(surv_sim))
+  surv_sim_cohort <- t(surv_sim[, as.character(target_year), ])
 
   # Calculating mean, upper and lower values of confidence interval for simulations
   # of survival function
-  surv_mean <- apply(surv_fn_for_cohort, 2, mean)
-  surv_lower <- apply(surv_fn_for_cohort, 2, stats::quantile, 1 - level / 100)
-  surv_upper <- apply(surv_fn_for_cohort, 2, stats::quantile, level / 100)
+  surv_mean <- apply(surv_sim_cohort, 2, mean)
+  surv_lower <- apply(surv_sim_cohort, 2, stats::quantile, 1 - level / 100)
+  surv_upper <- apply(surv_sim_cohort, 2, stats::quantile, level / 100)
 
   # Computing x and y limits of plot
   plot_ylim <- range(surv_mean, surv_lower, surv_upper, na.rm = TRUE)
