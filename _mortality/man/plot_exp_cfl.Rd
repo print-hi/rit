@@ -2,19 +2,19 @@
 % Please edit documentation in R/summary_stats.R
 \name{plot_exp_cfl}
 \alias{plot_exp_cfl}
-\title{Plot Curtate Future Lifetime Forecasts}
+\title{Plot Curtate Future Lifetime Simulations}
 \usage{
-plot_exp_cfl(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level = 95)
+plot_exp_cfl(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level = 95)
 }
 \arguments{
 \item{exp_cfl_hist}{vector of expected curtate future lifetime for historical years}
 
 \item{years_hist}{vector of historical years}
 
-\item{exp_cfl_for}{matrix of expected curtate future lifetime for forecasted years
+\item{exp_cfl_sim}{matrix of simulated expected curtate future lifetime
 with simulation number (on the rows) and calendar year (on the columns)}
 
-\item{years_for}{vector of forecasted years}
+\item{years_sim}{vector of years for simulations}
 
 \item{level}{desired confidence level with 95\% as default}
 }
@@ -22,7 +22,7 @@ with simulation number (on the rows) and calendar year (on the columns)}
 returns \code{NULL}
 }
 \description{
-Plots historical and forecasted expected curtate future lifetime.
+Plots historical and simulated expected curtate future lifetime.
 }
 \examples{
 

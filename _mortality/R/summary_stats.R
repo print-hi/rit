@@ -223,19 +223,19 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 }
 
 
-#' Plot Curtate Future Lifetime Forecasts
+#' Plot Curtate Future Lifetime Simulations
 #'
-#' Plots historical and forecasted expected curtate future lifetime.
+#' Plots historical and simulated expected curtate future lifetime.
 #'
 #' @param exp_cfl_hist
 #' vector of expected curtate future lifetime for historical years
 #' @param years_hist
 #' vector of historical years
-#' @param exp_cfl_for
-#' matrix of expected curtate future lifetime for forecasted years
+#' @param exp_cfl_sim
+#' matrix of simulated expected curtate future lifetime
 #' with simulation number (on the rows) and calendar year (on the columns)
-#' @param years_for
-#' vector of forecasted years
+#' @param years_sim
+#' vector of years for simulations
 #' @param level
 #' desired confidence level with 95% as default
 #'
@@ -246,17 +246,17 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #'
 #' @examples
 #'
-plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level = 95) {
+plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level = 95) {
 
   # Calculating mean, upper and lower values of confidence interval for simulations
   # of expected curtate future lifetime
-  exp_cfl_mean <- apply(exp_cfl_for, 2, mean)
-  exp_cfl_lower <- apply(exp_cfl_for, 2, stats::quantile, 1 - level / 100)
-  exp_cfl_upper <- apply(exp_cfl_for, 2, stats::quantile, level / 100)
+  exp_cfl_mean <- apply(exp_cfl_sim, 2, mean)
+  exp_cfl_lower <- apply(exp_cfl_sim, 2, stats::quantile, 1 - level / 100)
+  exp_cfl_upper <- apply(exp_cfl_sim, 2, stats::quantile, level / 100)
 
   # Computing x and y limits of plot
   plot_ylim <- range(exp_cfl_hist, exp_cfl_mean, exp_cfl_lower, exp_cfl_upper, na.rm = TRUE)
-  plot_xlim <- c(years_hist[1], utils::tail(years_for, 1))
+  plot_xlim <- c(years_hist[1], utils::tail(years_sim, 1))
 
   # Initial plot of historical values
   plot(x = years_hist,
@@ -274,13 +274,13 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_for, years_for, level
   # Adding confidence intervals
   fanplot::fan(rbind(exp_cfl_lower, exp_cfl_upper),
                data.type = "values",
-               start = years_for[1],
+               start = years_sim[1],
                anchor = utils::tail(exp_cfl_hist, 1),
                probs = c(level / 200, 1 - level / 200),
                fan.col = fan_col, n.fan = fan_n + 1, ln = NULL)
 
   # Adding mean
-  graphics::lines(x = c(utils::tail(years_hist, 1), years_for),
+  graphics::lines(x = c(utils::tail(years_hist, 1), years_sim),
                   y = c(utils::tail(exp_cfl_hist, 1), exp_cfl_mean))
 
 }
