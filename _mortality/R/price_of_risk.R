@@ -1,36 +1,42 @@
 #' Convert death probabilities to survival function
 #'
-#' Converts 1-year death probabilities to the associated survival function.
+#' Converts mortality rates to the associated survival function.
 #'
 #' The survival function has survival time (starting from 0) on the rows.
 #'
-#' @param qx
-#' vector, matrix or 3D array of 1-year death probabilities with age
+#' @param rates
+#' vector, matrix or 3D array of mortality rates with age
 #' (on the rows) and calendar year (on the columns) and simulation
 #' number (3rd dimension)
 #' @param ages
-#' vector of ages for `qx`
+#' vector of ages for `rates`
+#' @param from
+#' character string representing the type of mortality rate to be converted
+#' from. Takes the following values: "central" for central death rates, "prob"
+#' for 1-year death probabilities, "force" for force of mortality.
 #' @param init_age
 #' initial age for which the survival function is to be calculated at. If not provided,
 #' the survival function will be calculated for the smallest age supplied in `ages`
 #' @param years
-#' optional vector of years for `qx`. If not supplied, then the column names
-#' of `qx` will be preserved
+#' optional vector of years for `rates`. If not supplied, then the column names
+#' of `rates` will be preserved
 #'
 #' @return
-#' associated survival function as a 3D array if `qx` is an array, or as a matrix otherwise
+#' associated survival function as a 3D array if `rates` is an array, or as a matrix otherwise
 #'
 #' @export
 #'
 #' @examples
 #'
-q2survival <- function(qx, ages, init_age = NULL, years = NULL) {
+rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = NULL) {
   if(is.null(init_age)) {
     init_age <- ages[1]
   } else if (!is.element(init_age, ages)) {
     stop("invalid initial age")
   }
 
+  # Converting to 1-year death probabilities
+  qx <- rate2rate(rates, from, "prob")
 
   # Converting to 1-year survival probabilities
   if(init_age == ages[1]) {
@@ -57,24 +63,28 @@ q2survival <- function(qx, ages, init_age = NULL, years = NULL) {
 
 #' Convert survival function to death probabilities
 #'
-#' Converts the survival function to the associated 1-year death probabilities.
+#' Converts the survival function to the associated mortality rates.
 #'
 #' @param surv
 #' vector, matrix or 3D array of the survival function with survival time starting from 0
 #' (on the rows) and calendar year (on the columns) and simulation number (3rd dimension)
 #' @param ages
 #' vector of desired ages for the resulting 1-year death probabilities
+#' @param to
+#' character string representing the type of mortality rate to be converted
+#' to. Takes the following values: "central" for central death rates, "prob"
+#' for 1-year death probabilities, "force" for force of mortality.
 #' @param years
 #' optional vector of years for `surv`. If not supplied, then the column names
 #' of `surv` will be preserved
 #'
 #' @return
-#' associated 1-year death probabilities in the same format as `surv`
+#' associated mortality rates in the same format as `surv`
 #' @export
 #'
 #' @examples
 #'
-survival2q <- function(surv, ages, years = NULL) {
+survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 
   if(!is.null(ages)) {
     stopifnot(length(ages) == NROW(surv) - 1)
@@ -87,18 +97,17 @@ survival2q <- function(surv, ages, years = NULL) {
   px <- ifelse(utils::head(surv, -1) == 0, 0, utils::tail(surv, -1) / utils::head(surv, -1))
   qx <- 1 - px
 
+  rates <- rate2rate(qx, from = "prob", to = to)
 
-  if (!is.vector(qx)) {
-    rownames(qx) <- as.character(ages)
-    colnames(qx) <- if (is.null(years)) colnames(surv) else as.character(years)
+
+  if (!is.vector(rates)) {
+    rownames(rates) <- as.character(ages)
+    colnames(rates) <- if (is.null(years)) colnames(surv) else as.character(years)
   }
 
-
-  return(qx)
+  return(rates)
 
 }
-
-
 
 
 #' Survival Function Transformation
