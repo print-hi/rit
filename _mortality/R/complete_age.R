@@ -40,9 +40,102 @@ arr_apply <- function(X, FUN) {
 #'
 coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
 
-  if (is.null(years)) {
-    col_names <- colnames(rates)
+# Flagging Errors ---------------------------------------------------------
+
+  # rates
+  if (!is.vector(rates) & !is.matrix(rates) & !(is.array(rates) & length(dim(rates)) == 3)) {
+    stop("rates must be a vector, 2D matrix or a 3D array")
   }
+
+  if (!is.numeric(rates)) {
+    stop("rates must be numeric")
+  }
+
+  if (any(rates < 0, na.rm = T)) {
+    stop("rates must be non-negative")
+  }
+
+  if (type == "prob" & any(rates > 1, na.rm = T)) {
+    stop("1-yr death probabilities must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(rates)) {
+    stop("length of ages must be equal to number of rows of rates")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # old_ages
+  if (!is.vector(old_ages) | !all(old_ages == floor(old_ages))) {
+    stop("old ages must be a vector of integers")
+  }
+
+  if (is.unsorted(old_ages) | utils::tail(old_ages, 1) - old_ages[1] + 1 != length(old_ages)) {
+    stop("old ages must be increasing by 1 at each step")
+  }
+
+  if (any(old_ages < 0)) {
+    stop("old ages must be non-negative")
+  }
+  # note, ages <- 55:110 and old_ages <- 90:130 is valid
+  if (old_ages[1] -  utils::tail(ages, 1) > 1 | old_ages[1] <= ages[1]) {
+    stop("old ages must connect with ages")
+  }
+
+  # type
+  if (!is.element(type, c("central", "prob", "force"))) {
+    stop("type must be 'central', 'prob' or 'force'")
+  }
+
+  # closure_age
+
+  if (closure_age != utils::tail(old_ages, 1)) {
+    stop("closure age must be the last age in old ages")
+  }
+
+  # m_end
+  if (!is.numeric(m_end) | !is.vector(m_end)) {
+    stop("closure central death rate must be a numeric vector")
+  }
+
+  if (length(m_end) != 1 & length(m_end) != NCOL(rates)) {
+    stop("length of closure central death rate must be 1 or equal to number of
+         columns of rates")
+  }
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(rates)) {
+      stop("length of years must be equal to number of columns of rates")
+    }
+
+    if (!is.vector(years) | !all(years == floor(years))) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+# Implementation ----------------------------------------------------------
+
+
 
   # Convert to central death rates
   mxy_arr <- rate2rate(rates, from = type, to = "central")
@@ -92,7 +185,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
   }
 
   rownames(completed_mxy_arr) <- as.character(c(kept_ages, old_ages))
-  colnames(completed_mxy_arr) <- if (is.null(years)) col_names else as.character(years)
+  colnames(completed_mxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
   return(rate2rate(completed_mxy_arr, from = "central", to = type))
@@ -120,9 +213,101 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #'
 denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
 
-  if (is.null(years)) {
-    col_names <- colnames(rates)
+
+# Flagging Errors ---------------------------------------------------------
+
+  # rates
+  if (!is.vector(rates) & !is.matrix(rates) & !(is.array(rates) & length(dim(rates)) == 3)) {
+    stop("rates must be a vector, 2D matrix or a 3D array")
   }
+
+  if (!is.numeric(rates)) {
+    stop("rates must be numeric")
+  }
+
+  if (any(rates < 0, na.rm = T)) {
+    stop("rates must be non-negative")
+  }
+
+  if (type == "prob" & any(rates > 1, na.rm = T)) {
+    stop("1-yr death probabilities must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(rates)) {
+    stop("length of ages must be equal to number of rows of rates")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # old_ages
+  if (!is.vector(old_ages) | !all(ages == floor(old_ages))) {
+    stop("old ages must be a vector of integers")
+  }
+
+  if (is.unsorted(old_ages) | utils::tail(old_ages, 1) - old_ages[1] + 1 != length(old_ages)) {
+    stop("old ages must be increasing by 1 at each step")
+  }
+
+  if (any(old_ages < 0)) {
+    stop("old ages must be non-negative")
+  }
+  # note, ages <- 55:110 and old_ages <- 90:130 is valid
+  if (old_ages[1] -  utils::tail(ages, 1) > 1 | old_ages[1] <= ages[1]) {
+    stop("old ages must connect with ages")
+  }
+
+  # type
+  if (!is.element(type, c("central", "prob", "force"))) {
+    stop("type must be 'central', 'prob' or 'force'")
+  }
+
+  # closure_age
+
+  if (closure_age != utils::tail(old_ages, 1)) {
+    stop("closure age must be the last age in old ages")
+  }
+
+  # start_fit_age
+  if (start_fit_age != floor(start_fit_age) | !is.element(start_fit_age, ages)) {
+    stop("start fit age must be an integer in ages")
+  }
+
+  # smoothing
+  if (!is.logical(smoothing)) {
+    stop("smoothing must be TRUE or FALSE")
+  }
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(rates)) {
+      stop("length of years must be equal to number of columns of rates")
+    }
+
+    if (!is.vector(years) | !is.integer(years)) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+# Implementation ----------------------------------------------------------
 
   # Convert to death probabilities
   qxy_arr <- rate2rate(rates, from = type, to = "prob")
@@ -195,7 +380,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
   }
 
   rownames(completed_qxy_arr) <- as.character(c(kept_ages, old_ages))
-  colnames(completed_qxy_arr) <- if (is.null(years)) col_names else as.character(years)
+  colnames(completed_qxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
   return(rate2rate(completed_qxy_arr, from = "prob", to = type))
@@ -220,9 +405,108 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #'
 kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
 
-  if (is.null(years)) {
-    col_names <- colnames(rates)
+
+# Flagging Errors ---------------------------------------------------------
+  # rates
+  if (!is.vector(rates) & !is.matrix(rates) & !(is.array(rates) & length(dim(rates)) == 3)) {
+    stop("rates must be a vector, 2D matrix or a 3D array")
   }
+
+  if (!is.numeric(rates)) {
+    stop("rates must be numeric")
+  }
+
+  if (any(rates < 0, na.rm = T)) {
+    stop("rates must be non-negative")
+  }
+
+  if (type == "prob" & any(rates > 1, na.rm = T)) {
+    stop("1-yr death probabilities must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(rates)) {
+    stop("length of ages must be equal to number of rows of rates")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # old_ages
+  if (!is.vector(old_ages) | !all(ages == floor(old_ages))) {
+    stop("old ages must be a vector of integers")
+  }
+
+  if (is.unsorted(old_ages) | utils::tail(old_ages, 1) - old_ages[1] + 1 != length(old_ages)) {
+    stop("old ages must be increasing by 1 at each step")
+  }
+
+  if (any(old_ages < 0)) {
+    stop("old ages must be non-negative")
+  }
+  # note, ages <- 55:110 and old_ages <- 90:130 is valid
+  if (old_ages[1] -  utils::tail(ages, 1) > 1 | old_ages[1] <= ages[1]) {
+    stop("old ages must connect with ages")
+  }
+
+  # fitted_ages
+  if (!is.vector(fitted_ages) | !all(ages == floor(fitted_ages))) {
+    stop("fitted ages must be a vector of integers")
+  }
+
+  if (is.unsorted(fitted_ages) | utils::tail(fitted_ages, 1) - fitted_ages[1] + 1 != length(fitted_ages)) {
+    stop("fitted ages must be increasing by 1 at each step")
+  }
+
+  if (any(fitted_ages < 0)) {
+    stop("fitted ages must be non-negative")
+  }
+  # e.g., ages <- 55:110, old_ages <- 90:130, fitted_ages <- 75:89 is valid
+  if (utils::tail(fitted_ages, 1) + 1 == old_ages[1]) {
+    stop("fitted ages must connect with ages")
+  }
+
+  # type
+  if (!is.element(type, c("central", "prob", "force"))) {
+    stop("type must be 'central', 'prob' or 'force'")
+  }
+
+  # closure_age
+
+  if (closure_age != utils::tail(old_ages, 1)) {
+    stop("closure age must be the last age in old ages")
+  }
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(rates)) {
+      stop("length of years must be equal to number of columns of rates")
+    }
+
+    if (!is.vector(years) | !is.integer(years)) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+
+# Implementation ----------------------------------------------------------
 
   # Convert to force of mortality
   muxy_arr <- rate2rate(rates, from = type, to = "force")
@@ -288,11 +572,10 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   }
 
   rownames(completed_muxy_arr) <- as.character(c(kept_ages, old_ages))
-  colnames(completed_muxy_arr) <- if (is.null(years)) col_names else as.character(years)
+  colnames(completed_muxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
   return(rate2rate(completed_muxy_arr, from = "force", to = type))
-
 
 }
 
@@ -333,6 +616,8 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 #'
 complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
                              type = "prob", closure_age = 130, years = NULL, ...) {
+
+  # error flagging already done in individual functions
 
   valid_methods = c("CK", "DG", "kannisto")
   if (!is.element(method, valid_methods)) stop("invalid completion method")

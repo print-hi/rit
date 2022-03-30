@@ -21,6 +21,29 @@ NULL
 #' @export
 psurv <- function(surv_fun, surv_time) {
 
+# Flagging Errors ---------------------------------------------------------
+
+  # surv_fun
+  if (!is.vector(surv_fun) | !is.numeric(surv_fun)) {
+    stop("survival function must be a numeric vector")
+  }
+
+  if (any(surv_fun < 0, na.rm = T)) {
+    stop("survival function must be non-negative")
+  }
+
+  if (any(surv_fun > 1, na.rm = T)) {
+    stop("survival function must be less than or equal to 1")
+  }
+
+  # surv_time
+  if (!is.vector(surv_time) | !is.numeric(surv_time)) {
+    stop("survival time must be a numeric vector")
+  }
+
+
+# Implementation ----------------------------------------------------------
+
   n <- length(surv_fun)
 
   # Checking bounds
@@ -40,6 +63,41 @@ psurv <- function(surv_fun, surv_time) {
 #'
 #' @export
 qsurv <- function(surv_fun, surv_prob) {
+
+# Flagging Errors ---------------------------------------------------------
+
+  # surv_fun
+  if (!is.vector(surv_fun) | !is.numeric(surv_fun)) {
+    stop("survival function must be a numeric vector")
+  }
+
+  if (any(surv_fun < 0, na.rm = T)) {
+    stop("survival function must be non-negative")
+  }
+
+  if (any(surv_fun > 1, na.rm = T)) {
+    stop("survival function must be less than or equal to 1")
+  }
+
+  # surv_prob
+
+  if (!is.vector(surv_prob) | !is.numeric(surv_prob)) {
+    stop("survival probabilities must be a numeric vector")
+  }
+
+  if (any(surv_prob < 0, na.rm = T)) {
+    stop("survival probabilities must be non-negative")
+  }
+
+  if (any(surv_prob > 1, na.rm = T)) {
+    stop("survival probabilities must be less than or equal to 1")
+  }
+
+  # surv_time
+
+
+# Implementation ----------------------------------------------------------
+
 
   n <- length(surv_fun)
 
@@ -172,13 +230,71 @@ cohort2period <- function(cohort_rates, ages) {
 #' @examples
 #'
 exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
+
+# Flagging Errors ---------------------------------------------------------
+
+  # qx
+  if (!is.vector(qx) & !is.matrix(qx) & !(is.array(qx) & length(dim(qx)) == 3)) {
+    stop("qx must be a vector, 2D matrix or a 3D array")
+  }
+
+  if (!is.numeric(qx)) {
+    stop("qx must be numeric")
+  }
+
+  if (any(qx < 0, na.rm = T)) {
+    stop("qx must be non-negative")
+  }
+
+  if (any(qx > 1, na.rm = T)) {
+    stop("qx must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(qx)) {
+    stop("length of ages must be equal to number of rows of qx")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(qx)) {
+      stop("length of years must be equal to number of columns of qx")
+    }
+
+    if (!is.vector(years) | !all(years == floor(years))) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+# Implementation ----------------------------------------------------------
+
+  # Converting to 1-year survival probabilities
   if(is.null(init_age)) {
     init_age <- ages[1]
   } else if (!is.element(init_age, ages)) {
     stop("invalid initial age")
   }
 
-  # Converting to 1-year survival probabilities
   if(init_age == ages[1]) {
     px <- 1 - qx
   } else {

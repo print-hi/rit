@@ -29,16 +29,82 @@
 #' @examples
 #'
 rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = NULL) {
-  if(is.null(init_age)) {
-    init_age <- ages[1]
-  } else if (!is.element(init_age, ages)) {
-    stop("invalid initial age")
+
+# Flagging errors ---------------------------------------------------------
+
+  # rates
+  if (!is.vector(rates) & !is.matrix(rates) & !(is.array(rates) & length(dim(rates)) == 3)) {
+    stop("rates must be a vector, 2D matrix or a 3D array")
   }
+
+  if (!is.numeric(rates)) {
+    stop("rates must be numeric")
+  }
+
+  if (any(rates < 0, na.rm = T)) {
+    stop("rates must be non-negative")
+  }
+
+  if (from == "prob" & any(rates > 1, na.rm = T)) {
+    stop("1-yr death probabilities must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(rates)) {
+    stop("length of ages must be equal to number of rows of rates")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # from
+  if (!is.element(from, c("central", "prob", "force"))) {
+    stop("from must be 'central', 'prob' or 'force'")
+  }
+
+
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(rates)) {
+      stop("length of years must be equal to number of columns of rates")
+    }
+
+    if (!is.vector(years) | !is.integer(years)) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+# Implementation ----------------------------------------------------------
 
   # Converting to 1-year death probabilities
   qx <- rate2rate(rates, from, "prob")
 
   # Converting to 1-year survival probabilities
+
+  if(is.null(init_age)) {
+    init_age <- ages[1]
+  } else if (!is.element(init_age, ages)) {
+    stop("initial age must be in ages")
+  }
+
   if(init_age == ages[1]) {
     px <- 1 - qx
   } else {
@@ -46,7 +112,7 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
   }
 
   # Deal with R numerical error
-  px[near(px, 0)] <- 0
+  px[dplyr::near(px, 0)] <- 0
 
   # Calculating survival function
   if (is.vector(px)) {
@@ -89,13 +155,66 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
 #'
 survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 
-  if(!is.null(ages)) {
-    stopifnot(length(ages) == NROW(surv) - 1)
+# Flagging Errors ---------------------------------------------------------
+  # surv
+  if (!is.vector(surv) & !is.matrix(surv) & !(is.array(surv) & length(dim(surv)) == 3)) {
+    stop("survival function must be a vector, 2D matrix or a 3D array")
   }
 
-  if(!is.null(years)) {
-    stopifnot(length(years) == NCOL(surv))
+  if (!is.numeric(surv)) {
+    stop("survival function must be numeric")
   }
+
+  if (any(surv < 0, na.rm = T)) {
+    stop("survival function must be non-negative")
+  }
+
+  if (any(surv > 1, na.rm = T)) {
+    stop("survival function must be less than or equal to 1")
+  }
+
+  # ages
+  if (length(ages) != NROW(surv) - 1) {
+    stop("length of ages and survival times do not match")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+  # to
+  if (!is.element(to, c("central", "prob", "force"))) {
+    stop("to must be 'central', 'prob' or 'force'")
+  }
+
+  # years
+  if (!is.null(years)) {
+    if (length(years) != NCOL(surv)) {
+      stop("length of years must be equal to number of columns of the survival function")
+    }
+
+    if (!is.vector(years) | !is.integer(years)) {
+      stop("years must be a vector of integers")
+    }
+
+    if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+      stop("years must be increasing by 1 at each step")
+    }
+
+    if (any(years < 0)) {
+      stop("years must be non-negative")
+    }
+  }
+
+# Implementation ----------------------------------------------------------
 
   px <- ifelse(utils::head(surv, -1) == 0, 0, utils::tail(surv, -1) / utils::head(surv, -1))
   qx <- 1 - px
@@ -118,16 +237,17 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #' Transforms the survival function from the real world P-measure to the risk-neutral
 #' Q-measure according to the specified risk-neutral principles.
 #'
-#' The risk-neutral principles and their corresponding strings are as follows:
-#' * "wang": Wang Transform
-#' * "ph": Proportional Hazard Transform
-#' * "dp": Dual-power Transform
-#' * "gp": Gini Principle
-#' * "dadp": Denneberg's Absolute Deviation Principle
-#' * "exp": Exponential Transform
-#' * "log": Logarithmic Transform
-#' * "canon": Univariate Canonical Valuation
-#' * "esscher": Esscher Transform
+#' The risk-neutral principles and their corresponding strings and valid lambda range
+#' are as follows:
+#' * "wang", \eqn{\lambda \ge 0}: Wang Transform,
+#' * "ph", \eqn{\lambda \ge 1}: Proportional Hazard Transform
+#' * "dp", \eqn{\lambda \ge 1}: Dual-power Transform
+#' * "gp", \eqn{0 \le \lambda \le 1}: Gini Principle
+#' * "dadp", \eqn{0 \le \lambda \le 1}: Denneberg's Absolute Deviation Principle
+#' * "exp", \eqn{\lambda > 0}: Exponential Transform
+#' * "log", \eqn{\lambda > 0}: Logarithmic Transform
+#' * "canon", \eqn{\lambda > 0}: Univariate Canonical Valuation
+#' * "esscher", \eqn{\lambda > 0}: Esscher Transform
 #'
 #' The first seven principles are distortion risk measures and act on the survival function.
 #' The last two principles act on the probability density function.
@@ -149,7 +269,36 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #'
 survivalP2Q <- function(StP, method, lambda) {
 
-  # TODO: make sure values only between 0 and 1
+# Flagging Errors ---------------------------------------------------------
+
+  # StP
+  if (!is.vector(StP) & !is.matrix(StP) & !(is.array(StP) & length(dim(StP)) == 3)) {
+    stop("survival function must be a vector, 2D matrix or a 3D array")
+  }
+
+  if (!is.numeric(StP)) {
+    stop("survival function must be numeric")
+  }
+
+  if (any(StP < 0, na.rm = T)) {
+    stop("survival function must be non-negative")
+  }
+
+  if (any(StP > 1, na.rm = T)) {
+    stop("survival function must be less than or equal to 1")
+  }
+
+  # method
+  valid_methods <- c("wang", "ph", "dp", "gp", "dadp", "exp", "log", "canon", "esscher")
+  if (!is.element(method, valid_methods)) {
+    stop("invalid risk distortion method")
+  }
+
+  if (!is.numeric(lambda)) {
+    stop("lambda must be numeric")
+  }
+
+# Implementation -----------------------------------------------------------
 
   # Defining survival function distortion functions
   wang <- function(x, lam) {
@@ -188,7 +337,7 @@ survivalP2Q <- function(StP, method, lambda) {
   }
 
   survival_type <- c("wang", "ph", "dp", "gp", "dadp", "exp", "log")
-  pdf_type <- type <- c("canon", "esscher")
+  pdf_type <- c("canon", "esscher")
 
   if (is.element(method, survival_type)) {
     if (method == "wang") distort <- wang
@@ -204,6 +353,7 @@ survivalP2Q <- function(StP, method, lambda) {
     # Risk-adjusted pdf is identical for univariate canonical valuation and
     # esscher transform
 
+    if (lambda <= 0) stop("invalid lambda value")
 
     pdfP2Q <- function(StP_mat) {
 

@@ -23,17 +23,18 @@ Transforms the survival function from the real world P-measure to the risk-neutr
 Q-measure according to the specified risk-neutral principles.
 }
 \details{
-The risk-neutral principles and their corresponding strings are as follows:
+The risk-neutral principles and their corresponding strings and valid lambda range
+are as follows:
 \itemize{
-\item "wang": Wang Transform
-\item "ph": Proportional Hazard Transform
-\item "dp": Dual-power Transform
-\item "gp": Gini Principle
-\item "dadp": Denneberg's Absolute Deviation Principle
-\item "exp": Exponential Transform
-\item "log": Logarithmic Transform
-\item "canon": Univariate Canonical Valuation
-\item "esscher": Esscher Transform
+\item "wang", \eqn{\lambda \ge 0}: Wang Transform,
+\item "ph", \eqn{\lambda \ge 1}: Proportional Hazard Transform
+\item "dp", \eqn{\lambda \ge 1}: Dual-power Transform
+\item "gp", \eqn{0 \le \lambda \le 1}: Gini Principle
+\item "dadp", \eqn{0 \le \lambda \le 1}: Denneberg's Absolute Deviation Principle
+\item "exp", \eqn{\lambda > 0}: Exponential Transform
+\item "log", \eqn{\lambda > 0}: Logarithmic Transform
+\item "canon", \eqn{\lambda > 0}: Univariate Canonical Valuation
+\item "esscher", \eqn{\lambda > 0}: Esscher Transform
 }
 
 The first seven principles are distortion risk measures and act on the survival function.
