@@ -1,17 +1,17 @@
 #' get_zcp_simulation
 #' 
-#' Returns the simulated paths of the zero-coupon interest rate term structure. The model is based on an Arbitrage-Free Nelson Siegel model. 
+#' Returns the simulated paths of the zero-coupon interest rate term structure. The model is based on an Arbitrage-Free Nelson Siegel model. This function uses the package `MASS` for random number generation. 
 #'
 #' @param num_years Number of years to forecast, counting from 2021-06-01. Default is 5 years. 
-#' @param num_paths Number of simulation paths. Default is 10000 paths. 
+#' @param num_paths Number of simulation paths. Default is 100 paths. 
 #' @param frequency One of "year", "quarter", and "month". Default is "month". Arithmetic average will be used for "year" and "quarter".
 #'
 #' @return A list containing 40 data frames for the simulated trajectories for maturities from 1 quarter up to 10 years. 
 #' @export
 #'
-#' @examples sim = get_zcp_simulations(num_years = 10, num_paths = 10000, frequency = "year"). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. 
+#' @examples sim = get_zcp_simulations(num_years = 10, num_paths = 100, frequency = "year"). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. 
 #' 
-get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "month") {
+get_zcp_simulation = function (num_years = 5, num_paths = 100, frequency = "month") {
     ################
     # error messages
     is.wholenumber = function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
@@ -28,9 +28,18 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
         ##################
         
         init_qtr = as.Date("2021-06-01")
-        num_pred = 12 * num_years 
-        h = 1/12
-        time_index = seq(from = init_qtr, length.out = num_pred, by = "month")
+        if (frequency == "year") {
+            h = 1
+            Q_est = diag(c(0.0000503249, 0.0000615258, 0.000109023))
+        } else if (frequency == "quarter") {
+            h = 1/4
+            Q_est = diag(c(0.0000147503, 0.0000259462, 0.0000405344))
+        } else {
+            h = 1/12
+            Q_est = diag(c(5.10007e-06, 9.88515e-06, 0.0000148928))
+        }
+        num_pred = num_years / h
+        time_index = seq(from = init_qtr, length.out = num_pred+1, by = frequency)[-1]
         path_index = paste("trajectory_", 1:num_paths, sep = "")
         init_xt = as.numeric(c(0.0431174, -0.0453477, -0.0422812))
         init_zcp = c(-0.0000666667,  0.0003857143,  0.0005095238,  0.0003571429,  0.0001000000, -0.0001000000, -0.0001571429, -0.0000476190,  0.0002238095,  0.0006333333,  0.0011523810,  0.0017523810,  0.0024047619,  0.0031000000, 0.0038142857,  0.0045238095,  0.0052428571,  0.0059571429,  0.0066380952,  0.0073000000,  0.0079523810, 0.0085809524,  0.0091952381,  0.0097761905,  0.0103476190,  0.0109047619,  0.0114190476,  0.0119380952, 0.0124333333,  0.0129095238,  0.0133714286,  0.0138142857,  0.0142476190,  0.0146666667,  0.0150857143, 0.0154714286,  0.0158523810,  0.0162238095,  0.0165952381,  0.0169333333)
@@ -41,7 +50,7 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
         ########################
         
         KP_est = diag(c(0.222361,0.840951,0.6043))
-        Sigma_est = diag(c(0.00789569, 0.0112751, 0.0137063))
+        # Sigma_est = diag(c(0.00789569, 0.0112751, 0.0137063))
         theta_est = matrix(c(0.0404048, -0.0247579, 0.000506779), nrow = 3, ncol = 1, byrow = T)
         lambda_est = 0.323143
         B_fitted = matrix(c(1, 0.960673, 0.0382820,
@@ -83,8 +92,7 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
                             1, 0.317712, 0.2673784,
                             1, 0.310624, 0.2641964,
                             1, 0.303803, 0.2609785,
-                            1, 0.297236, 0.2577355),
-                          nrow = 40, byrow = T)
+                            1, 0.297236, 0.2577355), nrow = 40, byrow = T)
         A_fitted = c(1.89811e-06, 7.32411e-06, 1.59407e-05, 2.74808e-05, 4.17307e-05, 5.85172e-05, 7.76972e-05, 9.91507e-05, 1.22775e-04, 1.48478e-04, 1.76182e-04, 2.05811e-04, 2.37298e-04, 2.70581e-04,
                      3.05599e-04, 3.42296e-04, 3.80619e-04, 4.20516e-04, 4.61940e-04, 5.04845e-04, 5.49187e-04, 5.94924e-04, 6.42020e-04, 6.90436e-04, 7.40140e-04, 7.91101e-04, 8.43288e-04, 8.96676e-04,
                      9.51240e-04, 1.00696e-03, 1.06381e-03, 1.12177e-03, 1.18084e-03, 1.24099e-03, 1.30221e-03, 1.36450e-03, 1.42783e-03, 1.49221e-03, 1.55763e-03, 1.62408e-03)
@@ -94,17 +102,17 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
         ###############
         
         Xt_indep_sim = replicate(n = num_paths,
-                                 expr = {data.frame(matrix(NA, nrow = 3, ncol = num_years/h+1))},
+                                 expr = {data.frame(matrix(NA, nrow = 3, ncol = num_pred+1))},
                                  simplify = F)
         Xt_indep_sim = lapply(Xt_indep_sim, function (x) {x[,1] = init_xt; return (x)})
 
-        noise = matrix(rnorm(3*num_paths*(num_years/h)),nrow = 3)
+        noise = MASS::mvrnorm(num_paths*num_pred, mu = c(0,0,0), Sigma = Q_est)
         noise_ind = 1
-        for (path in 1:num_paths) { # discretisation
-            for (i in 2:(num_years/h+1)) {
-                e = noise[,noise_ind] #as.matrix(rnorm(3))
+        for (path in 1:num_paths) { 
+            for (i in 2:(num_pred+1)) {
+                eta = as.matrix(noise[noise_ind,]) #as.matrix(mvrnorm(mu = c(0,0,0), Sigma = Q_est))
                 Xt = as.matrix(Xt_indep_sim[[path]][,i-1])
-                Xt_indep_sim[[path]][,i] = h * KP_est %*% (theta_est - Xt) + Xt + sqrt(h) * Sigma_est %*% e
+                Xt_indep_sim[[path]][,i] = (diag(3) - expm(-h * KP_est)) %*% theta_est + expm(-h * KP_est) %*% Xt + eta
                 noise_ind = noise_ind + 1
             }
         }
@@ -114,7 +122,7 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
         ##############
         
         zcp_indep_sim = replicate(n = num_paths,
-                                  expr = {matrix(NA, nrow = num_years/h+1, ncol = 40)},
+                                  expr = {matrix(NA, nrow = num_pred+1, ncol = 40)},
                                   simplify = F)
         zcp_indep_sim = lapply(1:num_paths, function (x) {zcp_indep_sim[[x]] = t(B_fitted %*% as.matrix(Xt_indep_sim[[x]])) - A_fitted})
         zcp_indep_sim = lapply(zcp_indep_sim, function(x){ x = as.data.frame(x)[-1,]; return (x)})
@@ -130,28 +138,6 @@ get_zcp_simulation = function (num_years = 5, num_paths = 10000, frequency = "mo
         zcp_sim = lapply(zcp_sim, function(x){row.names(x) = as.character(time_index); colnames(x) = path_index; return (x)})
         names(zcp_sim) = mat_qtrs
         
-        
-        #################
-        # Adj frequency #
-        #################
-
-        output = list()
-        if (frequency == "month") {
-            output = zcp_sim
-            
-        } else if (frequency == "quarter") {
-            time_index_qtr = seq(from = init_qtr, length.out = num_years*4, by = "quarter")
-            output = lapply(zcp_sim, function (x) apply(x, 2, function (y) {colMeans(matrix(y, nrow=3))} ))
-            output = lapply(output, function(x) {row.names(x) = as.character(time_index_qtr); x})
-            
-        } else if (frequency == "year") {
-            time_index_year = seq(from = init_qtr, length.out = num_years, by = "year")
-            output = lapply(zcp_sim, function (x) apply(x, 2, function (y) {colMeans(matrix(y, nrow=12))} ))
-            output = lapply(output, function(x) {row.names(x) = as.character(time_index_year); x})
-        }
-        output = lapply(output, function(x){x = as.data.frame(x)})
-        
-        return (output)
-        
+        return (zcp_sim)
     } 
 } 
