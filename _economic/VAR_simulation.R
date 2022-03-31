@@ -1,20 +1,20 @@
 #' get_discrete_simulations
 #'
-#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields (in %), (2) Australia 10-year zero-coupon spread (in %), (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
-#' Simulations are based on a Vector Autoregression model. 
+#' Returns the simulated paths for various economic and financial variables: (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon spread, (3) New South Wales houses value index, (4) New South Wales houses rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing price, (8) Australian dollar trade-weighted index, (9) Australia mortgage rate, (10) New South Wales unemployment rate (in %). 
+#' Simulations are based on a Vector Autoregression model. This function uses the package `zoo` to convert the frequnency units. 
 #' 
 #' @param num_years Number of years to forecast, counting from 2021-01-01. Default is 5 years, recommended period is less than 10 years. 
 #' @param num_paths Number of simulation paths. Default is 10000 paths. 
 #' @param frequency One of "year", "quarter", and "month". Default is "quarter", which is the simulation frequency for the Vector Autoregression model. Linear interpolation will be used if the required frequency is higher, whereas arithmetic average will be used if the frequency is lower.   
 #' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
-#' @param return_noise If the white noises of the model is returned. Default is FALSE. 
+#' @param return_sdf If the VAR-based stochastic discount factors are returned. Default is FALSE. 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for each economic variable, and a list of white noises in the VAR model. 
 #' @export
 #'
-#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 10000, frequency = "year", return_noise = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
+#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 100, frequency = "year", return_sdf = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
 #' 
-get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "quarter", perc_change = FALSE, return_noise = FALSE) {
+                                                                                        get_var_simulations = function (num_years = 5, num_paths = 100, frequency = "quarter", perc_change = FALSE, return_sdf = FALSE) {
     
     ################
     # error messages 
@@ -25,12 +25,14 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
     } else if (!frequency %in% c("year", "quarter", "month")) { 
         stop ("Frequency must be one of 'year', 'quarter', and 'month'. ")
         
-    } else if (!is.logical(perc_change) | !is.logical(return_noise)) {
-        stop ("perc_change and return_noise must be logical. ")
+    } else if (!is.logical(perc_change) | !is.logical(return_sdf)) {
+        stop ("perc_change and return_sdf must be logical. ")
         
     } else {
-        ########################################################
-        # VAR(1) calibrated coefficients (for stationary series)
+        ##########################################################
+        # VAR(1) calibrated coefficients (for stationary series) #
+        ##########################################################
+      
         # variable names 
         var_names = c("zcp3m_yield", "zcp10y_spread", "home_index", "rental_yield", "GDP", "CPI", "ASX200", "AUD")
         sim_var_names = c(var_names, "mortgage_rate", "unemployment_rate")
@@ -59,8 +61,10 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
                             row.names = var_names)
         covres = as.matrix(covres)
         
-        ###########################
-        # simulation initialisation
+        #############################
+        # simulation initialisation #
+        #############################
+        
         # starting quarter 
         init_qtr = as.Date("2021-01-01")
         num_pred = 4 * num_years 
@@ -71,8 +75,10 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
         # initial values for original series 
         init_orig = c(-0.00435484, 1.418226, 157.5923, 0.04984992, 501788, 117.9, 6766.84, 63.8000, 5.70600)
         
-        ##########################
-        # step-by-step simulations 
+        ############################
+        # step-by-step simulations # 
+        ############################
+        
         # white noise
         noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1), nrow = length(intercept))
         noise = lapply(seq(from = 1, to = num_paths * num_pred, by = num_pred), function (x) {noise[, x:(x+num_pred-1)]})
@@ -96,8 +102,10 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
             return (path)
         }
         
-        ######################################
-        # simulation for the stationary series 
+        ########################################
+        # simulation for the stationary series #
+        ########################################
+        
         var_sim_stationary = function (num_pred, num_paths) {
             
             # loops thru the series (separate lists)
@@ -105,49 +113,114 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
                                expr = {data.frame(matrix(NA, nrow = num_pred, ncol = length(intercept)))},
                                simplify = F)
             v_path = lapply(1:num_paths, function (x) {var_path(num_pred, x)})
-            
-            # reorganise the results 
-            stat = replicate(n = length(var_names), 
-                             expr = {data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))},
-                             simplify = F)
-            names(stat) = var_names
-            
-            stat = lapply(1:length(intercept), function (y) { lapply(1:num_paths, function (x) {v_path[[x]][,y]}) })
-            stat = lapply(stat, function(x){x = as.data.frame(x)})
-            stat = lapply(stat, function(x){row.names(x) = time_index[-1]; colnames(x) = path_index; return (x)})
-            return (stat)
+            return (v_path)
         }
         stat = var_sim_stationary(num_pred, num_paths)
+        names(stat) = path_index
         
-        ################################################
-        # convert forecasted variables -> original units 
+        ##################################################
+        # convert forecasted variables -> original units #
+        ##################################################
+        
         diff_inv = function (x, init) {
-            # undo differencing once: zcp3m_yield, rental_yield
-            diffinv(x, xi = init)
+          # undo differencing once: zcp3m_yield, rental_yield
+          diffinv(x, xi = init)
         }
         index2grow_inv = function (x, init) {
-            # reverse index to growth rate: home_value, gdp, cpi, asx200, aud
-            Reduce (function (init, x) {init * exp(x)}, c(init, x), accumulate = T)
+          # reverse index to growth rate: home_value, gdp, cpi, asx200, aud
+          Reduce (function (init, x) {init * exp(x)}, c(init, x), accumulate = T)
         }
         
         # adj for the original series
-        sim = list ()
-        sim[[1]] = apply(stat[[1]], 2, function (x) {diff_inv(x, init_orig[1])}) # zcp3m_yield 
-        sim[[2]] = rbind(init_orig[2], stat[[2]]) # zcp10y_spread: not changed 
-        sim[[3]] = apply(stat[[3]], 2, function (x) {index2grow_inv(x, init_orig[3])}) # home_index
-        sim[[4]] = apply(stat[[4]], 2, function (x) {diff_inv(x, init_orig[4])}) # rental_yield 
-        sim[[5]] = apply(stat[[5]], 2, function (x) {index2grow_inv(x, init_orig[5])}) # GDP
-        sim[[6]] = apply(stat[[6]], 2, function (x) {index2grow_inv(x, init_orig[6])}) # CPI
-        sim[[7]] = apply(stat[[7]], 2, function (x) {index2grow_inv(x, init_orig[7])}) # ASX200
-        sim[[8]] = apply(stat[[8]], 2, function (x) {index2grow_inv(x, init_orig[8])}) # AUD
-        sim[[9]] = sim[[1]] + 2.825 # mortage_rate
-        sim[[10]] = sim[[2]] + 4.956 # unemployment_rate 
+        sdf_use = replicate(n = num_paths, 
+                         expr = {data.frame(matrix(NA, nrow = num_pred+1, ncol = length(intercept)))},
+                         simplify = F)
+        orig = replicate(n = num_paths, 
+                            expr = {data.frame(matrix(NA, nrow = num_pred+1, ncol = length(intercept)))},
+                            simplify = F)
+        sdf_use = lapply(1:num_paths, function (x) {sdf_use[[x]] = cbind(diff_inv(stat[[x]][,1], init_orig[1])/100, # zcp3m_yield 
+                                                                   c(init_stat[2], stat[[x]][,2])/100, # zcp10y
+                                                                   c(init_stat[3], stat[[x]][,3]), # home_index
+                                                                   diff_inv(stat[[x]][,4], init_orig[4]), # rental_yield 
+                                                                   c(init_stat[5], stat[[x]][,5]), # GDP
+                                                                   c(init_stat[6], stat[[x]][,6]), # CPI
+                                                                   c(init_stat[7], stat[[x]][,7]), # ASX200
+                                                                   c(init_stat[8], stat[[x]][,8]))}) # AUD
+
+        orig = lapply(1:num_paths, function (x) {orig[[x]] = cbind(sdf_use[[x]][,1], # zcp3m_yield 
+                                                                   sdf_use[[x]][,2], # zcp10y
+                                                                   index2grow_inv(stat[[x]][,3], init_orig[3]), # home_index
+                                                                   sdf_use[[x]][,4], # rental_yield 
+                                                                   index2grow_inv(stat[[x]][,5], init_orig[5]), # GDP
+                                                                   index2grow_inv(stat[[x]][,6], init_orig[6]),  # CPI
+                                                                   index2grow_inv(stat[[x]][,7], init_orig[7]),  # ASX200
+                                                                   index2grow_inv(stat[[x]][,8], init_orig[8]))}) # AUD
+        
+        # reorganise the results 
+        sim = replicate(n = length(var_names), 
+                         expr = {data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))},
+                         simplify = F)
+        sim = lapply(1:length(intercept), function (y) { lapply(1:num_paths, function (x) {orig[[x]][,y]}) })
+        sim = lapply(sim, function(x){x = as.data.frame(x)})
+        sim = lapply(sim, function(x){row.names(x) = time_index; colnames(x) = path_index; return (x)})
+        sim[[9]] = sim[[1]] + 0.02825 # mortage_rate
+        sim[[10]] = sim[[2]] + 0.04956 # unemployment_rate 
         sim = lapply(sim, function (x) {x = as.data.frame(x)})
         sim = lapply(sim, function (x) {row.names(x) = time_index; x})
         names(sim) = sim_var_names
         
-        ###############
-        # Adj frequency
+        
+        ###############################
+        # stochastic discount factors #
+        ###############################
+        
+        if (isTRUE(return_sdf)) {
+          #################################
+          # market price of risk (lambda_t)
+
+          # parameters 
+          lambda_0 = matrix(c(-0.0300869, -0.012627, -0.0179271, 0.0245439, -0.0141266, -0.013161, -0.0339329, -0.0298033), nrow = 8)
+          lambda_1 = matrix(c(-0.00676676,0.00190172,0.00375620,0.006151668,0.00116080,0.00081834,0.00363284,0.00510658,
+                              0.00874009,0.00329734,0.00514494,0.007689653,0.00494228,0.01165728,0.00777616,0.01117729,
+                              -0.00399927,0.00188649,0.00345333, -0.005177457,0.00722763, -0.00883047,0.00290525,0.01205820,
+                              0.01598942,0.01589751,0.01790125,0.011338143,0.00546149,0.01048769,0.00908834,0.01011179,
+                              -0.00319565,0.00488528,0.00568038, -0.001230780,0.00773241,0.00787398,0.00216374, -0.01536454,
+                              -0.00164112,0.01035217,0.00172788,0.000642188, -0.00192222,0.00954098,0.00139571,0.01200787,
+                              -0.02448375, -0.01474440, -0.00439583,0.049782154, -0.00573123, -0.00386753, -0.00522005,0.01668418,
+                              -0.03278908, -0.00688552,0.00839877,0.002207839, -0.00159956, -0.00580826,0.00300228,0.01805823), nrow = 8, byrow = T)
+          
+          # find lambda_t's for different trajectories 
+          lambda_t = replicate(n = num_paths, 
+                               expr = {matrix(NA, ncol = num_pred+1, nrow = 8)},
+                               simplify = F)
+          lambda_t = lapply(1:num_paths, function (x) {lambda_t[[x]] = sapply(1:(num_pred+1),  function (y) {lambda_t[[x]][,y] = lambda_0 + lambda_1 %*% as.matrix(sdf_use[[x]][y,])})})
+          lambda_t = lapply(lambda_t, function (x) {x = as.data.frame(x); row.names(x) = var_names; colnames(x) = as.character(time_index); x = x[,-ncol(x)]; return (x)})
+          
+          #################
+          # Pricing kernels 
+          
+          # find s_t for different trajectories 
+          st = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
+          init_st = 0.997953 # historical discount factor 
+          st_expn = function (time,path) {
+            # finds s(t+1)
+            exp(-sdf_use[[path]][time,1] - 1/2 * sum(lambda_t[[path]][,time]^2) - sum(lambda_t[[path]][,time] * noise[[path]][,time]))
+          }
+          st = sapply(1:num_paths, function (x) {sapply(1:num_pred, function (y) {st[y,x] = st_expn(y,x)}, simplify = T)}, simplify = T)
+          st = rbind(init_st,st)
+          row.names(st) = as.character(time_index)
+          colnames(st) = path_index
+          
+          ########
+          # output
+          sim[[length(sim_var_names) + 1]] = st
+          names(sim)[length(sim_var_names) + 1] = "discount_factors"
+        }
+        
+        #################
+        # Adj frequency #
+        #################
+        
         output = list()
         if (frequency == "month") {
             time_index_month = seq(from = init_qtr, length.out = num_years * 12 + 1, by = "month")
@@ -173,18 +246,14 @@ get_var_simulations = function (num_years = 5, num_paths = 10000, frequency = "q
         }
         output = lapply(output, function(x){x = as.data.frame(x)})
         
-        ##############
-        # output units 
+        #############
+        # Adj units # 
+        #############
+        
         if (isTRUE(perc_change)) {
             output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
         }
-        
-        if (isTRUE(return_noise)) {
-            noise = lapply(noise, function(x) {as.data.frame(t(x))})
-            output[[length(sim_var_names) + 1]] = noise
-            names(output)[length(sim_var_names) + 1] = "noise"
-        }
-        
+
         return (output)
     }
 }
