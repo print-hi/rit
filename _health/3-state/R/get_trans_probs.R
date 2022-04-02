@@ -37,6 +37,16 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
     stop('year must be an integer')
   }
 
+  if (!is.character(param_file)) {
+    if (nrow(param_file) != 15 | ncol(param_file) != 6) {
+      stop('incorrect size for parameter file')
+    }
+  }
+
+  if (year < 1998 | year > 2999) {
+    stop('year must be within reasonable range: 1998 to 2999 inclusive')
+  }
+
   # extract parameter values from parameter file
   if (is.character(param_file)) {
     param_list <- readxl::read_excel(param_file)
