@@ -46,6 +46,10 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
     stop('invalid target age')
   }
 
+  if (length(trans_probs) != 111 - init_age) {
+    stop('initial age does not correspond to the number of transition probability matrices')
+  }
+
   # we multiply probability matrices in the trans_probs to get transition rates
   P <- Reduce('%*%', trans_probs[1:(target_age-init_age)])
 
