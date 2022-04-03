@@ -92,6 +92,10 @@ prob_plots <- function(init_state, init_age, trans_probs) {
     stop('invalid state; enter 0 for healthy, 1 for disabled')
   }
 
+  if (length(trans_probs) != 111 - init_age) {
+    stop('initial age does not correspond to the number of transition probability matrices')
+  }
+
   # create 3 different probabilities:
   # general alive probability, healthy, and disabled
   alive_probs <- c(1)
