@@ -7,7 +7,8 @@
 afl(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 }
 \arguments{
-\item{init_age}{integer between 65 and 110 denoting initial age of individual}
+\item{init_age}{integer between 65 and 110 denoting initial age of individual. This needs to be same
+initial age used in generation of \code{trans_probs} or \code{simulated_path}}
 
 \item{init_state}{0 for healthy, 1 for disabled}
 

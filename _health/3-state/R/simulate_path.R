@@ -5,7 +5,8 @@
 #' Simulates the path each life takes in an initial cohort using transition probabilities
 #'
 #' @param init_age
-#' integer between 64 and 110 denoting current age
+#' integer between 65 and 110 denoting current age. This has to the be same as the initial
+#' age used in the generation of transition probability matrices.
 #' @param init_state
 #' 0 for healthy, 1 for disabled
 #' @param trans_probs
@@ -30,6 +31,22 @@ simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
 
   if (init_age<65 | init_age>110) {
     stop('invalid age')
+  }
+
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
+  if (length(trans_probs) != 111 - init_age) {
+    stop('initial age does not correspond to the number of transition probability matrices')
+  }
+
+  if (cohort < 0) {
+    stop('cohort needs to be a positive integer')
+  }
+
+  if (as.integer(cohort) != cohort) {
+    stop('cohort needs to be an integer')
   }
 
   # create empty matrix to contain simulated population

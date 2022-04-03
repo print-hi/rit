@@ -7,7 +7,8 @@
 simulate_path(init_age, init_state, trans_probs, cohort = 10000)
 }
 \arguments{
-\item{init_age}{integer between 64 and 110 denoting current age}
+\item{init_age}{integer between 65 and 110 denoting current age. This has to the be same as the initial
+age used in the generation of transition probability matrices.}
 
 \item{init_state}{0 for healthy, 1 for disabled}
 

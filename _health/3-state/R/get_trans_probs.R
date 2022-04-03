@@ -29,6 +29,10 @@ get_trans_probs <- function(model_type, param_file, init_age, female, year) {
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (female != 0 & female != 1) {
     stop('invalid gender')
   }

@@ -10,7 +10,8 @@
 #' NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 #'
 #' @param init_age
-#' integer between 65 and 110 denoting initial age of individual
+#' integer between 65 and 110 denoting initial age of individual. This needs to be same
+#' initial age used in generation of `trans_probs` or `simulated_path`
 #'
 #' @param init_state
 #' 0 for healthy, 1 for disabled
@@ -38,16 +39,32 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (is.null(trans_probs) & is.null(simulated_path)) {
     stop('no transition probability matrices or simulated paths were provided')
   }
 
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     # simulate path
     SP <- simulated_path
   } else if (is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else {
+    if (length(trans_probs) != 111-init_age) {
+      stop('initial age does not correspond with number of transition probability matrices')
+    }
+
     SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
   # count time at death
@@ -98,6 +115,10 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, use 0 for healthy and 1 for disabled')
   }
@@ -108,6 +129,10 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
   if (n != as.integer(n)) {
     stop('non integer value of n')
+  }
+
+  if (n <= 0) {
+    stop('n must be positive')
   }
 
   future_lifetimes <- rep(0, n*10000)
@@ -161,16 +186,32 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (is.null(trans_probs) & is.null(simulated_path)) {
     stop('no transition probability matrices or simulated paths were provided')
   }
 
   # generate simulation path, or just take it from input
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else if (is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else {
+    if (length(trans_probs) != 111-init_age) {
+      stop('initial age does not correspond with number of transition probability matrices')
+    }
+
     # simulate path
     SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
@@ -223,6 +264,10 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, use 0 for healthy and 1 for disabled')
   }
@@ -233,6 +278,10 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
   if (n != as.integer(n)) {
     stop('non integer value of n')
+  }
+
+  if (n <= 0) {
+    stop('n must be positive')
   }
 
   healthy_lifetimes <- rep(0, n*10000)
@@ -292,16 +341,32 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (is.null(trans_probs) & is.null(simulated_path)) {
     stop('no transition probability matrices or simulated paths were provided')
   }
 
   # simulate path and count disabled time
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else if (is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else {
+    if (length(trans_probs) != 111-init_age) {
+      stop('initial age does not correspond with number of transition probability matrices')
+    }
+
     # simulate path
     SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
@@ -352,6 +417,10 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, use 0 for healthy and 1 for disabled')
   }
@@ -362,6 +431,10 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
   if (n != as.integer(n)) {
     stop('non integer value of n')
+  }
+
+  if (n <= 0) {
+    stop('n must be positive')
   }
 
   disabled_lifetime <- rep(0, n*10000)
@@ -415,16 +488,32 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (is.null(trans_probs) & is.null(simulated_path)) {
     stop('no transition probability matrices or simulated paths were provided')
   }
 
   # simulate path or just use path given
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else if (is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else {
+    if (length(trans_probs) != 111-init_age) {
+      stop('initial age does not correspond with number of transition probability matrices')
+    }
+
     # simulate path
     SP <- tshm::simulate_path(init_age, 0, trans_probs, 50000)
   }
@@ -475,12 +564,20 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (female != 0 & female != 1) {
     stop('invalid gender, use 0 for male and 1 for female')
   }
 
   if (n != as.integer(n)) {
     stop('non integer value of n')
+  }
+
+  if (n <= 0) {
+    stop('n must be positive')
   }
 
   # create n unique latent factor paths
@@ -532,16 +629,32 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (is.null(trans_probs) & is.null(simulated_path)) {
     stop('no transition probability matrices or simulated paths were provided')
   }
 
   # simulate path or just use path given
   if (!is.null(simulated_path) & !is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else if (is.null(trans_probs)) {
+    if (ncol(simulated_path) != 111-init_age +1) {
+      stop('initial age does not correspond with size of simulated path')
+    }
+
     SP <- simulated_path
   } else {
+    if (length(trans_probs) != 111-init_age) {
+      stop('initial age does not correspond with number of transition probability matrices')
+    }
+
     # simulate path
     SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
   }
@@ -622,6 +735,10 @@ survival_statsF <- function(init_age, init_state, female, year, param_file, n = 
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, use 0 for healthy and 1 for disabled')
   }
@@ -632,6 +749,10 @@ survival_statsF <- function(init_age, init_state, female, year, param_file, n = 
 
   if (n != as.integer(n)) {
     stop('non integer value of n')
+  }
+
+  if (n <= 0) {
+    stop('n must be positive')
   }
 
   # empty vectors to hold row datas

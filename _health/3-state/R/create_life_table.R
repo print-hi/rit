@@ -27,12 +27,24 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
     stop('invalid age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, enter 0 for healthy, 1 for disabled')
   }
 
   if (cohort != floor(cohort)) {
     stop('cohort must be integer value')
+  }
+
+  if (cohort <= 0) {
+    stop('cohort must be positive integer')
+  }
+
+  if (length(trans_probs) != 111 - init_age) {
+    stop('initial age does not correspond to the number of transition probability matrices')
   }
 
   # create first row
@@ -98,6 +110,14 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 #'
 #' @examples
 create_life_tableF <- function(init_age, female, year, param_file, init_state = 0, n = 3000) {
+  if (as.integer(n) != n) {
+    stop('n must be an integer')
+  }
+
+  if (n <= 0) {
+    stop('n must be a positive integer')
+  }
+
   life_tables <- list()
   for (i in 1:n) {
     TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)

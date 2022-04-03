@@ -42,8 +42,16 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
     stop('invalid initial age')
   }
 
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+  }
+
   if (target_age < 65 | target_age > 110) {
     stop('invalid target age')
+  }
+
+  if (as.integer(target_age) != target_age) {
+    stop('target age must be an integer')
   }
 
   if (length(trans_probs) != 111 - init_age) {
@@ -87,6 +95,10 @@ prob_plots <- function(init_state, init_age, trans_probs) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     stop('invalid age')
+  }
+
+  if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
   }
 
   if (init_state != 0 & init_state != 1) {
