@@ -39,11 +39,11 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
   }
 
   if (init_age<65 | init_age>110) {
-    stop('invalid age')
+    stop('invalid initial age')
   }
 
   if (target_age < 65 | target_age > 110) {
-    stop('invalid age')
+    stop('invalid target age')
   }
 
   # we multiply probability matrices in the trans_probs to get transition rates
