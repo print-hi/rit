@@ -1,4 +1,4 @@
-# Tests get_discrete_simulations()
+# Tests get_var_simulations()
 
 all_var_names = c("zcp3m", "zcp10y", "home_index", "rental_yield", "GDP", "CPI", "ASX200", "forex") # those to be kept 
 all_data_original = as.data.frame(matrix(NA, nrow = 112, ncol = 1+length(all_var_names)))
@@ -387,47 +387,45 @@ forex_inv = function (x, init) {
 # forecast 
 num_years = 10
 num_paths = 10
+source("VAR_simulation.R")
 
-########################################################################################################################
-# qtrly data############################################################################################################
+############################
+# qtrly data ###############
+
 forecast_date_qtr = c(all_data_original$Date, as.yearqtr(seq(as.Date("2021-04-01"), by="quarter", length.out = num_years*4-1)))
 library(doParallel)
 cl <- makeCluster(detectCores())
 registerDoParallel(cl)
-
-start.time <- Sys.time()
 set.seed(1)
-sim_paths_qtr = get_var_simulations(num_years, num_paths, "quarter")
-
-Sys.time() - start.time
+sim_paths_qtr = get_var_simulations(num_years, num_paths, "quarter", return_sdf = T)
 stopCluster(cl)
 sim_paths_qtr = lapply(sim_paths_qtr, function (x) {x = x[-1,]})
 
 ############
 # zcp3 month
 # simulations 
-plot_data_forecast = c(all_data_original$zcp3m, sim_paths_qtr$zcp3m[,1])
+plot_data_forecast = c(all_data_original$zcp3m, sim_paths_qtr$zcp3m[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-5, 10), main = ("r^{(1)}"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original$zcp3m, sim_paths_qtr$zcp3m[,i])
+    plot_data_forecast = c(all_data_original$zcp3m, sim_paths_qtr$zcp3m[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ############
 # zcp10 year 
 # simulations 
-plot_data_forecast = c(all_data_original$zcp10y, sim_paths_qtr$zcp10y[,1] + sim_paths_qtr$zcp3m_yield[,1])
+plot_data_forecast = c(all_data_original$zcp10y, sim_paths_qtr$zcp10y[,1] *100 + sim_paths_qtr$zcp3m_yield[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-2.5, 10), main = ("r^{(40)}"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original$zcp10y, sim_paths_qtr$zcp10y[,i] + sim_paths_qtr$zcp3m[,i])
+    plot_data_forecast = c(all_data_original$zcp10y, sim_paths_qtr$zcp10y[,i] *100+ sim_paths_qtr$zcp3m[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ###################
 # zcp10 year spread
 # simulations 
-plot_data_forecast = c(all_data[,2], sim_paths_qtr$zcp10y[,1])
+plot_data_forecast = c(all_data[,2], sim_paths_qtr$zcp10y[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-2.5, 5), main = ("r^{(40)}- r^{(1)}"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data[,2], sim_paths_qtr$zcp10y[,i])
+    plot_data_forecast = c(all_data[,2], sim_paths_qtr$zcp10y[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ############
@@ -487,21 +485,22 @@ for (i in 2:(num_paths - 1)) {
 ###########
 # mortgage 
 # simulations 
-plot_data_forecast = c(lending, sim_paths_qtr$mortgage_rate[,1])
+plot_data_forecast = c(lending, sim_paths_qtr$mortgage_rate[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(-1, 15), main = ("mortgage"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(lending, sim_paths_qtr$mortgage_rate[,i])
+    plot_data_forecast = c(lending, sim_paths_qtr$mortgage_rate[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
 ###########
 # unemploy
 # simulations 
-plot_data_forecast = c(unemploy_nsw, sim_paths_qtr$unemployment_rate[,1])
+plot_data_forecast = c(unemploy_nsw, sim_paths_qtr$unemployment_rate[,1]*100)
 plot(forecast_date_qtr, plot_data_forecast, "l", ylim = c(2, 20), main = ("UE"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(unemploy_nsw, sim_paths_qtr$unemployment_rate[,i])
+    plot_data_forecast = c(unemploy_nsw, sim_paths_qtr$unemployment_rate[,i]*100)
     lines(forecast_date_qtr, plot_data_forecast, col = "grey")
 }
+
 
 #######################################################################################################
 #######################################################
@@ -513,7 +512,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_qtr = get_discrete_simulations(num_years, num_paths, "quarter",T)
+sim_paths_qtr = get_var_simulations(num_years, num_paths, "quarter",perc_change =T)
 
 Sys.time() - start.time
 stopCluster(cl)
@@ -620,8 +619,8 @@ for (i in 2:(num_paths - 1)) {
 }
 
 
-#########################################################################################################################
-# annual data############################################################################################################
+###############
+# annual data #
 all_data_original_year = cbind(all_data_original, lending, unemploy_nsw)
 all_data_original_year = all_data_original_year[-c(1:3,nrow(all_data_original)), -1] # start from Q1 1994
 all_data_original_year = apply (all_data_original_year, 2, function (y) {colMeans(matrix(y, nrow=4))})
@@ -633,37 +632,37 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_year = get_discrete_simulations(num_years, num_paths, "year", F)
+sim_paths_year = get_var_simulations(num_years, num_paths, "year", F)
 Sys.time() - start.time
 stopCluster(cl)
 
 ############
 # zcp3 month
 # simulations 
-plot_data_forecast = c(all_data_original_year$zcp3m, sim_paths_year$zcp3m[,1])
+plot_data_forecast = c(all_data_original_year$zcp3m, sim_paths_year$zcp3m[,1]*100)
 plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-5, 10), main = ("r^{(1)}"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$zcp3m, sim_paths_year$zcp3m[,i])
+    plot_data_forecast = c(all_data_original_year$zcp3m, sim_paths_year$zcp3m[,i]*100)
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 ############
 # zcp10 year 
 # simulations 
-plot_data_forecast = c(all_data_original_year$zcp10y, sim_paths_year$zcp10y[,1] + sim_paths_year$zcp3m_yield[,1])
+plot_data_forecast = c(all_data_original_year$zcp10y, sim_paths_year$zcp10y[,1]*100 + sim_paths_year$zcp3m_yield[,1]*100)
 plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-2.5, 10), main = ("r^{(40)}"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$zcp10y, sim_paths_year$zcp10y[,i] + sim_paths_year$zcp3m[,i])
+    plot_data_forecast = c(all_data_original_year$zcp10y, sim_paths_year$zcp10y[,i]*100 + sim_paths_year$zcp3m[,i]*100)
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 ###################
 # zcp10 year spread
 # simulations 
-plot_data_forecast = c(all_data[,2], sim_paths_year$zcp10y[,1])
-plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-2.5, 5), main = ("r^{(40)}- r^{(1)}"), ylab = "", xlab = "", col = "grey")
-for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data[,2], sim_paths_year$zcp10y[,i])
-    lines(forecast_date_year, plot_data_forecast, col = "grey")
-}
+# plot_data_forecast = c(all_data[,2], sim_paths_year$zcp10y[,1]*100)
+# plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-2.5, 5), main = ("r^{(40)}- r^{(1)}"), ylab = "", xlab = "", col = "grey")
+# for (i in 2:(num_paths - 1)) {
+#     plot_data_forecast = c(all_data[,2], sim_paths_year$zcp10y[,i]*100)
+#     lines(forecast_date_year, plot_data_forecast, col = "grey")
+# }
 ############
 # home index 
 # simulations 
@@ -676,10 +675,10 @@ for (i in 2:(num_paths - 1)) {
 ##############
 # rental yield 
 # simulations 
-plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,1])
+plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,1]*100)
 plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-2.5, 15), main = ("y_t"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,i])
+    plot_data_forecast = c(all_data_original_year$rental_yield*100, sim_paths_year$rental_yield[,i]*100)
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 ################
@@ -721,19 +720,19 @@ for (i in 2:(num_paths - 1)) {
 ###########
 # mortgage 
 # simulations 
-plot_data_forecast = c(all_data_original_year$lending, sim_paths_year$mortgage_rate[,1])
+plot_data_forecast = c(all_data_original_year$lending, sim_paths_year$mortgage_rate[,1]*100)
 plot(forecast_date_year, plot_data_forecast, "l", ylim = c(-1, 15), main = ("mortgage"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$lending, sim_paths_year$mortgage_rate[,i])
+    plot_data_forecast = c(all_data_original_year$lending, sim_paths_year$mortgage_rate[,i]*100)
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 ###########
 # unemploy 
 # simulations 
-plot_data_forecast = c(all_data_original_year$unemploy_nsw, sim_paths_year$unemployment_rate[,1])
+plot_data_forecast = c(all_data_original_year$unemploy_nsw, sim_paths_year$unemployment_rate[,1]*100)
 plot(forecast_date_year, plot_data_forecast, "l", ylim = c(2, 20), main = ("UE"), ylab = "", xlab = "", col = "grey")
 for (i in 2:(num_paths - 1)) {
-    plot_data_forecast = c(all_data_original_year$unemploy_nsw, sim_paths_year$unemployment_rate[,i])
+    plot_data_forecast = c(all_data_original_year$unemploy_nsw, sim_paths_year$unemployment_rate[,i]*100)
     lines(forecast_date_year, plot_data_forecast, col = "grey")
 }
 
@@ -750,7 +749,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_year = get_discrete_simulations(num_years, num_paths, "year", T)
+sim_paths_year = get_var_simulations(num_years, num_paths, "year", T)
 Sys.time() - start.time
 stopCluster(cl)
 
@@ -875,7 +874,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_month = get_discrete_simulations(num_years, num_paths, "month")
+sim_paths_month = get_var_simulations(num_years, num_paths, "month")
 Sys.time() - start.time
 stopCluster(cl)
 sim_paths_month = lapply(sim_paths_month, function (x) {x = x[-c(1,nrow(x)),]})
@@ -992,7 +991,7 @@ registerDoParallel(cl)
 
 start.time <- Sys.time()
 set.seed(1)
-sim_paths_month = get_discrete_simulations(num_years, num_paths, "month", perc_change = T, return_noise = F)
+sim_paths_month = get_var_simulations(num_years, num_paths, "month", perc_change = T, return_noise = F)
 Sys.time() - start.time
 stopCluster(cl)
 sim_paths_month = lapply(sim_paths_month, function (x) {x = x[-nrow(x),]})
