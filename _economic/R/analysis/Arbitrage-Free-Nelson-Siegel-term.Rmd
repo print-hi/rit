@@ -235,8 +235,8 @@ loglike = function(para_un, m.spot) {
 # estimation #
 ##############
 
-load("Xt_indep_fitted.RData")
-load("param_indep.RData")
+load("data/Xt_indep_fitted.RData")
+load("data/param_indep.RData")
 # init_para_un = param_indep$par
 
 # init_para_un = c(
@@ -255,8 +255,8 @@ load("param_indep.RData")
 #           method = c("Nelder-Mead"), m.spot = m.spot)
 # stopCluster(cl)
 # param_indep$par = trans(param_indep$par)
-# save(param_indep, file = "param_indep2.RData")
-# save(Xt_indep_fitted, file = "Xt_indep_fitted2.RData")
+# save(param_indep, file = "data/param_indep2.RData")
+# save(Xt_indep_fitted, file = "data/Xt_indep_fitted2.RData")
 # # 
 # prev_likev = param_indep$value
 # v.likev = param_indep$value
@@ -426,13 +426,8 @@ lines(plot_date, plot_data)
 ### get_afns_simulation testing 
 
 ```{r}
-<<<<<<< HEAD
 source("../AFNS.R")
 par(mfrow = c(1,2))
-=======
-source("AFNS_simulation.R")
-par(mfrow = c(3,2))
->>>>>>> 443914675d4875a6c76b765626aa93ca8e484b80
 
 ###########
 # monthly # 
@@ -444,7 +439,7 @@ set.seed(1)
 zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "independent", model = "interest_rate")
 stopCluster(cl)
 
-# load("zcp_sim.RData")
+# load("data/zcp_sim.RData")
 
 # 6-month 
 plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
@@ -620,8 +615,8 @@ loglike = function(para_un, m.spot) {
 # estimation #
 ##############
 
-load("Xt_corr_fitted.RData")
-load("param_corr.RData")
+load("data/Xt_corr_fitted.RData")
+load("data/param_corr.RData")
 # init_para_un = c(-0.0476178177,  0.1883954039,  0.0541799806,  0.2064502345 , 0.2015218743, 0.0146430812,  0.1045131689,  0.0775538368,  0.0614675899, -0.0230449955,-0.0083917935,  0.0058363718, -0.0051956064,  0.0833732357,  0.0578036401,  0.0582078076,  0.0007094596, -0.1004346733, -0.2186760439,  0.0080832384, 0.0090482006,  0.0090737995,  0.0069131880,  0.0054576034,  0.0051214121,  0.0050331757,  0.0031130047,  0.0031930137,  0.0026735465,  0.0022726559,  0.0019033178,  0.0016513816,  0.0013720447,  0.0009117307,  0.0008735190,  0.0007680491,  0.0005937637,  0.0004093408,  0.0002576219,  0.0001553900,  0.0001260321,  0.0001332250,  0.0001758465,  0.0002983394,  0.0003039219,  0.0003742852,  0.0003395232,  0.0002577990,  0.0002057602, -0.0001150165,  0.0000144974,  0.0001768591,  0.0003043769,  0.0004212505,  0.0006777493,  0.0009113994,  0.0010890702,  0.0021454108,  0.0018323320)
 init_para_un = param_corr$par
 npara = length(init_para_un) # # of observations
@@ -632,8 +627,8 @@ npara = length(init_para_un) # # of observations
 #           control = optim_ctrl,
 #           method = c("Nelder-Mead"), m.spot = m.spot)
 # stopCluster(cl)
-# save(param_corr, file = "param_corr.RData")
-# save(Xt_corr_fitted, file = "Xt_corr_fitted.RData")
+# save(param_corr, file = "data/param_corr.RData")
+# save(Xt_corr_fitted, file = "data/Xt_corr_fitted.RData")
 param_corr$par = trans(param_corr$par)
 
 ##########
@@ -811,7 +806,7 @@ set.seed(1)
 zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "correlated", model = "interest_rate")
 stopCluster(cl)
 
-# load("zcp_sim.RData")
+# load("data/zcp_sim.RData")
 
 # 6-month 
 plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
@@ -921,7 +916,7 @@ m.spot = as.matrix(zcp_month[,-1])
 nmat = length(v.mat) # # of maturities
 nobs = nrow(m.spot)  # # of observations
 
-load("param_indep.RData")
+load("data/param_indep.RData")
 
 #########
 # house # 

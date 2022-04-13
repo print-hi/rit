@@ -98,7 +98,7 @@ row.names(zcp_sdf) = as.character(time_names_past[-1])
 
 ###################
 # import zt vectors 
-all_data = read.csv("all_data.csv")[,-1]
+all_data = read.csv("data/all_data.csv")[,-1]
 all_data = as.matrix(t(all_data))
 row.names(all_data) = var_names
 colnames(all_data) = as.character(time_names_past)
@@ -266,10 +266,10 @@ get_sse = function (lambda_list) {
 # stopCluster(cl)
 # lambdas
 # 
-# save(lambdas, file = "lambdas.RData")
-# load("lambdas.RData")
-lambda_0 = as.matrix(read.csv("lambda_0.csv")[,-1])
-lambda_1 = as.matrix(read.csv("lambda_1.csv")[,-1])
+# save(lambdas, file = "data/lambdas.RData")
+# load("data/lambdas.RData")
+lambda_0 = as.matrix(read.csv("data/lambda_0.csv")[,-1])
+lambda_1 = as.matrix(read.csv("data/lambda_1.csv")[,-1])
 ```
 
 # Model - fitted s_t
@@ -283,7 +283,7 @@ lambda_1 = as.matrix(read.csv("lambda_1.csv")[,-1])
 # for (i in 3:112) {
 #   zt_fitted[,i] = intercept + coef1 %*% zt_fitted[,i-1] + coef2 %*% zt_fitted[,i-2]
 # }
-zt_fitted = read.csv("all_data_fitted.csv")[,-1]
+zt_fitted = read.csv("data/all_data_fitted.csv")[,-1]
 row.names(zt_fitted) = var_names
 colnames(zt_fitted) = time_names_past
 zt_fitted[1:2,] = zt_fitted[1:2,] / 100
