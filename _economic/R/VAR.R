@@ -183,11 +183,6 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     ###############################
     
     if (isTRUE(return_sdf)) {
-        #################################
-        # market price of risk (lambda_t)
-        
-
-
         # find lambda_t's for different trajectories 
         lambda_t = replicate(n = num_paths, 
                                 expr = {matrix(NA, ncol = num_pred+1, nrow = 8)},
@@ -200,10 +195,6 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
                           function (x) {x = cbind(init_lambdat, as.data.frame(x)); 
                                         row.names(x) = var_names; colnames(x) = as.character(time_index); 
                                         x = x[,-ncol(x)]; return (x)})
-        
-        #################
-        # Pricing kernels 
-        
         
         # find s_t for different trajectories 
         st = as.data.frame(matrix(NA, nrow = num_pred, ncol = num_paths))
