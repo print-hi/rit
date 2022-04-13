@@ -81,7 +81,7 @@ time_index_sim = seq(from = end_date, length.out = num_years / h, by = "month")
 # zcp # 
 #######
 
-zcp = read.csv("data/zcp.csv")
+zcp = read.csv("zcp.csv")
 zcp$date = as.Date(zcp$date)
 zcp[,-1] = zcp[,-1] / 100 
 zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
@@ -427,7 +427,7 @@ lines(plot_date, plot_data)
 
 ```{r}
 source("AFNS_simulation.R")
-par(mfrow = c(1,2))
+par(mfrow = c(3,2))
 
 ###########
 # monthly # 
@@ -643,7 +643,10 @@ Sigma_corr_est = matrix(c(param_corr$par[10],0,0,
                      param_corr$par[13],param_corr$par[14],param_corr$par[15]), byrow = T, nrow = 3)
 theta_corr_est = as.matrix(param_corr$par[16:18],nrow = 3)
 lambda_corr_est = param_corr$par[19]
-
+Q_corr_est = matrix(c(0.0000722608, -0.0000614619, -0.000162393,
+                                     -0.0000614619,  0.0000544916,  0.000124538,
+                                     -0.0001623930,  0.0001245380,  0.000603918), nrow = 3, byrow = T)
+                    
 
 # fitted Xt
 matplot(Xt_corr_fitted, type = "l", ylab = "L,S,C", lty = 1, main = "AFNS 3 Factor Estimates (L,S,C)", lwd = 2)
@@ -741,57 +744,58 @@ lines(plot_date, plot_data)
 # compute yt #
 ##############
 
-# simulations
-zcp_corr_sim = replicate(n = num_paths,
-                         expr = {matrix(NA, nrow = num_years/h+1, ncol = 40)},
-                         simplify = F)
-for (path in 2:num_paths) {
-  zcp_corr_sim[[path]] = t(B_corr_fitted %*% as.matrix(Xt_corr_sim[[path]])) - A_corr_fitted
-}
-zcp_corr_sim = lapply(zcp_corr_sim, function(x){ x = as.data.frame(x); x[1,] = zcp_month[nrow(zcp_month), -1]; return (x)})
-zcp_corr_sim = lapply(zcp_corr_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
-
-# mean
-zcp_corr_mean = t(B_corr_fitted %*% as.matrix(Xt_corr_mean)) - A_corr_fitted
-zcp_corr_mean = as.data.frame(zcp_corr_mean)
-row.names(zcp_corr_mean) = c("2021-05-01", as.character(time_index_sim))
-colnames(zcp_corr_mean) = colnames(zcp)[-1]
-zcp_corr_mean[1,] = zcp_month[nrow(zcp_month),-1]
-
-###########
-# plot yt #
-###########
-par(mfrow = c(1,2))
-#######
-# zcp3m
-# sim
-plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[1]][-1,1])
-plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
-for (i in 2:num_paths) {
-  plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[i]][-1,1])
-  lines(plot_date, plot_data, col = "grey")
-}
-# mean
-plot_data = c(zcp_month$x1_qtrs, zcp_corr_mean[-1,1])
-lines(plot_date, plot_data)
-
-########
-# zcp10y
-# sim
-plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[1]][-1,40])
-plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
-for (i in 2:num_paths) {
-  plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[i]][-1,40])
-  lines(plot_date, plot_data, col = "grey")
-}
-# mean
-plot_data = c(zcp_month$x40_qtrs, zcp_corr_mean[-1,40])
-lines(plot_date, plot_data)
+# # simulations
+# zcp_corr_sim = replicate(n = num_paths,
+#                          expr = {matrix(NA, nrow = num_years/h+1, ncol = 40)},
+#                          simplify = F)
+# for (path in 2:num_paths) {
+#   zcp_corr_sim[[path]] = t(B_corr_fitted %*% as.matrix(Xt_corr_sim[[path]])) - A_corr_fitted
+# }
+# zcp_corr_sim = lapply(zcp_corr_sim, function(x){ x = as.data.frame(x); x[1,] = zcp_month[nrow(zcp_month), -1]; return (x)})
+# zcp_corr_sim = lapply(zcp_corr_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
+# 
+# # mean
+# zcp_corr_mean = t(B_corr_fitted %*% as.matrix(Xt_corr_mean)) - A_corr_fitted
+# zcp_corr_mean = as.data.frame(zcp_corr_mean)
+# row.names(zcp_corr_mean) = c("2021-05-01", as.character(time_index_sim))
+# colnames(zcp_corr_mean) = colnames(zcp)[-1]
+# zcp_corr_mean[1,] = zcp_month[nrow(zcp_month),-1]
+# 
+# ###########
+# # plot yt #
+# ###########
+# par(mfrow = c(1,2))
+# #######
+# # zcp3m
+# # sim
+# plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[1]][-1,1])
+# plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+# for (i in 2:num_paths) {
+#   plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[i]][-1,1])
+#   lines(plot_date, plot_data, col = "grey")
+# }
+# # mean
+# plot_data = c(zcp_month$x1_qtrs, zcp_corr_mean[-1,1])
+# lines(plot_date, plot_data)
+# 
+# ########
+# # zcp10y
+# # sim
+# plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[1]][-1,40])
+# plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+# for (i in 2:num_paths) {
+#   plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[i]][-1,40])
+#   lines(plot_date, plot_data, col = "grey")
+# }
+# # mean
+# plot_data = c(zcp_month$x40_qtrs, zcp_corr_mean[-1,40])
+# lines(plot_date, plot_data)
 ```
 
 ### get_afns_simulation testing 
 
 ```{r}
+par(mfrow = c(3,2))
 ###########
 # monthly # 
 ###########
@@ -893,7 +897,7 @@ time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
 # zcp # 
 #######
 
-zcp = read.csv("data/zcp.csv")
+zcp = read.csv("zcp.csv")
 zcp$date = as.Date(zcp$date)
 zcp[,-1] = zcp[,-1] / 100 
 zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
@@ -918,7 +922,7 @@ load("param_indep.RData")
 # house # 
 #########
 
-properties = read.csv("data/Market_Trends_Data.csv")
+properties = read.csv("Market_Trends_Data.csv")
 properties = clean_names(properties)
 properties = properties %>% mutate_if(is.character, as.factor)
 properties$value_at_date = as.Date(properties$value_at_date, format =  "%d/%m/%Y")
@@ -936,7 +940,7 @@ home_value_houses_nsw = home_value_houses_nsw %>%
 # ASX200 #
 ##########
 
-asx200 = read.csv("data/asx200_price.csv")
+asx200 = read.csv("asx200_price.csv")
 asx200$exchange_date = as.Date(asx200$exchange_date)
 asx200 = asx200 %>% filter(exchange_date <= end_date & exchange_date >= start_pc_date)
 asx200$month = format(asx200$exchange_date, "%Y-%m")
