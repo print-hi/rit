@@ -138,9 +138,7 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
         
         # loops thru the series (separate lists)
         v_path = replicate(n = num_paths, 
-                            expr = {data.frame(matrix(NA, 
-                                                      nrow = num_pred, 
-                                                      ncol = length(intercept)))},
+                            expr = {data.frame(matrix(NA, nrow = num_pred, ncol = length(intercept)))},
                             simplify = F)
         v_path = lapply(1:num_paths, 
                         function (x) {var_path(num_pred, x)})
