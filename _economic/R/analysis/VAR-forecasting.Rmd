@@ -75,7 +75,7 @@ A VAR(p) process can be represented by \begin{align*}
 # Economic/financial variables 
 
 ```{r, message=FALSE, warning=FALSE}
-variables = read_excel("Variables.xlsx")
+variables = read_excel("data/Variables.xlsx")
 
 all_var_names = c("zcp3m", "zcp10y", "home_index", "rental_yield", "GDP", "CPI", "ASX200", "forex") # those to be kept 
 all_data_original = as.data.frame(matrix(NA, nrow = 112, ncol = 1+length(all_var_names)))
@@ -120,15 +120,15 @@ end_date = as.Date("2021-03-31")
 ################################################
 # ZERO-COUPON INTEREST RATES – ANALYTICAL SERIES
 # import - 3 months 
-zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), c(1,3)]
-zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), c(1,3)]
+zcp_old = read_excel("data/ZCP_till2008.xls")[-c(1:10), c(1,3)]
+zcp_new = read_excel("data/ZCP_from2008.xls")[-c(1:10), c(1,3)]
 names(zcp_old) = c("Date", "ZCP3month")
 names(zcp_new) = c("Date", "ZCP3month")
 zcp3m = rbind(zcp_old, zcp_new)
 
 # import - 10 years 
-zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), c(1,42)]
-zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), c(1,42)]
+zcp_old = read_excel("data/ZCP_till2008.xls")[-c(1:10), c(1,42)]
+zcp_new = read_excel("data/ZCP_from2008.xls")[-c(1:10), c(1,42)]
 names(zcp_old) = c("Date", "ZCP10year")
 names(zcp_new) = c("Date", "ZCP10year")
 zcp10y = rbind(zcp_old, zcp_new)
@@ -163,7 +163,7 @@ zcp10y_spread = ts(zcp10y$ZCP10y_spread_qtr_rate)
 
 ###############
 # Mortgage rate
-lending = read_excel("Mortgage-RBA.xls", sheet = "Data")[-c(1:10), c(1,4)]
+lending = read_excel("data/Mortgage-RBA.xls", sheet = "Data")[-c(1:10), c(1,4)]
 names(lending) = c("Date", "mortgage_rate")
 lending = lending %>% mutate_if(is.character, as.numeric)
 lending$Date = as.Date(lending$Date, origin = "1899-12-30")
@@ -180,7 +180,7 @@ lending = ts(lending$mortgage_rate_qtr)
 ######################################
 # House price dynamics & rental yields 
 # import & cleaning 
-properties = read.csv("Market_Trends_Data.csv")
+properties = read.csv("data/Market_Trends_Data.csv")
 properties = clean_names(properties)
 properties = properties %>% mutate_if(is.character, as.factor)
 properties$value_at_date = as.Date(properties$value_at_date, format =  "%d/%m/%Y")
@@ -269,7 +269,7 @@ rental_houses_nsw = ts(rental_houses_nsw$rental_yields_qtr_rate)
 ####################################################################
 # Gross domestic product: Chain volume measures; seasonally adjusted
 # import 
-gdp = read_excel("GDP-ABS.xls", sheet = "Data1")[-c(1:9), c(1,54)]
+gdp = read_excel("data/GDP-ABS.xls", sheet = "Data1")[-c(1:9), c(1,54)]
 names(gdp) = c("Date", "GDP")
 gdp = gdp %>% mutate_if(is.character, as.numeric)
 gdp$Date = as.Date(gdp$Date, origin = "1899-12-30")
@@ -291,7 +291,7 @@ gdp = ts(gdp$gdp_rates)
 #####################################
 # CPI: Australia; seasonally adjusted
 # import 
-cpi = read_excel("CPI-ABS.xls", sheet = "Data1")[-c(1:9), c(1,10)]
+cpi = read_excel("data/CPI-ABS.xls", sheet = "Data1")[-c(1:9), c(1,10)]
 names(cpi) = c("Date", "CPI")
 cpi = cpi %>% mutate_if(is.character, as.numeric)
 cpi$Date = as.Date(cpi$Date, origin = "1899-12-30")
@@ -313,7 +313,7 @@ cpi = ts(cpi$cpi_rate)
 ##################################################################
 # Non-financial corporate BBB bonds – yield – 10 year target tenor
 # import 
-# corpBBB_10y_spread = read_excel("corporate_bonds-RBA.xls", sheet = "Data")[-c(1:10), c(1,36)]
+# corpBBB_10y_spread = read_excel("data/corporate_bonds-RBA.xls", sheet = "Data")[-c(1:10), c(1,36)]
 # names(corpBBB_10y_spread) = c("Date", "yield")
 # corpBBB_10y_spread = corpBBB_10y_spread %>% mutate_if(is.character, as.numeric)
 # corpBBB_10y_spread$Date = as.Date(corpBBB_10y_spread$Date, origin = "1899-12-30")
@@ -333,16 +333,16 @@ cpi = ts(cpi$cpi_rate)
 #################################
 # S&P/ASX200: daily closing price
 # import 
-asx200_new = read_excel("ASX200_from2001.xlsx")[, 1:2]
+asx200_new = read_excel("data/ASX200_from2001.xlsx")[, 1:2]
 asx200_new = clean_names(asx200_new)
 
-asx200_oldest = read_excel("ASX200_till2001Q2.xlsx")[,c(1,6)]
+asx200_oldest = read_excel("data/ASX200_till2001Q2.xlsx")[,c(1,6)]
 names(asx200_oldest) = c("exchange_date", "close")
 asx200_oldest = asx200_oldest %>% mutate_if(is.character, as.numeric)
 asx200_oldest$exchange_date = as.Date(asx200_oldest$exchange_date, origin = "1899-12-30")
 asx200_oldest = asx200_oldest[order(asx200_oldest$exchange_date),]
 
-asx200_old = read_excel("ASX200_till2001Nov19.xlsx")[,c(1,6)]
+asx200_old = read_excel("data/ASX200_till2001Nov19.xlsx")[,c(1,6)]
 names(asx200_old) = c("exchange_date", "close")
 asx200_old = asx200_old %>% mutate_if(is.character, as.numeric)
 asx200_old$exchange_date = as.Date(asx200_old$exchange_date, origin = "1899-12-30")
@@ -367,7 +367,7 @@ asx200 = ts(asx200$close_qtr_rate)
 ############################################
 # unemployment rate NSW; seasonally adjusted
 # import
-unemploy_nsw = read_excel("Unemployment NSW-ABS.xls", sheet = "Data1")[-c(1:9), c(1, 48)]
+unemploy_nsw = read_excel("data/Unemployment NSW-ABS.xls", sheet = "Data1")[-c(1:9), c(1, 48)]
 names(unemploy_nsw) = c("Date", "Unemployment_rate")
 unemploy_nsw = unemploy_nsw %>% mutate_if(is.character, as.numeric)
 unemploy_nsw$Date = as.Date(unemploy_nsw$Date, origin = "1899-12-30")
@@ -387,8 +387,8 @@ unemploy_nsw = ts(unemploy_nsw$unemploy_qtr_rate)
 ###############################################
 # forex: Australian Dollar Trade-weighted Index
 # import 
-forex1 = read_excel("Forex_till2010.xls")[-c(1:20), c(1,15)]
-forex2 = read_excel("Forex_from2010.xls")[-c(1:10), c(1,3)]
+forex1 = read_excel("data/Forex_till2010.xls")[-c(1:20), c(1,15)]
+forex2 = read_excel("data/Forex_from2010.xls")[-c(1:10), c(1,3)]
 names(forex1) = c("Date", "AUD_index")
 names(forex2) = c("Date", "AUD_index")
 forex = rbind(forex1, forex2)

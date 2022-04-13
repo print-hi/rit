@@ -73,7 +73,7 @@ var_names = c("zcp3m_yield", "zcp10y_spread", "home_index_growth", "rental_yield
 
 #######################
 # import interest rates 
-zcp = read.csv("zcp.csv")
+zcp = read.csv("data/zcp.csv")
 zcp$date = as.Date(zcp$date)
 # zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), -2]
 # zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), -2]
