@@ -8,7 +8,7 @@ survivalP2Q(StP, method, lambda)
 }
 \arguments{
 \item{StP}{vector, matrix or 3D array of the survival function under the P-measure with
-survival time (on the rows) and calendar year (on the columns) and simulation
+survival time (on the rows) and calendar year or cohort (on the columns) and simulation
 number (3rd dimension)}
 
 \item{method}{character string representing the distortion risk measure to be used. See "Details".}

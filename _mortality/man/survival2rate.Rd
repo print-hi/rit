@@ -8,7 +8,7 @@ survival2rate(surv, ages, to = "prob", years = NULL)
 }
 \arguments{
 \item{surv}{vector, matrix or 3D array of the survival function with survival time starting from 0
-(on the rows) and calendar year (on the columns) and simulation number (3rd dimension)}
+(on the rows) and calendar year or cohort (on the columns) and simulation number (3rd dimension)}
 
 \item{ages}{vector of desired ages for the resulting 1-year death probabilities}
 

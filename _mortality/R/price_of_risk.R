@@ -6,7 +6,7 @@
 #'
 #' @param rates
 #' vector, matrix or 3D array of mortality rates with age
-#' (on the rows) and calendar year (on the columns) and simulation
+#' (on the rows) and calendar year or cohort (on the columns) and simulation
 #' number (3rd dimension)
 #' @param ages
 #' vector of ages for `rates`
@@ -79,7 +79,7 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
       stop("length of years must be equal to number of columns of rates")
     }
 
-    if (!is.vector(years) | !is.integer(years)) {
+    if (!is.vector(years) | !all(years == floor(years))) {
       stop("years must be a vector of integers")
     }
 
@@ -126,7 +126,7 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
   rownames(St) <- as.character(0:(ages[length(ages)] - init_age + 1))
   colnames(St) <- if (is.null(years)) colnames(qx) else as.character(years)
 
-  return(list(surv = St, age = init_age))
+  return(St)
 
 }
 
@@ -136,7 +136,7 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
 #'
 #' @param surv
 #' vector, matrix or 3D array of the survival function with survival time starting from 0
-#' (on the rows) and calendar year (on the columns) and simulation number (3rd dimension)
+#' (on the rows) and calendar year or cohort (on the columns) and simulation number (3rd dimension)
 #' @param ages
 #' vector of desired ages for the resulting 1-year death probabilities
 #' @param to
@@ -201,7 +201,7 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
       stop("length of years must be equal to number of columns of the survival function")
     }
 
-    if (!is.vector(years) | !is.integer(years)) {
+    if (!is.vector(years) | !all(years == floor(years))) {
       stop("years must be a vector of integers")
     }
 
@@ -254,7 +254,7 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #'
 #' @param StP
 #' vector, matrix or 3D array of the survival function under the P-measure with
-#' survival time (on the rows) and calendar year (on the columns) and simulation
+#' survival time (on the rows) and calendar year or cohort (on the columns) and simulation
 #' number (3rd dimension)
 #' @param method
 #' character string representing the distortion risk measure to be used. See "Details".

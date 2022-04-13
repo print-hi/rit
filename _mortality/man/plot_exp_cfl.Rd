@@ -7,12 +7,14 @@
 plot_exp_cfl(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level = 95)
 }
 \arguments{
-\item{exp_cfl_hist}{vector of expected curtate future lifetime for historical years}
+\item{exp_cfl_hist}{vector of expected curtate future lifetime for historical years. Should be
+generated from \code{\link{exp_cfl}}}
 
 \item{years_hist}{vector of historical years}
 
-\item{exp_cfl_sim}{matrix of simulated expected curtate future lifetime
-with simulation number (on the rows) and calendar year (on the columns)}
+\item{exp_cfl_sim}{matrix of simulated expected curtate future lifetime with simulation number
+(on the rows) and calendar year or cohort (on the columns).
+Should be generated from \code{\link{exp_cfl}}}
 
 \item{years_sim}{vector of years for simulations}
 

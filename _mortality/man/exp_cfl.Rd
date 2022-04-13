@@ -8,7 +8,7 @@ exp_cfl(qx, ages, init_age = NULL, years = NULL)
 }
 \arguments{
 \item{qx}{vector, matrix or 3D array of 1-year death probabilities with age
-(on the rows) and calendar year (on the columns) and simulation
+(on the rows) and calendar year or cohort (on the columns) and simulation
 number (3rd dimension)}
 
 \item{ages}{vector of ages for \code{qx}}
@@ -21,7 +21,7 @@ of \code{qx} will be preserved}
 }
 \value{
 expected curtate future lifetime as a matrix if \code{qx} is a 3D array
-with simulation number (on the rows) and calendar year (on the columns).
+with simulation number (on the rows) and calendar year or cohort (on the columns).
 Returns a vector otherwise
 }
 \description{

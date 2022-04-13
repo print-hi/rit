@@ -8,7 +8,7 @@ rate2survival(rates, ages, from = "prob", init_age = NULL, years = NULL)
 }
 \arguments{
 \item{rates}{vector, matrix or 3D array of mortality rates with age
-(on the rows) and calendar year (on the columns) and simulation
+(on the rows) and calendar year or cohort (on the columns) and simulation
 number (3rd dimension)}
 
 \item{ages}{vector of ages for \code{rates}}

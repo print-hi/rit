@@ -4,11 +4,11 @@
 \alias{plot_surv_sim}
 \title{Plot Survival Function Simulations}
 \usage{
-plot_surv_sim(surv_sim, init_age, target_year, level = 95)
+plot_surv_sim(surv_sim, init_age, target_year, level = 95, years = NULL)
 }
 \arguments{
 \item{surv_sim}{3D array of forecasted survival functions with survival time
-(on the rows) and calendar year (on the columns) and simulation
+(on the rows) and calendar year or cohort (on the columns) and simulation
 number (3rd dimension)}
 
 \item{init_age}{initial age for which \code{surv_sim} was calculated at}
@@ -16,6 +16,9 @@ number (3rd dimension)}
 \item{target_year}{year for which the survival function is plotted for}
 
 \item{level}{desired confidence level with 95\% as default}
+
+\item{years}{optional vector of years for \code{surv_sim}. If not supplied, then the column names
+of \code{surv_sim} will be preserved}
 }
 \value{
 returns \code{NULL}

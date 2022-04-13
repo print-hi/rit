@@ -251,7 +251,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
   }
 
   # old_ages
-  if (!is.vector(old_ages) | !all(ages == floor(old_ages))) {
+  if (!is.vector(old_ages) | !all(old_ages == floor(old_ages))) {
     stop("old ages must be a vector of integers")
   }
 
@@ -294,7 +294,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
       stop("length of years must be equal to number of columns of rates")
     }
 
-    if (!is.vector(years) | !is.integer(years)) {
+    if (!is.vector(years) | !all(years == floor(years))) {
       stop("years must be a vector of integers")
     }
 
@@ -442,7 +442,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   }
 
   # old_ages
-  if (!is.vector(old_ages) | !all(ages == floor(old_ages))) {
+  if (!is.vector(old_ages) | !all(old_ages == floor(old_ages))) {
     stop("old ages must be a vector of integers")
   }
 
@@ -459,7 +459,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   }
 
   # fitted_ages
-  if (!is.vector(fitted_ages) | !all(ages == floor(fitted_ages))) {
+  if (!is.vector(fitted_ages) | !all(fitted_ages == floor(fitted_ages))) {
     stop("fitted ages must be a vector of integers")
   }
 
@@ -471,8 +471,8 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
     stop("fitted ages must be non-negative")
   }
   # e.g., ages <- 55:110, old_ages <- 90:130, fitted_ages <- 75:89 is valid
-  if (utils::tail(fitted_ages, 1) + 1 == old_ages[1]) {
-    stop("fitted ages must connect with ages")
+  if (utils::tail(fitted_ages, 1) + 1 != old_ages[1]) {
+    stop("fitted ages must connect with old ages")
   }
 
   # type
@@ -492,7 +492,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
       stop("length of years must be equal to number of columns of rates")
     }
 
-    if (!is.vector(years) | !is.integer(years)) {
+    if (!is.vector(years) | !all(years == floor(years))) {
       stop("years must be a vector of integers")
     }
 
