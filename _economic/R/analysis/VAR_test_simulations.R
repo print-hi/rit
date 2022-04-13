@@ -387,7 +387,7 @@ forex_inv = function (x, init) {
 # forecast 
 num_years = 10
 num_paths = 10
-source("VAR_simulation.R")
+source("../VAR.R")
 
 ############################
 # qtrly data ###############
