@@ -426,7 +426,7 @@ lines(plot_date, plot_data)
 ### get_afns_simulation testing 
 
 ```{r}
-source("AFNS_simulation.R")
+source("../AFNS.R")
 par(mfrow = c(1,2))
 
 ###########

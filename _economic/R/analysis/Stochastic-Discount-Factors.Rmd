@@ -323,8 +323,8 @@ cor(st_past, all_data[8,])
 num_paths = 10
 num_years = 20
 
-source("SDF_Simulation.R")
-source("VAR_simulation.R")
+source("../SDF_Simulation.R")
+source("../VAR.R")
 
 cl <- makeCluster(detectCores())
 registerDoParallel(cl)
