@@ -9,7 +9,7 @@
 #' @param perc_change If the outputs are expressed in terms of percentage change. Default is FALSE 
 #' @param return_sdf If the VAR-based stochastic discount factors are returned. Default is FALSE. 
 #'
-#' @return A list containing 10 data frames for the simulated trajectories for each economic variable, and a list of white noises in the VAR model. 
+#' @return A list containing 10 data frames for the simulated trajectories for each economic variable, or 11 data frames including the simulated stochastic discount factors if `return_sdf` is set `TRUE`.
 #' @export
 #'
 #' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 100, frequency = "year", return_sdf = T). To obtain all trajectories of Australia 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the first trajectory, type sim$noise$trajectory_1. 
