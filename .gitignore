@@ -1,5 +1,10 @@
 # ----------------------------------------------------------------
 # --- Custom Files
+
+Pipfile
+.DS_store
+.vscode
+.ipynb_checkpoints
 .Rproj
 .Rproj.user
 
