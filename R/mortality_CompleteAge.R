@@ -34,7 +34,7 @@ arr_apply <- function(X, FUN) {
 #' completed mortality rates for all ages and old ages in the same format as
 #' `rates`
 #'
-#' @export
+#' @export coale_kisker
 #'
 #' @examples
 #'
@@ -207,7 +207,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #' completed mortality rates for all ages and old ages in the same format as
 #' `rates`
 #'
-#' @export
+#' @export denuit_goderniaux
 #'
 #' @examples
 #'
@@ -399,7 +399,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #' completed mortality rates for all ages and old ages in the same format as
 #' `rates`
 #'
-#' @export
+#' @export kannisto
 #'
 #' @examples
 #'
@@ -610,7 +610,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 #' @return
 #' completed mortality rates for all ages and old ages in the same format as
 #' `rates`
-#' @export
+#' @export complete_old_age
 #'
 #' @examples
 #'

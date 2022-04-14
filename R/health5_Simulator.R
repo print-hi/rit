@@ -18,7 +18,7 @@
 #' @return
 #' 10000 rows of individual paths in the states, 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 #' for each row it starts from the initial age as an input, and end at age 110
-#' @export
+#' @export simulate_individual_path
 #'
 #' @examples
 #' simulated_individual_path=simulate_individual_path(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
@@ -84,7 +84,7 @@ simulate_individual_path <- function(init_age, init_state, params, gender, i, co
 #' for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
 #' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
 #' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
-#' @export
+#' @export simulate_life_table
 #'
 #' @examples
 #' simulated_lifetable=simulate_life_table(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)

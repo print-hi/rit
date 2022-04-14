@@ -20,7 +20,7 @@
 #'
 #' -1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 #'
-#' @export
+#' @export simulate_path
 #'
 #' @examples
 simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {

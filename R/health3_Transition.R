@@ -19,7 +19,7 @@
 #' @return
 #' list of transition probability matrices
 #'
-#' @export
+#' @export get_trans_probs
 #' @import expm
 #' @examples
 #'

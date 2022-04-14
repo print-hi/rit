@@ -19,7 +19,7 @@
 #' @return
 #' numeric denoting probability of surviving to end age in end state
 #'
-#' @export
+#' @export surv_prob
 #'
 #' @examples
 surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state = NULL) {
@@ -86,7 +86,7 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 #' line plot with 3 lines, each denoting survival probability, survivial probability to
 #' disabled, and survival probability to healthy.
 #'
-#' @export
+#' @export prob_plots
 #'
 #' @import tidyr dplyr ggplot2
 #'

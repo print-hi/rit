@@ -24,7 +24,7 @@
 #' @return
 #' associated survival function as a 3D array if `rates` is an array, or as a matrix otherwise
 #'
-#' @export
+#' @export rate2survival
 #'
 #' @examples
 #'
@@ -149,7 +149,7 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
 #'
 #' @return
 #' associated mortality rates in the same format as `surv`
-#' @export
+#' @export survival2rate
 #'
 #' @examples
 #'
@@ -263,7 +263,7 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #'
 #' @return
 #' the transformed survival function under the specified Q-measure
-#' @export
+#' @export survivalP2Q
 #'
 #' @examples
 #'

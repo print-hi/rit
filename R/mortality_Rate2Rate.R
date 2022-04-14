@@ -30,7 +30,7 @@ q2m <- function(rates) return(-log(1 - rates))
 #' @return
 #' vector, matrix or 3D array of converted mortality rates
 #'
-#' @export
+#' @export rate2rate
 #'
 #' @examples
 #' A <- matrix(c(0.02, 0.04, 0.03, 0.05), nrow = 2, ncol = 2, byrow = TRUE)

@@ -26,7 +26,7 @@
 #' @return
 #' numeric output for average and standard deviation of future lifetime
 #'
-#' @export
+#' @export afl
 #'
 #' @examples
 afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
@@ -106,7 +106,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #' @return
 #' numeric output for expected future lifetime and standard deviation of future lifetime
 #'
-#' @export
+#' @export aflF
 #'
 #' @examples
 aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
@@ -173,7 +173,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' @return
 #' Numeric output of expected time and standard deviation of time spent in healthy state.
 #'
-#' @export
+#' @export hfl
 #'
 #' @examples
 hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
@@ -255,7 +255,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #' Numeric output denoting the average time spent in healthy state and its
 #' standard deviation.
 #'
-#' @export
+#' @export hflF
 #'
 #' @examples
 hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
@@ -328,7 +328,7 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' numeric output for average future lifetime in disabled state and its standard
 #' deviation.
 #'
-#' @export
+#' @export afld
 #'
 #' @examples
 afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
@@ -408,7 +408,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
 #' @return
 #' numeric output for average time spent and standard deviation of time in disabled state
 #'
-#' @export
+#' @export afldF
 #'
 #' @examples
 afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
@@ -479,7 +479,7 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #' numeric denoting the average time until individual becomes disabled and its
 #' standard deviation.
 #'
-#' @export
+#' @export time_to_disabled
 #'
 #' @examples
 time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL) {
@@ -555,7 +555,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
 #' numeric denoting the average time until individual becomes disabled, and its
 #' standard deviation.
 #'
-#' @export
+#' @export time_to_disabledF
 #'
 #' @examples
 time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
@@ -616,7 +616,7 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
 #' @return
 #' dataframe output containing mean and standard deviation of different statistics
 #'
-#' @export
+#' @export survival_stats
 #'
 #' @examples
 survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
@@ -726,7 +726,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
 #' @return
 #' dataframe output containing mean and standard deviation of different statistics
 #'
-#' @export
+#' @export survival_statsF
 #'
 #' @examples
 survival_statsF <- function(init_age, init_state, female, year, param_file, n = 1000) {

@@ -13,7 +13,7 @@
 #'
 #' @return a list of 5 times 5 transition probability matrices, from the initial age to age 110
 #' @import readxl expm
-#' @export
+#' @export get_full_trans_prob_matrix
 #'
 #' @examples
 #' trans_prob_matrix_age65to110=get_full_trans_prob_matrix(params, init_age=65, gender, i, model=3)
@@ -58,7 +58,7 @@ return(trans_prob_matrix)
 #'
 #' @return
 #' 5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
-#' @export
+#' @export transition_probability_5_frailty
 #' @import expm
 #'
 #' @examples
@@ -90,7 +90,7 @@ transition_probability_5_frailty=function(params,age,gender,i,latent,model){
 #' 1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model
 #' @return
 #' 12 times 1 vector of transition rates for the 12 types of transitions
-#' @export
+#' @export transition_rate_5_frailty
 #'
 #' @examples
 #' transition_rates=transition_rate_5_frailty(params, init_age, gender, i, latent, model=3)

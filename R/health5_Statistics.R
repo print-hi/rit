@@ -10,7 +10,7 @@
 #'
 #' @return
 #' a column that consists the first time leaving or entering the state for a number of individuals
-#' @export
+#' @export first_time_stats
 #'
 #' @examples
 #' first_time_H=first_time_stats(simulated_individual_path, 0)
@@ -51,7 +51,7 @@ first_time_stats=function(simulated_path, state){
 #' the list of values to be studied
 #' @return
 #' mean and variance of the
-#' @export
+#' @export stats_produce
 #'
 #' @examples
 #' stats_first_time_leave_H=stats_produce(first_time_stats(simulated_path,0))
@@ -76,7 +76,7 @@ stats_produce=function(input){
 #'
 #' @return
 #' a column that consists the total time in different states for a number of individuals
-#' @export
+#' @export total_time_stats
 #'
 #' @examples
 #' total_time_alive=total_time_stats(simulated_individual_path, 4)

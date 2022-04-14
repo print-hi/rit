@@ -17,7 +17,7 @@
 #' @return
 #' dataframe of lifetable generated
 #'
-#' @export
+#' @export create_life_table
 #'
 #' @examples
 #'
@@ -106,7 +106,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 #' @return
 #' Dataframe containing life table
 #'
-#' @export
+#' @export create_life_tableF
 #'
 #' @examples
 create_life_tableF <- function(init_age, female, year, param_file, init_state = 0, n = 3000) {

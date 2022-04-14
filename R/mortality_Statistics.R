@@ -18,7 +18,7 @@ NULL
 
 #' @rdname surv
 #'
-#' @export
+#' @export psurv
 psurv <- function(surv_fun, surv_time) {
 
 # Flagging Errors ---------------------------------------------------------
@@ -61,7 +61,7 @@ psurv <- function(surv_fun, surv_time) {
 
 #' @rdname surv
 #'
-#' @export
+#' @export qsurv
 qsurv <- function(surv_fun, surv_prob) {
 
 # Flagging Errors ---------------------------------------------------------
@@ -225,7 +225,7 @@ cohort2period <- function(cohort_rates, ages) {
 #' with simulation number (on the rows) and calendar year or cohort (on the columns).
 #' Returns a vector otherwise
 #'
-#' @export
+#' @export exp_cfl
 #'
 #' @examples
 #'
@@ -360,7 +360,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #' @return
 #' returns `NULL`
 #'
-#' @export
+#' @export plot_exp_cfl
 #'
 #' @examples
 #'
@@ -478,7 +478,7 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level
 #' @return
 #' returns `NULL`
 #'
-#' @export
+#' @export plot_surv_sim
 #'
 #' @examples
 #'
