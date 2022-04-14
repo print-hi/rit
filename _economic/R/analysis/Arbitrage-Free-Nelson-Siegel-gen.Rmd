@@ -79,7 +79,7 @@ time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
 # zcp # 
 #######
 
-zcp = read.csv("zcp.csv")
+zcp = read.csv("data/zcp.csv")
 zcp$date = as.Date(zcp$date)
 zcp[,-1] = zcp[,-1] / 100 
 zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
@@ -104,7 +104,7 @@ load("param_indep.RData")
 # house # 
 #########
 
-properties = read.csv("Market_Trends_Data.csv")
+properties = read.csv("data/Market_Trends_Data.csv")
 properties = clean_names(properties)
 properties = properties %>% mutate_if(is.character, as.factor)
 properties$value_at_date = as.Date(properties$value_at_date, format =  "%d/%m/%Y")
@@ -122,7 +122,7 @@ home_value_houses_nsw = home_value_houses_nsw %>%
 # ASX200 #
 ##########
 
-asx200 = read.csv("asx200_price.csv")
+asx200 = read.csv("data/asx200_price.csv")
 asx200$exchange_date = as.Date(asx200$exchange_date)
 asx200 = asx200 %>% filter(exchange_date <= end_date & exchange_date >= start_pc_date)
 asx200$month = format(asx200$exchange_date, "%Y-%m")
@@ -291,8 +291,8 @@ loglike = function(para_un, m.spot) {
 
 # init_para_un = c(0.3696448117, -0.0226900395,  0.7603241807, -0.1382333940, -0.1212550658, -0.0120939080,  0.2048884876 , 0.2570906817, 0.5953711481, -0.5581090375,  0.5621663040, -0.0773762896,  1.1323443970, -0.4059042990, -0.1079379843,  0.3634425387, 0.0045291023,  0.6044371074, -0.0515580273,  0.0122061338,  0.0114722658,  0.0096651618,  0.0085276468,  0.0068691666, 0.0059631228,  0.0052143616,  0.0047095021,  0.0041040807, -0.0041710564,  0.0038269661,  0.0033805255,  0.0033465011,  0.0027621710,  0.0027256280,  0.0025578855,  0.0022913802,  0.0019411415,  0.0016112021, -0.0015108390, -0.0013903791,  0.0010614574, -0.0008603987,  0.0006777453,  0.0005330642,  0.0004203710, -0.0002549369,  0.0001683272, -0.0000954686,  0.0000584604,  0.0000953540,  0.0001625798,  0.0002451214,  0.0003346435,  0.0004616734,  0.0005425149,  0.0006963937,  0.0008938731,  0.0011882339,  0.0013112355, -0.0039078314, -0.0212962482)
 
-load("param_gindep.RData")
-load("Xt_gindep_fitted.RData")
+load("data/param_gindep.RData")
+load("data/Xt_gindep_fitted.RData")
 init_para_un = param_gindep$par
 npara = length(init_para_un) # # of observations
 
@@ -302,8 +302,8 @@ param_gindep = optim(init_para_un, loglike,
           control = optim_ctrl,
           method = c("Nelder-Mead"), m.spot = m.spot)
 stopCluster(cl)
-# save(param_gindep, file = "param_gindep.RData")
-# save(Xt_gindep_fitted, file = "Xt_gindep_fitted.RData")
+# save(param_gindep, file = "data/param_gindep.RData")
+# save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
 param_gindep$par = trans(param_gindep$par)
 
 ##########
@@ -778,8 +778,8 @@ loglike = function(para_un, m.spot) {
 # estimation #
 ##############
 
-load("Xt_gcorr_fitted.RData")
-load("param_gcorr.RData")
+load("data/Xt_gcorr_fitted.RData")
+load("data/param_gcorr.RData")
 init_para_un = param_gcorr$par
 init_para_un[1:15] = c(0.0475592317, 0.5748226990,  0.4097137770, -0.0840235925,  0.5399904687, -0.5759468991, -0.1441768904 , 0.2141827041,  0.8868924683, 0.1104182340,  0.0356603515, -0.2683629035,  0.0753902709 , 0.0655699795,-0.1195371885)
 npara = length(init_para_un) # # of observations
@@ -791,8 +791,8 @@ param_gcorr = optim(init_para_un, loglike,
           method = c("Nelder-Mead"), m.spot = m.spot)
 stopCluster(cl)
 param_gcorr$par = trans(param_gcorr$par)
-save(param_gcorr, file = "param_gcorr.RData")
-save(Xt_gcorr_fitted, file = "Xt_gcorr_fitted.RData")
+save(param_gcorr, file = "data/param_gcorr.RData")
+save(Xt_gcorr_fitted, file = "data/Xt_gcorr_fitted.RData")
 
 ##########
 # fitted #
