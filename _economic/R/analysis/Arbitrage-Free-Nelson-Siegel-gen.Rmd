@@ -98,8 +98,6 @@ m.spot = as.matrix(zcp_month[,-1])
 nmat = length(v.mat) # # of maturities
 nobs = nrow(m.spot)  # # of observations
 
-load("param_indep.RData")
-
 #########
 # house # 
 #########
@@ -296,12 +294,12 @@ load("data/Xt_gindep_fitted.RData")
 init_para_un = param_gindep$par
 npara = length(init_para_un) # # of observations
 
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
-param_gindep = optim(init_para_un, loglike,
-          control = optim_ctrl,
-          method = c("Nelder-Mead"), m.spot = m.spot)
-stopCluster(cl)
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gindep = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
 # save(param_gindep, file = "data/param_gindep.RData")
 # save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
 param_gindep$par = trans(param_gindep$par)
@@ -698,11 +696,6 @@ loglike = function(para_un, m.spot) {
                     c(para[7],para[8],para[9],0,0),
                     c(-1,-1,0,0,0),
                     c(-1,-1,0,0,0))
-    # rho41 = para[10]; rho42 = para[11]; rho43 = para[12]
-    # rho44 = sqrt(1 - rho41^2 - rho42^2 - rho43^2)
-    # rho51 = para[13]; rho52 = para[14]; rho53 = para[15]; rho54 = para[16]
-    # rho55 = sqrt(1 - rho51^2 - rho52^2 - rho53^2 - rho54 ^ 2)
-    # sigma4 = para[17]; sigma5 = para[18]
     sigma  = rbind(c(para[10],0,0,0,0),
                     c(para[11],para[12],0,0,0),
                     c(para[13],para[14],para[15],0,0),
@@ -781,18 +774,17 @@ loglike = function(para_un, m.spot) {
 load("data/Xt_gcorr_fitted.RData")
 load("data/param_gcorr.RData")
 init_para_un = param_gcorr$par
-init_para_un[1:15] = c(0.0475592317, 0.5748226990,  0.4097137770, -0.0840235925,  0.5399904687, -0.5759468991, -0.1441768904 , 0.2141827041,  0.8868924683, 0.1104182340,  0.0356603515, -0.2683629035,  0.0753902709 , 0.0655699795,-0.1195371885)
 npara = length(init_para_un) # # of observations
 
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
-param_gcorr = optim(init_para_un, loglike,
-          control = optim_ctrl,
-          method = c("Nelder-Mead"), m.spot = m.spot)
-stopCluster(cl)
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gcorr = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
 param_gcorr$par = trans(param_gcorr$par)
-save(param_gcorr, file = "data/param_gcorr.RData")
-save(Xt_gcorr_fitted, file = "data/Xt_gcorr_fitted.RData")
+# save(param_gcorr, file = "data/param_gcorr.RData")
+# save(Xt_gcorr_fitted, file = "data/Xt_gcorr_fitted.RData")
 
 ##########
 # fitted #
@@ -807,16 +799,11 @@ save(Xt_gcorr_fitted, file = "data/Xt_gcorr_fitted.RData")
                   c(param_gcorr$par[13],param_gcorr$par[14],param_gcorr$par[15],0,0),
                   c(param_gcorr$par[16],param_gcorr$par[17],param_gcorr$par[18],param_gcorr$par[19],0),
                   c(param_gcorr$par[20],param_gcorr$par[21],param_gcorr$par[22],param_gcorr$par[23],param_gcorr$par[24])))
-# rho41 = param_gcorr$par[10]; rho42 = param_gcorr$par[11]; rho43 = param_gcorr$par[12]
-# rho44 = sqrt(1 - rho41^2 - rho42^2 - rho43^2)
-# rho51 = param_gcorr$par[13]; rho52 = param_gcorr$par[14]; rho53 = param_gcorr$par[15]; rho54 = param_gcorr$par[16]
-# rho55 = sqrt(1 - rho51^2 - rho52^2 - rho53^2 - rho54 ^ 2)
-# sigma4 = param_gcorr$par[17]; sigma5 = param_gcorr$par[18]
-# Sigma_est  = rbind(c(param_gcorr$par[19],0,0,0,0),
-#                 c(param_gcorr$par[20],param_gcorr$par[21],0,0,0),
-#                 c(param_gcorr$par[22],param_gcorr$par[23],param_gcorr$par[24],0,0),
-#                 c(sigma4 * rho41, sigma4 * rho42, sigma4 * rho43, sigma4 * rho44,0),
-#                 c(sigma5 * rho51, sigma5 * rho52, sigma5 * rho53, sigma5 * rho54, sigma5 * rho55))
+Sigma_est  = rbind(c(param_gcorr$par[19],0,0,0,0),
+                c(param_gcorr$par[20],param_gcorr$par[21],0,0,0),
+                c(param_gcorr$par[22],param_gcorr$par[23],param_gcorr$par[24],0,0),
+                c(sigma4 * rho41, sigma4 * rho42, sigma4 * rho43, sigma4 * rho44,0),
+                c(sigma5 * rho51, sigma5 * rho52, sigma5 * rho53, sigma5 * rho54, sigma5 * rho55))
 (theta_est  = as.matrix(c(param_gcorr$par[25:27], home_value_houses_nsw$log_index[1], asx200$log_price[1])))
 (lambda_est = param_gcorr$par[28])
 
