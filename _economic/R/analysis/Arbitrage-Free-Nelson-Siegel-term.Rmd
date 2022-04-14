@@ -81,7 +81,7 @@ time_index_sim = seq(from = end_date, length.out = num_years / h, by = "month")
 # zcp # 
 #######
 
-zcp = read.csv("zcp.csv")
+zcp = read.csv("data/zcp.csv")
 zcp$date = as.Date(zcp$date)
 zcp[,-1] = zcp[,-1] / 100 
 zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
