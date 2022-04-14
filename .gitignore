@@ -5,6 +5,8 @@ Pipfile
 .DS_store
 .vscode
 .ipynb_checkpoints
+.Rproj
+.Rproj.user
 
 # ----------------------------------------------------------------
 # --- R Default 
@@ -48,3 +50,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+.Rproj.user
+.Rdata
+.DS_Store
