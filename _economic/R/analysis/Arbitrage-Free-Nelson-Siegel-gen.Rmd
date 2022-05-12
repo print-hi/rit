@@ -298,10 +298,10 @@ param_gindep = optim(init_para_un, loglike,
           control = optim_ctrl,
           method = c("Nelder-Mead"), m.spot = m.spot)
 stopCluster(cl)
-param_gindep
-save(param_gindep, file = "data/param_gindep.RData")
+init_para_un = param_gindep$par # updating the parameters for next trial 
+save(param_gindep, file = "data/param_gindep.RData") # saving the parameters 
 save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
-param_gindep$par = trans(param_gindep$par)
+param_gindep$par = trans(param_gindep$par) # imposing constraints to the parameters eg positivity. The model parameters are constrained, but optim() is an unconstrained optimisation algorithm, so the constraints must be incorporated in the objective ie in trans(). 
 
 ##########
 # fitted #
