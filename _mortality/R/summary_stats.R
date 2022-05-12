@@ -113,32 +113,37 @@ qsurv <- function(surv_fun, surv_prob) {
 }
 
 
-period2cohort <- function(period_rates, ages) {
+
+
+
+period2cohort <- function(period_rates, ages, init_age = NULL) {
 
   # Requires years to be continuous increasing vector e.g. 2000:2017
+
+  if(is.null(init_age)) {
+    init_age <- ages[1]
+  } else if (!is.element(init_age, ages)) {
+    stop("initial age must be in ages")
+  }
+
+  # Extract relevant rates starting from init_age
+  if(init_age != ages[1]) {
+    period_rates <- utils::tail(period_rates, ages[1] - init_age)
+  }
 
   p2c_mat <- function(p_rates) {
 
     # Convert vector to matrix if necessary
     p_mat <- as.matrix(p_rates)
 
-    r <- nrow(p_mat)
-    c <- ncol(p_mat)
+    n_row <- nrow(p_mat)
+    n_col <- ncol(p_mat)
 
-    c_rates <- matrix(NA, nrow = r, ncol = c)
+    c_rates <- matrix(NA, nrow = n_row, ncol = n_col)
 
-    for (i in 1:r) {
-
-      # Check for 0 as tail does not handle 0 well
-      if (ages[i] == 0) {
-        c_rates[i, ] <- p_mat[i, ]
-        next
-      }
-
-      if (ages[i] < c) {
-        c_vec <- c(utils::tail(p_mat[i, ], -ages[i]), rep(NA, ages[i]))
-        c_rates[i, ] <- c_vec
-      } else break
+    # Filling out cohort rates
+    for (i in 1:min(n_row, n_col)) {
+      c_rates[i, ] <- c(p_mat[i, i:n_col], rep(NA, i - 1))
     }
 
     c_rates
@@ -153,36 +158,26 @@ period2cohort <- function(period_rates, ages) {
 
   dimnames(cohort_rates) <- dimnames(period_rates)
 
-
   cohort_rates
 
 }
 
 
-cohort2period <- function(cohort_rates, ages) {
+cohort2period <- function(cohort_rates) {
 
   c2p_mat <- function(c_rates) {
 
     # Convert vector to matrix if necessary
     c_mat <- as.matrix(c_rates)
 
-    r <- nrow(c_mat)
-    c <- ncol(c_mat)
+    n_row <- nrow(c_mat)
+    n_col <- ncol(c_mat)
 
-    p_rates <- matrix(NA, nrow = r, ncol = c)
+    p_rates <- matrix(NA, nrow = n_row, ncol = n_col)
 
-    for (i in 1:r) {
-
-      # Check for 0 as tail does not handle 0 well
-      if (ages[i] == 0) {
-        p_rates[i, ] <- c_mat[i, ]
-        next
-      }
-
-      if (ages[i] < c) {
-        p_vec <- c(rep(NA, ages[i]), utils::head(c_mat[i, ], -ages[i]))
-        p_rates[i, ] <- p_vec
-      } else break
+    # Filling out period rates
+    for (i in 1:min(n_row, n_col)) {
+      p_rates[i, ] <- c(rep(NA, i - 1), c_mat[i, 1:(n_col + 1 - i)])
     }
 
     p_rates
@@ -196,7 +191,6 @@ cohort2period <- function(cohort_rates, ages) {
   }
 
   dimnames(period_rates) <- dimnames(cohort_rates)
-
 
   period_rates
 
