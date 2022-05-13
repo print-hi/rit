@@ -115,7 +115,8 @@ qsurv <- function(surv_fun, surv_prob) {
 
 #' Summarise Curtate Future Lifetime Statistics
 #'
-#' Produces expected curtate future lifetime for a life table.
+#' Produces expected curtate future lifetime for a 3D array of 1-year
+#' death probabilities.
 #'
 #' @param qx
 #' vector, matrix or 3D array of 1-year death probabilities with age

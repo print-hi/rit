@@ -50,9 +50,65 @@ combine_hist_sim <- function(rates_hist, rates_sim) {
 
 
 
+#' Convert from Period to Cohort Rates
+#'
+#' Converts from period to cohort mortality rates
+#'
+#' @param period_rates
+#' matrix or 3D array of mortality rates with age (on the rows) and calendar
+#' year (on the columns) and simulation number (3rd dimension)
+#' @param ages
+#' vector of ages for `period_rates`
+#' @param init_age
+#' initial age for which the cohort is to be considered. If not provided,
+#' the cohort will correspond to the smallest age supplied in `ages`
+#'
+#' @return
+#' associated cohort mortality rates as a 3D array if `period_rates` is an array,
+#' or as a matrix otherwise
+#' @export
+#'
+#' @examples
+#'
 period2cohort <- function(period_rates, ages, init_age = NULL) {
 
-  # Requires years to be continuous increasing vector e.g. 2000:2017
+
+# Flagging errors ---------------------------------------------------------
+
+  # period_rates
+
+  if (!is.matrix(period_rates) & !(is.array(period_rates) & length(dim(period_rates)) == 3)) {
+    stop("period rates must be a 2D matrix or a 3D array")
+  }
+
+  if (!is.numeric(period_rates)) {
+    stop("period rates must be numeric")
+  }
+
+  if (any(period_rates < 0, na.rm = T)) {
+    stop("period rates must be non-negative")
+  }
+
+
+  # ages
+  if (length(ages) != NROW(period_rates)) {
+    stop("length of ages must be equal to number of rows of period rates")
+  }
+
+  if (!is.vector(ages) | !all(ages == floor(ages))) {
+    stop("ages must be a vector of integers")
+  }
+
+  if (is.unsorted(ages) | utils::tail(ages, 1) - ages[1] + 1 != length(ages)) {
+    stop("ages must be increasing by 1 at each step")
+  }
+
+  if (any(ages < 0)) {
+    stop("ages must be non-negative")
+  }
+
+
+# Implementation ----------------------------------------------------------
 
   if(is.null(init_age)) {
     init_age <- ages[1]
@@ -84,7 +140,7 @@ period2cohort <- function(period_rates, ages, init_age = NULL) {
   }
 
 
-  if (is.vector(period_rates) | is.matrix(period_rates)) {
+  if (is.matrix(period_rates)) {
     cohort_rates <- p2c_mat(period_rates)
   } else if (is.array(period_rates)) {
     cohort_rates <- arr_apply(period_rates, p2c_mat)
@@ -97,7 +153,41 @@ period2cohort <- function(period_rates, ages, init_age = NULL) {
 }
 
 
+#' Convert from Cohort to Period Rates
+#'
+#' Converts from cohort to period mortality rates
+#'
+#' @param cohort_rates
+#' matrix or 3D array of mortality rates with age (on the rows) and cohort
+#' (on the columns) and simulation number (3rd dimension)
+#'
+#' @return
+#' associated period mortality rates as a 3D array if `cohort_rates` is an array,
+#' or as a matrix otherwise
+#' @export
+#'
+#' @examples
+#'
 cohort2period <- function(cohort_rates) {
+
+# Flagging errors ---------------------------------------------------------
+
+  # cohort_rates
+
+  if (!is.matrix(cohort_rates) & !(is.array(cohort_rates) & length(dim(cohort_rates)) == 3)) {
+    stop("cohort rates must be a 2D matrix or a 3D array")
+  }
+
+  if (!is.numeric(cohort_rates)) {
+    stop("cohort rates must be numeric")
+  }
+
+  if (any(cohort_rates < 0, na.rm = T)) {
+    stop("cohort rates must be non-negative")
+  }
+
+
+# Implementation ----------------------------------------------------------
 
   c2p_mat <- function(c_rates) {
 
