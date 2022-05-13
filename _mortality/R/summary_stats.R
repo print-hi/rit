@@ -113,90 +113,6 @@ qsurv <- function(surv_fun, surv_prob) {
 }
 
 
-
-
-
-period2cohort <- function(period_rates, ages, init_age = NULL) {
-
-  # Requires years to be continuous increasing vector e.g. 2000:2017
-
-  if(is.null(init_age)) {
-    init_age <- ages[1]
-  } else if (!is.element(init_age, ages)) {
-    stop("initial age must be in ages")
-  }
-
-  # Extract relevant rates starting from init_age
-  if(init_age != ages[1]) {
-    period_rates <- utils::tail(period_rates, ages[1] - init_age)
-  }
-
-  p2c_mat <- function(p_rates) {
-
-    # Convert vector to matrix if necessary
-    p_mat <- as.matrix(p_rates)
-
-    n_row <- nrow(p_mat)
-    n_col <- ncol(p_mat)
-
-    c_rates <- matrix(NA, nrow = n_row, ncol = n_col)
-
-    # Filling out cohort rates
-    for (i in 1:min(n_row, n_col)) {
-      c_rates[i, ] <- c(p_mat[i, i:n_col], rep(NA, i - 1))
-    }
-
-    c_rates
-  }
-
-
-  if (is.vector(period_rates) | is.matrix(period_rates)) {
-    cohort_rates <- p2c_mat(period_rates)
-  } else if (is.array(period_rates)) {
-    cohort_rates <- arr_apply(period_rates, p2c_mat)
-  }
-
-  dimnames(cohort_rates) <- dimnames(period_rates)
-
-  cohort_rates
-
-}
-
-
-cohort2period <- function(cohort_rates) {
-
-  c2p_mat <- function(c_rates) {
-
-    # Convert vector to matrix if necessary
-    c_mat <- as.matrix(c_rates)
-
-    n_row <- nrow(c_mat)
-    n_col <- ncol(c_mat)
-
-    p_rates <- matrix(NA, nrow = n_row, ncol = n_col)
-
-    # Filling out period rates
-    for (i in 1:min(n_row, n_col)) {
-      p_rates[i, ] <- c(rep(NA, i - 1), c_mat[i, 1:(n_col + 1 - i)])
-    }
-
-    p_rates
-
-  }
-
-  if (is.vector(cohort_rates) | is.matrix(cohort_rates)) {
-    period_rates <- c2p_mat(cohort_rates)
-  } else if (is.array(cohort_rates)) {
-    period_rates <- arr_apply(cohort_rates, c2p_mat)
-  }
-
-  dimnames(period_rates) <- dimnames(cohort_rates)
-
-  period_rates
-
-}
-
-
 #' Summarise Curtate Future Lifetime Statistics
 #'
 #' Produces expected curtate future lifetime for a life table.
@@ -337,17 +253,12 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #'
 #' Plots historical and simulated expected curtate future lifetime.
 #'
-#' @param exp_cfl_hist
-#' vector of expected curtate future lifetime for historical years. Should be
-#' generated from \code{\link{exp_cfl}}
-#' @param years_hist
-#' vector of historical years
-#' @param exp_cfl_sim
+#' @param exp_cfl_rates
 #' matrix of simulated expected curtate future lifetime with simulation number
 #' (on the rows) and calendar year or cohort (on the columns).
 #' Should be generated from \code{\link{exp_cfl}}
-#' @param years_sim
-#' vector of years for simulations
+#' @param years
+#' vector of years for \code{exp_cfl_rates}
 #' @param level
 #' desired confidence level with 95% as default
 #'
@@ -358,53 +269,32 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #'
 #' @examples
 #'
-plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level = 95) {
+plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 
 
 # Flagging Errors ---------------------------------------------------------
 
-  # exp_cfl_hist
-  if (!is.numeric(exp_cfl_hist) | !is.vector(exp_cfl_hist)) {
-    stop("exp_cfl_hist must be a numeric vector")
+
+  # exp_cfl_rates
+  if (!is.numeric(exp_cfl_rates) | !is.matrix(exp_cfl_rates)) {
+    stop("exp_cfl_rates must be a numeric matrix")
   }
 
-  # years_hist
-  if (length(years_hist) != length(exp_cfl_hist)) {
-    stop("length of historical years must be equal to length of exp_cfl_hist")
+  # years
+  if (length(years) != NCOL(exp_cfl_rates)) {
+    stop("length of years must be equal to number of columns of exp_cfl_rates")
   }
 
-  if (!is.vector(years_hist) | !all(years_hist == floor(years_hist))) {
-    stop("historical years must be a vector of integers")
+  if (!is.vector(years) | !all(years == floor(years))) {
+    stop("years must be a vector of integers")
   }
 
-  if (is.unsorted(years_hist) | utils::tail(years_hist, 1) - years_hist[1] + 1 != length(years_hist)) {
-    stop("historical years must be increasing by 1 at each step")
+  if (is.unsorted(years) | utils::tail(years, 1) - years[1] + 1 != length(years)) {
+    stop("years must be increasing by 1 at each step")
   }
 
-  if (any(years_hist < 0)) {
-    stop("historical years must be non-negative")
-  }
-
-  # exp_cfl_sim
-  if (!is.numeric(exp_cfl_sim) | !is.matrix(exp_cfl_sim)) {
-    stop("exp_cfl_sim must be a numeric matrix")
-  }
-
-  # years_sim
-  if (length(years_sim) != NCOL(exp_cfl_sim)) {
-    stop("length of years for simulations must be equal to number of columns of exp_cfl_sim")
-  }
-
-  if (!is.vector(years_sim) | !all(years_sim == floor(years_sim))) {
-    stop("years for simulations must be a vector of integers")
-  }
-
-  if (is.unsorted(years_sim) | utils::tail(years_sim, 1) - years_sim[1] + 1 != length(years_sim)) {
-    stop("years for simulations must be increasing by 1 at each step")
-  }
-
-  if (any(years_sim < 0)) {
-    stop("years for simulations must be non-negative")
+  if (any(years < 0)) {
+    stop("years must be non-negative")
   }
 
   # level
@@ -417,17 +307,17 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level
 
   # Calculating mean, upper and lower values of confidence interval for simulations
   # of expected curtate future lifetime
-  exp_cfl_mean <- apply(exp_cfl_sim, 2, mean)
-  exp_cfl_lower <- apply(exp_cfl_sim, 2, stats::quantile, 1 / 2 - level / 200)
-  exp_cfl_upper <- apply(exp_cfl_sim, 2, stats::quantile, 1 / 2 + level / 200)
+  exp_cfl_mean <- apply(exp_cfl_rates, 2, mean)
+  exp_cfl_lower <- apply(exp_cfl_rates, 2, stats::quantile, 1 / 2 - level / 200)
+  exp_cfl_upper <- apply(exp_cfl_rates, 2, stats::quantile, 1 / 2 + level / 200)
 
   # Computing x and y limits of plot
-  plot_ylim <- range(exp_cfl_hist, exp_cfl_mean, exp_cfl_lower, exp_cfl_upper, na.rm = TRUE)
-  plot_xlim <- c(years_hist[1], utils::tail(years_sim, 1))
+  plot_ylim <- range(exp_cfl_mean, exp_cfl_lower, exp_cfl_upper, na.rm = TRUE)
+  plot_xlim <- range(years)
 
-  # Initial plot of historical values
-  plot(x = years_hist,
-       y = exp_cfl_hist,
+  # Initial plot of mean
+  plot(x = years,
+       y = exp_cfl_mean,
        xlim = plot_xlim,
        ylim = plot_ylim,
        type = "l",
@@ -441,14 +331,12 @@ plot_exp_cfl <- function(exp_cfl_hist, years_hist, exp_cfl_sim, years_sim, level
   # Adding confidence intervals
   fanplot::fan(rbind(exp_cfl_lower, exp_cfl_upper),
                data.type = "values",
-               start = years_sim[1],
-               anchor = utils::tail(exp_cfl_hist, 1),
+               start = years[1],
                probs = c(1 / 2 - level / 200, 1 / 2 + level / 200),
                fan.col = fan_col, n.fan = fan_n + 1, ln = NULL)
 
-  # Adding mean
-  graphics::lines(x = c(utils::tail(years_hist, 1), years_sim),
-                  y = c(utils::tail(exp_cfl_hist, 1), exp_cfl_mean))
+  # Overlaying mean on top of confidence intervals
+  graphics::lines(x = years, y = exp_cfl_mean)
 
 }
 
