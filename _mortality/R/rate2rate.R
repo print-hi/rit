@@ -1,10 +1,3 @@
-# Constant Force of Mortality ---------------------------------------------
-mu2q <- function(rates) return(1 - exp(-rates))
-q2mu <- function(rates) return(-log(1 - rates))
-
-m2q <- function(rates) return(1 - exp(-rates))
-q2m <- function(rates) return(-log(1 - rates))
-
 
 #' Convert mortality rates
 #'
@@ -33,9 +26,32 @@ q2m <- function(rates) return(-log(1 - rates))
 #' @export
 #'
 #' @examples
-#' A <- matrix(c(0.02, 0.04, 0.03, 0.05), nrow = 2, ncol = 2, byrow = TRUE)
-#' rate2rate(A, from = "prob", to = "force")
+#'
 rate2rate <- function(rates, from, to) {
+
+# Flagging errors ---------------------------------------------------------
+
+  # rates
+  if (!is.vector(rates) & !is.matrix(rates) & !(is.array(rates) & length(dim(rates)) == 3)) {
+    stop("rates must be a vector, 2D matrix or a 3D array")
+  }
+
+  if (!is.numeric(rates)) {
+    stop("rates must be numeric")
+  }
+
+  if (any(rates < 0, na.rm = T)) {
+    stop("rates must be non-negative")
+  }
+
+  if (from == "prob" & any(rates > 1, na.rm = T)) {
+    stop("1-yr death probabilities must be less than or equal to 1")
+  }
+
+  mu2q <- function(rates) return(1 - exp(-rates))
+  q2mu <- function(rates) return(-log(1 - rates))
+  m2q <- function(rates) return(1 - exp(-rates))
+  q2m <- function(rates) return(-log(1 - rates))
 
   type <- c("central", "prob", "force")
 

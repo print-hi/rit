@@ -31,6 +31,5 @@ resulting in the following conversions:
 \deqn{m_{xy}  = -log(1 - q_{xy})}
 }
 \examples{
-A <- matrix(c(0.02, 0.04, 0.03, 0.05), nrow = 2, ncol = 2, byrow = TRUE)
-rate2rate(A, from = "prob", to = "force")
+
 }
