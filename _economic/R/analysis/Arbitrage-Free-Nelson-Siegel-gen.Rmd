@@ -67,6 +67,7 @@ end_date = as.Date("2021-06-01")
 optim_ctrl = list(maxit = 5000)
 
 num_year = 10
+num_years = 10
 num_paths = 100
 h = 1/12 # monthly simulations 
 time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
@@ -181,9 +182,9 @@ m.spot = cbind(m.spot, home_value_houses_nsw$log_index, asx200$log_price)
 
 ```{r}
 # factor estimates
-Xt_gindep_fitted = matrix(0,nobs,nf)
-colnames(Xt_gindep_fitted) = c("level", "slope", "curvature", "house", "stock")
-row.names(Xt_gindep_fitted) = zcp_month$month
+# Xt_gindep_fitted = matrix(0,nobs,nf)
+# colnames(Xt_gindep_fitted) = c("level", "slope", "curvature", "house", "stock")
+# row.names(Xt_gindep_fitted) = zcp_month$month
 
 trans = function(b) {
     # parameter restrictions of independent factor
@@ -289,18 +290,19 @@ loglike = function(para_un, m.spot) {
 
 
 load("data/param_gindep.RData")
+load("data/Xt_gindep_fitted.RData")
 init_para_un = param_gindep$par
 npara = length(init_para_un) # # of observations
 
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
-param_gindep = optim(init_para_un, loglike,
-          control = optim_ctrl,
-          method = c("Nelder-Mead"), m.spot = m.spot)
-stopCluster(cl)
-init_para_un = param_gindep$par # updating the parameters for next trial 
-save(param_gindep, file = "data/param_gindep.RData") # saving the parameters 
-save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gindep = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
+# init_para_un = param_gindep$par # updating the parameters for next trial 
+# save(param_gindep, file = "data/param_gindep.RData") # saving the parameters 
+# save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
 param_gindep$par = trans(param_gindep$par) # imposing constraints to the parameters eg positivity. The model parameters are constrained, but optim() is an unconstrained optimisation algorithm, so the constraints must be incorporated in the objective ie in trans(). 
 
 ##########
@@ -504,8 +506,9 @@ lines(plot_date, plot_data)
 ### get_afns_simulation testing 
 
 ```{r}
-source("AFNS_simulation.R")
-par(mfrow = c(1,2))
+source("../AFNS.R")
+source("../Model.R")
+par(mfrow = c(2,2))
 
 ###########
 # monthly # 
@@ -757,15 +760,15 @@ loglike = function(para_un, m.spot) {
 
 load("Xt_gcorr_fitted.RData")
 load("param_gcorr_new.RData")
-init_para_un = param_gcorr$par[1:33]
+init_para_un = param_gcorr$par
 npara = length(init_para_un) # # of observations
 
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
-param_gcorr = optim(init_para_un, loglike,
-          control = optim_ctrl,
-          method = c("Nelder-Mead"), m.spot = m.spot)
-stopCluster(cl)
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gcorr = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
 param_gcorr$par = trans(param_gcorr$par)
 save(param_gcorr, file = "param_gcorr.RData")
 save(Xt_gcorr_fitted, file = "Xt_gcorr_fitted.RData")
@@ -969,7 +972,9 @@ lines(plot_date, plot_data)
 ### get_gafns_simulation 
 
 ```{r}
-par(mfrow = c(3,2))
+source("../AFNS.R")
+source("../Model.R")
+par(mfrow = c(2,2))
 
 ###########
 # monthly # 
