@@ -224,7 +224,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
       healthy_lifetimes[i] <- sum(row_val == 0)
     }
   }
-  return(list('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
+  return(list('mean' = mean(healthy_lifetimes), 's.dev' = sd(healthy_lifetimes)))
 }
 
 #' Heatlhy Future Lifetime (Frailty Model)
@@ -297,7 +297,7 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
       }
     }
   }
-  return(list('mean' = mean(healthy_lifetimes), 's_dev' = sd(healthy_lifetimes)))
+  return(list('mean' = mean(healthy_lifetimes), 's.dev' = sd(healthy_lifetimes)))
 }
 
 
@@ -380,7 +380,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
       disabled_lifetime[i] <- sum(row_val == 1)
     }
   }
-  return(list('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
+  return(list('mean' = mean(disabled_lifetime), 's.dev' = sd(disabled_lifetime)))
 }
 
 
@@ -451,7 +451,7 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
       }
     }
   }
-  return(list('mean' = mean(disabled_lifetime), 's_dev' = sd(disabled_lifetime)))
+  return(list('mean' = mean(disabled_lifetime), 's.dev' = sd(disabled_lifetime)))
 }
 
 
@@ -526,7 +526,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
     }
   }
   first_time <- first_time[first_time != 0]
-  return(list('mean' = mean(first_time), 'sd' = sd(first_time)))
+  return(list('mean' = mean(first_time), 's.dev' = sd(first_time)))
 }
 
 
@@ -593,7 +593,7 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
     }
   }
   first_time <- first_time[first_time != 0]
-  return(list('mean' = mean(first_time), 's_dev' = sd(first_time)))
+  return(list('mean' = mean(first_time), 's.dev' = sd(first_time)))
 }
 
 
@@ -687,7 +687,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     stats_df <- data.frame(
       'stats' = c('total_life', 'healthy_life', 'disabled_life', 'onset_disability'),
       'mean' = means,
-      's_dev' = sds
+      's.dev' = sds
     )
     return(stats_df)
   } else {
@@ -696,7 +696,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     stats_df <- data.frame(
       'stats' = c('total_life', 'healthy_life', 'disabled_life'),
       'mean' = means,
-      's_dev' = sds
+      's.dev' = sds
     )
     return(stats_df)
   }
@@ -788,7 +788,7 @@ survival_statsF <- function(init_age, init_state, female, year, param_file, n = 
     stats_df <- data.frame(
       'stats' = c('total_life', 'healthy_life', 'disabled_life', 'onset_disability'),
       'mean' = means,
-      's_dev' = sds
+      's.dev' = sds
     )
     return(stats_df)
   } else {
@@ -797,7 +797,7 @@ survival_statsF <- function(init_age, init_state, female, year, param_file, n = 
     stats_df <- data.frame(
       'stats' = c('total_life', 'healthy_life', 'disabled_life'),
       'mean' = means,
-      's_dev' = sds
+      's.dev' = sds
     )
     return(stats_df)
   }
