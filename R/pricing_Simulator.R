@@ -175,7 +175,7 @@ get_policy_scenario <- function(policy, age, seed, n) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_3 <- as.matrix(read.csv("R/data/health3.csv", header = FALSE))
+    health_3 <- as.matrix(read.csv("lib/_pricing/R/data/health3.csv", header = FALSE))
     health_3 <- ifelse(health_3 > 0, -2, health_3)
     colnames(health_3) <- NULL
     rownames(health_3) <- NULL
@@ -184,7 +184,7 @@ get_health_state_3 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to health-state module
 get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    health_5 <- as.matrix(read.csv("R/data/health5.csv", header = FALSE))
+    health_5 <- as.matrix(read.csv("lib/_pricing/R/data/health5.csv", header = FALSE))
     colnames(health_5) <- NULL
     rownames(health_5) <- NULL
     return(health_5)
@@ -195,7 +195,7 @@ get_health_state_5 <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    mortality <- as.matrix(read.csv("R/data/mortality.csv", header = FALSE))
+    mortality <- as.matrix(read.csv("lib/_pricing/R/data/mortality.csv", header = FALSE))
     colnames(mortality) <- NULL
     rownames(mortality) <- NULL
     return(mortality)
@@ -203,7 +203,7 @@ get_aggregate_mortality <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool.csv", header = FALSE))
+    pool <- as.matrix(read.csv("lib/_pricing/R/data/pool.csv", header = FALSE))
     colnames(pool) <- NULL
     rownames(pool) <- NULL
     return(pool)
@@ -211,7 +211,7 @@ get_pool_realised <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("R/data/pool-exp.csv", header = FALSE))
+    pool <- as.matrix(read.csv("lib/_pricing/R/data/pool-exp.csv", header = FALSE))
     colnames(pool) <- NULL
     rownames(pool) <- NULL
     return(pool)
@@ -222,7 +222,7 @@ get_pool_expected <- function(age = 17, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_zcp3m_yield <- function(age = 17, seed = 0, n = 1000) {
-    get_zcp3m_yield <- as.matrix(read.csv("R/data/zcp3m_yield.csv", header = FALSE))
+    get_zcp3m_yield <- as.matrix(read.csv("lib/_pricing/R/data/zcp3m_yield.csv", header = FALSE))
     get_zcp3m_yield <- (get_zcp3m_yield/100)
     colnames(get_zcp3m_yield) <- NULL
     rownames(get_zcp3m_yield) <- NULL
@@ -231,7 +231,7 @@ get_zcp3m_yield <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_inflation <- function(age = 17, seed = 0, n = 1000) {
-    inflation <- as.matrix(read.csv("R/data/cpi.csv", header = FALSE))
+    inflation <- as.matrix(read.csv("lib/_pricing/R/data/cpi.csv", header = FALSE))
     inflation <- cbind(rep(0,100),
                        (inflation[,-1] - inflation[,-100])/inflation[,-100])
     colnames(inflation) <- NULL
@@ -241,7 +241,7 @@ get_inflation <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_house_price <- function(age = 17, seed = 0, n = 1000) {
-    house <- as.matrix(read.csv("R/data/home_index.csv", header = FALSE))
+    house <- as.matrix(read.csv("lib/_pricing/R/data/home_index.csv", header = FALSE))
     house <- cbind(rep(0,100),
                     (house[,-1] - house[,-100])/house[,-100])
     colnames(house) <- NULL
@@ -251,7 +251,7 @@ get_house_price <- function(age = 17, seed = 0, n = 1000) {
 
 # Temporary helper function, should link to economic module
 get_stock_price <- function(age = 17, seed = 0, n = 1000) {
-    stock <- as.matrix(read.csv("R/data/asx200.csv", header = FALSE))
+    stock <- as.matrix(read.csv("lib/_pricing/R/data/asx200.csv", header = FALSE))
     stock <- cbind(rep(0,100),
                    (stock[,-1] - stock[,-100])/stock[,-100])
     colnames(stock) <- NULL
