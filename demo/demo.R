@@ -89,7 +89,7 @@ sim <- get_zcp_simulation(num_years = 10, num_paths = 10000, frequency = 'year')
 ap <- create_policy_AP(400000, 60000)
 
 # Simulating Cashflows
-cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
+cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
 
 # Pricing / Valuation
 v <- value_policy(ap, cf)
