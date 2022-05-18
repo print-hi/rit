@@ -1,6 +1,12 @@
 # ----------------------------------------------------------------
 # --- Custom Files
 
+Pipfile
+.DS_store
+.vscode
+.ipynb_checkpoints
+.Rproj
+.Rproj.user
 *.code-workspace
 
 # ----------------------------------------------------------------
@@ -45,3 +51,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+.Rproj.user
+.Rdata
+.DS_Store
