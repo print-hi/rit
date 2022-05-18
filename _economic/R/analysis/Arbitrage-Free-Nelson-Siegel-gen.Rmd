@@ -656,7 +656,7 @@ row.names(Xt_gcorr_fitted) = zcp_month$month
 trans = function(b) {
     # parameter restrictions of independent factor
     bb = b
-    bb[1] = 1/(1+exp(b[1])) # kappa11
+    # bb[1] = 1/(1+exp(b[1])) # kappa11
     bb[c(10,12,15,19,24)] = b[c(10,12,15,19,24)] ^ 2 # sigmas
     bb[30] = b[30]^2          # lambda
     bb[31:npara] = b[31:npara]^2          # measurement error
@@ -678,19 +678,14 @@ loglike = function(para_un, m.spot) {
                     c(para[7],para[8],para[9],0,0),
                     c(-1,-1,0,0,0),
                     c(-1,-1,0,0,0))
-    # rho41 = para[10]; rho42 = para[11]; rho43 = para[12]
-    # rho44 = sqrt(1 - rho41^2 - rho42^2 - rho43^2)
-    # rho51 = para[13]; rho52 = para[14]; rho53 = para[15]; rho54 = para[16]
-    # rho55 = sqrt(1 - rho51^2 - rho52^2 - rho53^2 - rho54 ^ 2)
-    # sigma4 = para[17]; sigma5 = para[18]
     sigma  = rbind(c(para[10],0,0,0,0),
-                    c(para[11],para[12],0,0,0),
-                    c(para[13],para[14],para[15],0,0),
-                    c(para[16],para[17],para[18],para[19],0),
-                    c(para[20],para[21],para[22],para[23], para[24]))
+                   c(para[11],para[12],0,0,0),
+                   c(para[13],para[14],para[15],0,0),
+                   c(para[16],para[17],para[18],para[19],0),
+                   c(para[20],para[21],para[22],para[23],para[24]))
     theta  = as.matrix(para[25:29])
     lambda = para[30]
-    H      = diag(c(rep(para[31],40),para[32],para[33]))
+    H      = diag(c(rep(para[31],40), para[32:33])) # diag(para[22:npara])
    
     B  = NS.B(lambda,v.mat) # factor loading matrix
     C  = as.matrix(c(-AFNS.C(sigma[1:3,1:3],lambda,v.mat),0,0))    # yield adjustment
@@ -719,7 +714,7 @@ loglike = function(para_un, m.spot) {
       return(results)
     }
     Q = integrate_matrix(from = 0, to = dt, num_step = 10)
-    Q0 = integrate_matrix(from = 0, to = 10, num_step = 240)
+    Q0 = integrate_matrix(from = 0, to = 2.5, num_step = 100)
     xt_term = integrate_matrix2(from = 0, to = dt, num_step = 10)
       
     # initialzation of vector and matrix
@@ -751,6 +746,7 @@ loglike = function(para_un, m.spot) {
         Xt_gcorr_fitted[i,] <<- prevX
         i = i + 1
     }
+    
     return(-loglike)
 }
 
@@ -758,20 +754,20 @@ loglike = function(para_un, m.spot) {
 # estimation #
 ##############
 
-load("Xt_gcorr_fitted.RData")
-load("param_gcorr_new.RData")
-init_para_un = param_gcorr$par
+load("Xt_gcorr_fitted_shorter.RData")
+load("param_gcorr_shorter.RData")
+init_para_un = param_gcorr$par[1:33]
 npara = length(init_para_un) # # of observations
 
-# cl <- makeCluster(detectCores())
-# registerDoParallel(cl)
-# param_gcorr = optim(init_para_un, loglike,
-#           control = optim_ctrl,
-#           method = c("Nelder-Mead"), m.spot = m.spot)
-# stopCluster(cl)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+param_gcorr = optim(init_para_un, loglike,
+          control = optim_ctrl,
+          method = c("Nelder-Mead"), m.spot = m.spot)
+stopCluster(cl)
+save(param_gcorr, file = "param_gcorr_shorter.RData")
+save(Xt_gcorr_fitted, file = "Xt_gcorr_fitted_shorter.RData")
 param_gcorr$par = trans(param_gcorr$par)
-save(param_gcorr, file = "param_gcorr.RData")
-save(Xt_gcorr_fitted, file = "Xt_gcorr_fitted.RData")
 
 ##########
 # fitted #
@@ -796,10 +792,10 @@ legend("topright", legend = c("level", "slope", "curvature"), col = 1:3, lty = 1
 
 # compare fitted yields 
 B_gcorr_fitted = NS.B(lambda_est, v.mat)
-A_gcorr_fitted = AFNS.C(Sigma_est, lambda_est, v.mat)
-zcp_gcorr_fitted = t(B_gcorr_fitted[1:40,1:3] %*% t(Xt_gcorr_fitted[,1:3])) - A_gcorr_fitted
+A_gcorr_fitted = c(AFNS.C(Sigma_est, lambda_est, v.mat),0,0)
+zcp_gcorr_fitted = t(B_gcorr_fitted %*% t(Xt_gcorr_fitted)) - A_gcorr_fitted
 
-par(mfrow = c(2,2))
+par(mfrow = c(1,2))
 plot(zcp_month$month, zcp_gcorr_fitted[,1], "l", main = "Historical vs fitted \n 3-month zero-coupon yields", xlab = "", ylab = "")
 lines(zcp_month$month, zcp_month$x1_qtrs, col = "blue")
 
@@ -825,25 +821,24 @@ Xt_gcorr_sim = replicate(n = num_paths,
                          expr = {data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))},
                          simplify = F)
 Xt_gcorr_sim = lapply(Xt_gcorr_sim, function (x) {x[,1] = Xt_gcorr_fitted[nrow(Xt_gcorr_fitted),]; return (x)})
-
 for (path in 1:num_paths) { # discretisation
   for (i in 2:(num_year/h+1)) {
     e = as.matrix(rnorm(nf)) # as.matrix(MASS::mvrnorm(mu = rep(0,5), Sigma = Q)) 
     Xt = as.matrix(Xt_gcorr_sim[[path]][,i-1])
-    Xt_gcorr_sim[[path]][,i] =  Xt + (theta_est - kappa_est %*% Xt) * h + sqrt(h) * Sigma_est %*% e # xt_term %*% theta_est + expm(-h * KP_est) %*% Xt + e 
+    Xt_gcorr_sim[[path]][,i] =  Xt +  (theta_est -kappa_est %*%Xt) * h + sqrt(h) * Sigma_est %*% e # xt_term %*% theta_est + expm(-h * KP_est) %*% Xt + e 
   }
 }
-
 # mean 
 Xt_gcorr_mean = data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))
 Xt_gcorr_mean[,1] = Xt_gcorr_fitted[nrow(Xt_gcorr_fitted),]
 for (i in 2:(num_year/h+1)) {
   Xt = as.matrix(Xt_gcorr_mean[,i-1])
-  Xt_gcorr_mean[,i] = Xt + h * (theta_est - kappa_est %*% Xt) 
+  Xt_gcorr_mean[,i] = Xt + h *(theta_est -   kappa_est %*% Xt) 
 }
 
 ###########
 # plot Xt #
+
 ###########
 par(mfrow = c(1,3))
 plot_date = seq(from = start_pc_date, to = max(time_index_sim), by = "month")
@@ -915,7 +910,6 @@ for (i in 2:num_paths) {
 plot_data = c(m.spot[,42], Xt_gcorr_mean[5,-1])
 lines(plot_date, plot_data)
 
-
 ##############
 # compute yt #
 ##############
@@ -936,7 +930,6 @@ zcp_gcorr_mean = as.data.frame(zcp_gcorr_mean)
 row.names(zcp_gcorr_mean) = c("2021-05-01", as.character(time_index_sim))
 colnames(zcp_gcorr_mean) = colnames(zcp)[-1]
 zcp_gcorr_mean[1,] = zcp_month[nrow(zcp_month),-1]
-
 
 ###########
 # plot yt #
