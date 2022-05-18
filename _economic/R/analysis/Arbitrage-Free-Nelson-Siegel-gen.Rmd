@@ -64,10 +64,10 @@ library(pracma)
 
 start_pc_date = as.Date("1993-01-01")
 end_date = as.Date("2021-06-01")
-optim_ctrl = list(maxit = 5000)
+optim_ctrl = list(maxit = 500)
 
-num_year = 10
-num_years = 10
+num_year = 30
+num_years = 30
 num_paths = 100
 h = 1/12 # monthly simulations 
 time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
@@ -80,7 +80,7 @@ time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
 # zcp # 
 #######
 
-zcp = read.csv("data/zcp.csv")
+zcp = read.csv("zcp.csv")
 zcp$date = as.Date(zcp$date)
 zcp[,-1] = zcp[,-1] / 100 
 zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
@@ -99,11 +99,13 @@ m.spot = as.matrix(zcp_month[,-1])
 nmat = length(v.mat) # # of maturities
 nobs = nrow(m.spot)  # # of observations
 
+load("param_indep.RData")
+
 #########
 # house # 
 #########
 
-properties = read.csv("data/Market_Trends_Data.csv")
+properties = read.csv("Market_Trends_Data.csv")
 properties = clean_names(properties)
 properties = properties %>% mutate_if(is.character, as.factor)
 properties$value_at_date = as.Date(properties$value_at_date, format =  "%d/%m/%Y")
@@ -121,7 +123,7 @@ home_value_houses_nsw = home_value_houses_nsw %>%
 # ASX200 #
 ##########
 
-asx200 = read.csv("data/asx200_price.csv")
+asx200 = read.csv("asx200_price.csv")
 asx200$exchange_date = as.Date(asx200$exchange_date)
 asx200 = asx200 %>% filter(exchange_date <= end_date & exchange_date >= start_pc_date)
 asx200$month = format(asx200$exchange_date, "%Y-%m")
@@ -182,9 +184,9 @@ m.spot = cbind(m.spot, home_value_houses_nsw$log_index, asx200$log_price)
 
 ```{r}
 # factor estimates
-# Xt_gindep_fitted = matrix(0,nobs,nf)
-# colnames(Xt_gindep_fitted) = c("level", "slope", "curvature", "house", "stock")
-# row.names(Xt_gindep_fitted) = zcp_month$month
+Xt_gindep_fitted = matrix(0,nobs,nf)
+colnames(Xt_gindep_fitted) = c("level", "slope", "curvature", "house", "stock")
+row.names(Xt_gindep_fitted) = zcp_month$month
 
 trans = function(b) {
     # parameter restrictions of independent factor
@@ -288,9 +290,8 @@ loglike = function(para_un, m.spot) {
 # estimation #
 ##############
 
-
-load("data/param_gindep.RData")
-load("data/Xt_gindep_fitted.RData")
+load("param_gindep.RData")
+load("Xt_gindep_fitted.RData")
 init_para_un = param_gindep$par
 npara = length(init_para_un) # # of observations
 
@@ -300,10 +301,9 @@ npara = length(init_para_un) # # of observations
 #           control = optim_ctrl,
 #           method = c("Nelder-Mead"), m.spot = m.spot)
 # stopCluster(cl)
-# init_para_un = param_gindep$par # updating the parameters for next trial 
-# save(param_gindep, file = "data/param_gindep.RData") # saving the parameters 
-# save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
-param_gindep$par = trans(param_gindep$par) # imposing constraints to the parameters eg positivity. The model parameters are constrained, but optim() is an unconstrained optimisation algorithm, so the constraints must be incorporated in the objective ie in trans(). 
+# save(param_gindep, file = "param_gindep.RData")
+# save(Xt_gindep_fitted, file = "Xt_gindep_fitted.RData")
+param_gindep$par = trans(param_gindep$par)
 
 ##########
 # fitted #
@@ -506,8 +506,8 @@ lines(plot_date, plot_data)
 ### get_afns_simulation testing 
 
 ```{r}
-source("../AFNS.R")
-source("../Model.R")
+source("AFNS.R")
+source("Model.R")
 par(mfrow = c(2,2))
 
 ###########
@@ -658,6 +658,7 @@ trans = function(b) {
     bb = b
     # bb[1] = 1/(1+exp(b[1])) # kappa11
     bb[c(10,12,15,19,24)] = b[c(10,12,15,19,24)] ^ 2 # sigmas
+    bb[16:24] = 1/(1+exp(b[16:24]))
     bb[30] = b[30]^2          # lambda
     bb[31:npara] = b[31:npara]^2          # measurement error
     return(bb)
@@ -965,8 +966,8 @@ lines(plot_date, plot_data)
 ### get_gafns_simulation 
 
 ```{r}
-source("../AFNS.R")
-source("../Model.R")
+source("AFNS.R")
+source("Model.R")
 par(mfrow = c(2,2))
 
 ###########
