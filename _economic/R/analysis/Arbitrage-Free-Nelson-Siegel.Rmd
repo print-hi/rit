@@ -1349,18 +1349,18 @@ for (i in 2:num_paths) {
 }
 
 # house 
-plot_data = c(exp(m.spot[,41]), zcp_sim$house_index[,1])
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
 plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
 for (i in 2:num_paths) {
-  plot_data = c(exp(m.spot[,41]), zcp_sim$house_index[,i])
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
   lines(plot_date, plot_data, col = "grey")
 }
 
 # stock 
-plot_data = c(exp(m.spot[,42]), zcp_sim$stock_price[,1])
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
 plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
 for (i in 2:num_paths) {
-  plot_data = c(exp(m.spot[,42]), zcp_sim$stock_price[,i])
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
   lines(plot_date, plot_data, col = "grey")
 }
 
@@ -1393,18 +1393,18 @@ for (i in 2:num_paths) {
 }
 
 # house 
-plot_data = c(exp(m.spot[,41]), zcp_sim$house_index[,1])
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
 plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
 for (i in 2:num_paths) {
-  plot_data = c(exp(m.spot[,41]), zcp_sim$house_index[,i])
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
   lines(plot_date, plot_data, col = "grey")
 }
 
 # stock 
-plot_data = c(exp(m.spot[,42]), zcp_sim$stock_price[,1])
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
 plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
 for (i in 2:num_paths) {
-  plot_data = c(exp(m.spot[,42]), zcp_sim$stock_price[,i])
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
   lines(plot_date, plot_data, col = "grey")
 }
 
