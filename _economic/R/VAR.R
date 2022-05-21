@@ -1,4 +1,4 @@
-#' get_discrete_simulations
+#' get_var_simulations
 #'
 #' Returns the simulated paths for various economic and financial variables:
 #' (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon
