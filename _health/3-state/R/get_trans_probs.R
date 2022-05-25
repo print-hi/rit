@@ -25,7 +25,7 @@
 #'
 get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # flagging errors
-  if (init_age < 65 | init_age > 110) {
+  if (init_age < 65 | init_age >= 110) {
     stop('invalid age')
   }
 
