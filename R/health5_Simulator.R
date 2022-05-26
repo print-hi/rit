@@ -7,7 +7,8 @@
 #' @param cohort
 #' the number of simulations, set to be 10000
 #' @param params
-#' the input parameters from the estimation results, read from an excel file
+#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param gender
 #' gender 1 if female, 0 if male
 #' @param i
@@ -64,7 +65,8 @@ simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, 
 #' the function to get n_sim number of lifetables
 #'
 #' @param params
-#' the input parameters from the estimation results, read from an excel file
+#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param gender
 #' gender 1 if female, 0 if male
 #' @param i

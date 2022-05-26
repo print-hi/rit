@@ -1,7 +1,8 @@
 #' function to calculate transition rates at a certain age
 #'
 #' @param params
-#' the input parameters from the estimation results, read from an excel file
+#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param age
 #' age of the individual
 #' @param gender
@@ -44,7 +45,8 @@ transition_rate_5=function(params,age,gender,i,latent,model){
 #' function to get a matrix of transition probabilities at a certain age
 #'
 #' @param params
-#' the input parameters from the estimation results, read from an excel file
+#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param age
 #' age of the individual
 #' @param gender
@@ -78,7 +80,8 @@ transition_probability_5=function(params,age,gender,i,latent,model){
 #' the function to get a full list of transition probability matrices from the initial age to age 110
 #'
 #' @param params
-#' the input parameters from the estimation results, read from an excel file
+#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param init_age
 #' the initial age of the transition probability matrices
 #' @param gender
