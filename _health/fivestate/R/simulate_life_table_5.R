@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' simulated_lifetable=simulate_life_table(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)
-simulate_life_table=function(params,init_age,gender,i,latent,initial_state,n_sim=100, model){
+simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_sim=100, model){
   state_status_full=list() # full list of state status for all n simulations
   expected_time_state_full=c()
   for (n in 1:100){ # 1000 simulations
@@ -52,7 +52,7 @@ simulate_life_table=function(params,init_age,gender,i,latent,initial_state,n_sim
 
     for (age in init_age:110){
 
-      trans_prob_matrix[[age-init_age+1]]=transition_probability_5_frailty(params,age,gender,i+(age-init_age)/2,latent, model) # calculate transition probability matrix for each age
+      trans_prob_matrix[[age-init_age+1]]=transition_probability_5(params,age,gender,i+(age-init_age)/2,latent, model) # calculate transition probability matrix for each age
 
       for (j in 2:6){
         state_status[age-init_age+2,j]=state_status[age-init_age+1,2]*trans_prob_matrix[[age-init_age+1]][1,j-1]+

@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' simulated_individual_path=simulate_individual_path(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
-simulate_individual_path <- function(init_age, init_state, params, gender, i, cohort = 10000, model) {
+simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, cohort = 10000, model) {
   # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
   # create empty matrix to contain simulated population
@@ -31,7 +31,7 @@ simulate_individual_path <- function(init_age, init_state, params, gender, i, co
   # initialise all individuals
   simulated_pop[, 1] <- init_state
 
-  trans_prob_matrix=get_full_trans_prob_matrix(params, init_age, gender, i, model)
+  trans_prob_matrix=get_full_trans_prob_matrix_5(params, init_age, gender, i, model)
 
   for (i in 2:ncol(simulated_pop)) {
     simulated_pop[simulated_pop[,i-1] == 0, i] <- sample(c(0, 1, 2, 3, -1),

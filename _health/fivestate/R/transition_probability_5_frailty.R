@@ -19,9 +19,9 @@
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=transition_probability_5_frailty(params, init_age, gender, i, latent, model=3)
-transition_probability_5_frailty=function(params,age,gender,i,latent,model){
-  trans_rate=transition_rate_5_frailty(params,age,gender,i,latent,model)
+#' transition_probabilities=transition_probability_5(params, init_age, gender, i, latent, model=3)
+transition_probability_5=function(params,age,gender,i,latent,model){
+  trans_rate=transition_rate_5(params,age,gender,i,latent,model)
   trans_rate_matrix=rbind(c(-sum(trans_rate[1:4]),trans_rate[1],trans_rate[2],trans_rate[3],trans_rate[4]),
                           c(0,-sum(trans_rate[5:6]),0,trans_rate[5],trans_rate[6]),
                           c(trans_rate[7],trans_rate[8],-sum(trans_rate[c(7,8,9,10)]),trans_rate[9],trans_rate[10]),

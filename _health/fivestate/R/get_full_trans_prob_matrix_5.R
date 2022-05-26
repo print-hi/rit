@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' trans_prob_matrix_age65to110=get_full_trans_prob_matrix(params, init_age=65, gender, i, model=3)
-get_full_trans_prob_matrix=function(params, init_age, gender, i, model){
+get_full_trans_prob_matrix_5=function(params, init_age, gender, i, model){
 latent=0 # initial value of latent factor
 # list of 46 vectors of transition rates for this simulation
 trans_rate=list()
@@ -31,7 +31,7 @@ state_status[1,]=c(1,0,0,0,0) # initial state status is 1 in the healthy state a
 #  }
 
 for (a in init_age:110){
-  trans_prob_matrix[[a-init_age+1]]=transition_probability_5_frailty(params,a,gender,i+(a-init_age)/2,latent, model) # calculate transition probability matrix for each age
+  trans_prob_matrix[[a-init_age+1]]=transition_probability_5(params,a,gender,i+(a-init_age)/2,latent, model) # calculate transition probability matrix for each age
   if (model==3){
     latent=latent+rnorm(1) # simulate the latent factor
   }
