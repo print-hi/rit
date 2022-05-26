@@ -37,5 +37,5 @@ for each row it starts from the initial age as an input, and end at age 110
 function to get the path of 10000 individuals
 }
 \examples{
-simulated_individual_path=simulate_individual_path(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
+simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
 }

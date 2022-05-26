@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-#' stats_first_time_leave_H=stats_produce(first_time_stats(simulated_path,0))
+#' stats_first_time_leave_H=stats_produce_5(first_time_stats(simulated_path,0))
 stats_produce_5=function(input){
   output=matrix(nrow=1, ncol = 2)
   colnames(output) <- c('expected_value', 'st_dev')

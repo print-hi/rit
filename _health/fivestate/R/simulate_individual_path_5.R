@@ -21,7 +21,7 @@
 #' @export
 #'
 #' @examples
-#' simulated_individual_path=simulate_individual_path(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
+#' simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
 simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, cohort = 10000, model) {
   # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 

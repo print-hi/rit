@@ -26,5 +26,5 @@ transition_rate_5(params, age, gender, i, latent, model)
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=transition_rate_5_frailty(params, init_age, gender, i, latent, model=3)
+transition_rates=transition_rate_5(params, init_age, gender, i, latent, model=3)
 }

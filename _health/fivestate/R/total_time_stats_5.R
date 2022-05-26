@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples
-#' total_time_alive=total_time_stats(simulated_individual_path, 4)
+#' total_time_alive=total_time_stats_5(simulated_individual_path, 4)
 total_time_stats_5=function(simulated_path, state){
   total_time=matrix(nrow=nrow(simulated_path),ncol=1)
   if (state==0){

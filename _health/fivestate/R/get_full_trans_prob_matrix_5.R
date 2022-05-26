@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=get_full_trans_prob_matrix(params, init_age=65, gender, i, model=3)
+#' trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params, init_age=65, gender, i, model=3)
 get_full_trans_prob_matrix_5=function(params, init_age, gender, i, model){
 latent=0 # initial value of latent factor
 # list of 46 vectors of transition rates for this simulation

@@ -24,7 +24,7 @@
 #' @export
 #'
 #' @examples
-#' simulated_lifetable=simulate_life_table(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)
+#' simulated_lifetable=simulate_life_table_5(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)
 simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_sim=100, model){
   state_status_full=list() # full list of state status for all n simulations
   expected_time_state_full=c()

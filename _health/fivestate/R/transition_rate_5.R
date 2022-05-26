@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-#' transition_rates=transition_rate_5_frailty(params, init_age, gender, i, latent, model=3)
+#' transition_rates=transition_rate_5(params, init_age, gender, i, latent, model=3)
 transition_rate_5=function(params,age,gender,i,latent,model){
   if (model==1){
     vari_x=matrix(c(1,age,gender),ncol=1) # construct a column vector of the variables

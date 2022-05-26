@@ -23,5 +23,5 @@ a column that consists the total time in different states for a number of indivi
 function to get the total time in different states for a number of individuals
 }
 \examples{
-total_time_alive=total_time_stats(simulated_individual_path, 4)
+total_time_alive=total_time_stats_5(simulated_individual_path, 4)
 }

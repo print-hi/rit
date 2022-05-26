@@ -22,5 +22,5 @@ a column that consists the first time leaving or entering the state for a number
 function to get the first time leaving or entering different states for a number of individuals
 }
 \examples{
-first_time_H=first_time_stats(simulated_individual_path, 0)
+first_time_H=first_time_stats_5(simulated_individual_path, 0)
 }

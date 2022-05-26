@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-#' first_time_H=first_time_stats(simulated_individual_path, 0)
+#' first_time_H=first_time_stats_5(simulated_individual_path, 0)
 first_time_stats_5=function(simulated_path, state){
   first_time=matrix(nrow=nrow(simulated_path),ncol=1)
   if (state==0){
