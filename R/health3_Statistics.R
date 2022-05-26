@@ -28,7 +28,7 @@
 #'
 #' @export afl
 #'
-#' @examples
+#' @examples example
 afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -108,7 +108,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #'
 #' @export aflF
 #'
-#' @examples
+#' @examples example
 aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -175,7 +175,7 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #'
 #' @export hfl
 #'
-#' @examples
+#' @examples example
 hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -257,7 +257,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
 #'
 #' @export hflF
 #'
-#' @examples
+#' @examples example
 hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -330,7 +330,7 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #'
 #' @export afld
 #'
-#' @examples
+#' @examples example
 afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -410,7 +410,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
 #'
 #' @export afldF
 #'
-#' @examples
+#' @examples example
 afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -481,7 +481,7 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 #'
 #' @export time_to_disabled
 #'
-#' @examples
+#' @examples example
 time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_age<65 | init_age>110) {
@@ -557,7 +557,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
 #'
 #' @export time_to_disabledF
 #'
-#' @examples
+#' @examples example
 time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -618,7 +618,7 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
 #'
 #' @export survival_stats
 #'
-#' @examples
+#' @examples example
 survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -728,7 +728,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
 #'
 #' @export survival_statsF
 #'
-#' @examples
+#' @examples example
 survival_statsF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {

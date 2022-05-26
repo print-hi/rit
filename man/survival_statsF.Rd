@@ -27,3 +27,6 @@ Produces statistics including: total expected lifetime, healthy lifetime,
 disabled lifetime, onset of disability (if initial state is healthy). It uses
 either transition probability matrices or a simulated paths.
 }
+\examples{
+example
+}

@@ -19,7 +19,7 @@
 #'
 #' @export create_life_table
 #'
-#' @examples
+#' @examples example
 #'
 create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
   # flagging errors
@@ -108,7 +108,7 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 #'
 #' @export create_life_tableF
 #'
-#' @examples
+#' @examples example
 create_life_tableF <- function(init_age, female, year, param_file, init_state = 0, n = 3000) {
   if (as.integer(n) != n) {
     stop('n must be an integer')

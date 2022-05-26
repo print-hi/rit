@@ -28,3 +28,6 @@ or a simulated lifetime path from \code{\link[tshm]{simulate_path}}. If both are
 then the function will use the simulated path provided.
 NOTE: USE \code{\link[tshm]{aflF}} for frailty model.
 }
+\examples{
+example
+}

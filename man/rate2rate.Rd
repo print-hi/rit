@@ -26,11 +26,10 @@ mortality.
 \details{
 Implementation assumes a constant force of mortality for fractional ages,
 resulting in the following conversions:
-\deqn{q_{xy} = 1 - e^{-\mu_{xy}}}
-\deqn{\mu_{xy} = m_{xy}}
-\deqn{m_{xy}  = -log(1 - q_{xy})}
+\deqn{q_{x, y} = 1 - e^{-\mu_{x, y}}}
+\deqn{\mu_{x, y} = m_{x, y}}
+\deqn{m_{x, y}  = -log(1 - q_{x, y})}
 }
 \examples{
-A <- matrix(c(0.02, 0.04, 0.03, 0.05), nrow = 2, ncol = 2, byrow = TRUE)
-rate2rate(A, from = "prob", to = "force")
+
 }

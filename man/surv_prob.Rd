@@ -24,3 +24,6 @@ numeric denoting probability of surviving to end age in end state
 \description{
 Calculates the probability of surviving to a certain age from an initial state and age
 }
+\examples{
+example
+}

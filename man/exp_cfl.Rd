@@ -25,7 +25,8 @@ with simulation number (on the rows) and calendar year or cohort (on the columns
 Returns a vector otherwise
 }
 \description{
-Produces expected curtate future lifetime for a life table.
+Produces expected curtate future lifetime for a 3D array of 1-year
+death probabilities.
 }
 \examples{
 

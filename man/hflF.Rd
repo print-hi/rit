@@ -28,3 +28,6 @@ Performs the same function as \code{\link[tshm]{hfl}}, but simulates unique late
 paths in the process.
 NOTE: USE \code{\link[tshm]{hfl}} for static and trend models.
 }
+\examples{
+example
+}

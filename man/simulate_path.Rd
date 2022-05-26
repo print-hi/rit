@@ -25,3 +25,6 @@ the individual's movement through each state.
 \description{
 Simulates the path each life takes in an initial cohort using transition probabilities
 }
+\examples{
+example
+}

@@ -23,5 +23,6 @@ Creates life table from a list of transition probability matrices at some initia
 and specified cohort size.
 }
 \examples{
+example
 
 }

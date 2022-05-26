@@ -25,3 +25,6 @@ standard deviation.
 Function serves the same purpose as \code{\link[tshm]{time_to_disabled}}, but it is for
 the frailty model.
 }
+\examples{
+example
+}
