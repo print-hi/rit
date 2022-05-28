@@ -250,7 +250,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 
 #' Plot Curtate Future Lifetime Simulations
 #'
-#' Plots historical and simulated expected curtate future lifetime.
+#' Plots simulated expected curtate future lifetime.
 #'
 #' @param exp_cfl_rates
 #' matrix of simulated expected curtate future lifetime with simulation number
@@ -259,10 +259,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #' @param years
 #' vector of years for \code{exp_cfl_rates}
 #' @param level
-#' desired confidence level with 95% as default
-#'
-#' @return
-#' returns `NULL`
+#' desired confidence level with 95\% as default
 #'
 #' @export
 #'
@@ -352,12 +349,10 @@ plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 #' @param target_year
 #' year for which the survival function is plotted for
 #' @param level
-#' desired confidence level with 95% as default
+#' desired confidence level with 95\% as default
 #' @param years
 #' optional vector of years for `surv_sim`. If not supplied, then the column names
 #' of `surv_sim` will be preserved
-#' @return
-#' returns `NULL`
 #'
 #' @export
 #'
