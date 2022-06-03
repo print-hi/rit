@@ -13,13 +13,10 @@ Should be generated from \code{\link{exp_cfl}}}
 
 \item{years}{vector of years for \code{exp_cfl_rates}}
 
-\item{level}{desired confidence level with 95\% as default}
-}
-\value{
-returns \code{NULL}
+\item{level}{desired confidence level with 95\\% as default}
 }
 \description{
-Plots historical and simulated expected curtate future lifetime.
+Plots simulated expected curtate future lifetime.
 }
 \examples{
 

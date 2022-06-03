@@ -7,7 +7,8 @@
 transition_rate_5(params, age, gender, i, latent, model)
 }
 \arguments{
-\item{params}{the input parameters from the estimation results, read from an excel file}
+\item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
 \item{age}{age of the individual}
 
@@ -26,5 +27,5 @@ transition_rate_5(params, age, gender, i, latent, model)
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=transition_rate_5(params, init_age, gender, i, latent, model=3)
+transition_rates=transition_rate_5(params, age, gender, i, latent, model=3)
 }
