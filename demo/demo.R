@@ -70,7 +70,7 @@ trans_probs <- get_trans_probs('T', US_HRS, 65, 0, 2021)
 life_table <- create_life_table(trans_probs, 65, 0)
 
 # Simulating Life Paths
-SP <- simulate_paths(65, 0, trans_probs)
+SP <- simulate_path(65, 0, trans_probs)
 
 # Statistics
 afl(65, init_state = 0, trans_probs)
@@ -89,16 +89,15 @@ survival_statsF(65, init_state = 0, female = 0, 2022, US_HRS)
 # ---- Health State: 5 State
 
 # Transition Probability Matrix
-trans_probs <- get_full_trans_prob_matrixfunction(params, init_age=65, gender=0, i, model=2)
+trans_probs <- transition_rate_5(params, age=65, gender=0, i, model=2)
 
 # Life Table Generation
 life_table <- simulate_life_table(params,init_age=65,gender,i,latent, initial_state=0, n_sim=100, model=3)
 
 # Simulating Life Paths
-simulated_path <- function(init_age=65, init_state=0, params, gender=0, i, cohort = 10000, model=3)
+simulated_path <- simulate_individual_path(65, 0, params, 0, 19, model = 2)
 
 # Statistics
-simulated_path <- simulate_individual_path(65, 0, params, 0, 19, model = 2)
 time_to_1 <- first_time_stats(simulated_path, 1)
 print(mean(time_to_1, na.rm = TRUE))
 
@@ -106,12 +105,15 @@ print(mean(time_to_1, na.rm = TRUE))
 # ---- Economic Scenario Generator
 
 # Discrete Generator
-sim <- get_var_simulations(num_years = 10, num_paths = 10000, frequency = 'year')
+sim <- get_var_simulations(num_years = 10, num_paths = 100, frequency = 'year')
 sim$zcp3m_yield
-sim$zcp3m_yield$trajectory_103
+sim$zcp3m_yield$trajectory_83
 
 # Continuous Generator
-sim <- get_zcp_simulation(num_years = 10, num_paths = 10000, frequency = 'year')
+sim <- get_afns_simulation(num_years = 10, num_paths = 100, frequency = 'year', model = "interest_house_stock")
+sim$maturity_40qtrs$trajectory_83
+sim$house_index$trajectory_83
+sim$stock_price$trajectory_83
 
 # ---------------------------------------------------------------------------- #
 # ---- Policy Valuation
@@ -130,4 +132,4 @@ rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)
 la <- create_policy_LA(60000, 5, 0.04, 0.05)
 pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
 ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
-va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
+va <- create_policy_VA(100000, 40, 0.4, 0.02)
