@@ -24,5 +24,5 @@ Policy object
 Generates policy object for Variable Annuity policies
 }
 \examples{
-va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
+va <- create_policy_VA(100000, 40, 0.4, 0.02)
 }

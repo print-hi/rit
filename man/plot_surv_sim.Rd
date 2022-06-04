@@ -15,7 +15,7 @@ number (3rd dimension)}
 
 \item{target_year}{year for which the survival function is plotted for}
 
-\item{level}{desired confidence level with 95\\% as default}
+\item{level}{desired confidence level with 95\% as default}
 
 \item{years}{optional vector of years for \code{surv_sim}. If not supplied, then the column names
 of \code{surv_sim} will be preserved}
