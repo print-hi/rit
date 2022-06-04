@@ -4,10 +4,13 @@
 #install.packages("expm")
 #install.packages("readxl")
 ##
-library("roxygen2")
-library("devtools")
-library("expm")
-library("readxl")
+#library("roxygen2")
+#library("devtools")
+#library("expm")
+#library("readxl")
+
+library(devtools)
+load_all(export_all=FALSE)
 
 #devtools::install("~/Documents/GitHub/retirement-toolkit/_health/fivestate")
 #library("fivestate")

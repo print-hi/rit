@@ -19,7 +19,8 @@ simulate_individual_path_5(
 
 \item{init_state}{the initial state of all individuals}
 
-\item{params}{the input parameters from the estimation results, read from an excel file}
+\item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
 \item{gender}{gender 1 if female, 0 if male}
 

@@ -16,7 +16,8 @@ simulate_life_table_5(
 )
 }
 \arguments{
-\item{params}{the input parameters from the estimation results, read from an excel file}
+\item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
 \item{init_age}{the initial age of the life table}
 
