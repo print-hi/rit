@@ -2,7 +2,7 @@
 % Please edit documentation in R/economic_VAR.R
 \name{get_var_simulations}
 \alias{get_var_simulations}
-\title{get_discrete_simulations}
+\title{get_var_simulations}
 \usage{
 get_var_simulations(
   num_years = 5,
