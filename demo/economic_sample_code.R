@@ -37,6 +37,11 @@ matplot(discrete_sim$unemployment_rate, type = "l", ylab = "", main = "NSW unemp
 matplot(discrete_sim$discount_factors, type = "l", ylab = "", main = "Australia stochastic discount factors")
 
 #### test discrete-time model: percentage change as outputs ####
+<<<<<<< Updated upstream
+=======
+# comments: interest rate at Q1 2020 was very low due to COVID, so the 
+# percentage change at the start could blow up. 
+>>>>>>> Stashed changes
 
 discrete_sim = get_var_simulations(num_years = num_years, 
                                    num_paths = num_paths, 
@@ -138,3 +143,7 @@ matplot(cts_sim$maturity_40qtrs, type = "l", ylab = "", main = "10-year zero-cou
 matplot(log(cts_sim$house_index), type = "l", ylab = "", main = "NSW log house value indexes")
 matplot(log(cts_sim$stock_price), type = "l", ylab = "", main = "log S&P/ASX200 prices")
 
+<<<<<<< Updated upstream
+=======
+# please change frequency at line 13 to "year", "quarter", or "month" 
+>>>>>>> Stashed changes
