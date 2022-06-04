@@ -26,3 +26,6 @@ a simulated lifetime paths. If both are provided, it will use the simulated life
 provided.
 NOTE: USE \code{\link[tshm]{hflF}} FOR FRAILTY MODEL.
 }
+\examples{
+example
+}

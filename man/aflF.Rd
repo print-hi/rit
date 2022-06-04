@@ -27,3 +27,6 @@ Performs the same function as the \code{\link[tshm]{afl}}, but simulates a numbe
 unique latent factor paths to make probabilities stochastic.
 NOTE: USE \code{\link[tshm]{afl}} for static and trend models.
 }
+\examples{
+example
+}

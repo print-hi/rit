@@ -21,7 +21,7 @@
 #'
 #' @export surv_prob
 #'
-#' @examples
+#' @examples example
 surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state = NULL) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
@@ -90,7 +90,7 @@ surv_prob <- function(init_state, init_age, target_age, trans_probs, end_state =
 #'
 #' @import tidyr dplyr ggplot2
 #'
-#' @examples
+#' @examples example
 prob_plots <- function(init_state, init_age, trans_probs) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {

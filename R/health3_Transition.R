@@ -21,7 +21,7 @@
 #'
 #' @export get_trans_probs
 #' @import expm
-#' @examples
+#' @examples example
 #'
 get_trans_probs <- function(model_type, param_file, init_age, female, year) {
   # flagging errors

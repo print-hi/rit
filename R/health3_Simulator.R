@@ -22,7 +22,7 @@
 #'
 #' @export simulate_path
 #'
-#' @examples
+#' @examples example
 simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {

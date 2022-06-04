@@ -21,3 +21,6 @@ disabled, and survival probability to healthy.
 \description{
 Create a plot of survival probabilities to alive, health, and disabled states.
 }
+\examples{
+example
+}

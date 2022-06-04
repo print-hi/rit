@@ -24,3 +24,6 @@ disabled lifetime, onset of disability (if initial state is healthy). It uses
 either transition probability matrices or a simulated paths.
 NOTE: USE \code{\link[tshm]{survival_statsF}} FOR FRAILTY MODEL.
 }
+\examples{
+example
+}

@@ -33,3 +33,6 @@ Dataframe containing life table
 Creates a large number of life tables simulated from different latent factor paths
 and averages them to create 1 life table output.
 }
+\examples{
+example
+}

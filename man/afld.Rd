@@ -28,3 +28,6 @@ simulated path. If both are provided, then the simulated path will be used.
 NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH STATIC AND TREND MODELS. USE
 \code{\link[tshm]{afldF}} FOR FRAILTY MODEL.
 }
+\examples{
+example
+}

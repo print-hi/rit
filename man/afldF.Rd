@@ -29,3 +29,6 @@ the randomness from the frailty factor into the calculation as well.
 NOTE: THIS FUNCTION SHOULD ONLY BE USED WITH THE FRAILTY MODEL. USE \code{\link[tshm]{afld}}
 FOR STATIC AND TREND MODEL.
 }
+\examples{
+example
+}

@@ -26,3 +26,6 @@ requires either list of transition probability matrices, or simulated lifetime p
 If both are given, then the simulated lifetime paths is used.
 NOTE: USE \code{\link[tshm]{time_to_disabledF}} for frailty model.
 }
+\examples{
+example
+}
