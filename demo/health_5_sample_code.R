@@ -16,10 +16,10 @@ load_all(export_all=FALSE)
 #library("fivestate")
 
 # read data
-load("~/Documents/GitHub/retirement-toolkit/demo/data/US_HRS_5.rda")
-params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # model 3
-params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # model 4
-params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # model 5
+# load("~/Documents/GitHub/retirement-toolkit/demo/data/US_HRS_5.rda")
+params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
+params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
+params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
 
 #save(US_HRS_5, file="data/US_HRS_5.rda")
 

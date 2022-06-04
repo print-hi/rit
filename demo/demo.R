@@ -88,18 +88,89 @@ survival_statsF(65, init_state = 0, female = 0, 2022, US_HRS)
 # ---------------------------------------------------------------------------- #
 # ---- Health State: 5 State
 
+# ---------------------------------------------------------------------------- #
+# ---- Health State: 5 State
+library(devtools)
+load_all(export_all=FALSE)
+
+# read data
+params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
+params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
+params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
+
+# select the parameter and model
+# model=1 no frailty model
+# model=2 no frailty model with trend
+# model=3 frailty model
+params=params_5_frailty
+model=3
+
+# input characteristics of the individual at time 0
+init_age=65
+gender=0
+i=8 # wave index
+latent=0 # initial value of latent factor
+
+##### test model 3 #####
+
+# Transition Rates
+transition_rates=transition_rate_5(params, init_age, gender, i, latent, model=3)
+
 # Transition Probability Matrix
-trans_probs <- transition_rate_5(params, age=65, gender=0, i, model=2)
+transition_probabilities=transition_probability_5(params, init_age, gender, i, latent, model=3)
 
-# Life Table Generation
-life_table <- simulate_life_table(params,init_age=65,gender,i,latent, initial_state=0, n_sim=100, model=3)
+# Full list of Transition Probability Matrices from Age 65 to 110
+trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params, init_age=65, gender, i, model=3)
 
-# Simulating Life Paths
-simulated_path <- simulate_individual_path(65, 0, params, 0, 19, model = 2)
+# Life Table Generation Using Frailty Model
+simulated_lifetable=simulate_life_table_5(params,init_age=65,gender,i,latent,initial_state=0, n_sim=100, model=3) #model=3 in this case because this function is for simulating the latent factor, otherwise it will produce 100 same simulations, use n_sim=1 for model 1 and 2
+
+# Simulating Life Paths Given Initially in H State
+simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
 
 # Statistics
-time_to_1 <- first_time_stats(simulated_path, 1)
-print(mean(time_to_1, na.rm = TRUE))
+## First Time Leaving The H State
+first_time_H=first_time_stats_5(simulated_individual_path, 0)
+
+### Statistics of First Time Leaving The H State
+stats_first_time_H=stats_produce_5(first_time_H)
+stats_first_time_H
+
+## Total Time Alive Given Initially in H State
+total_time_alive=total_time_stats_5(simulated_individual_path, 4)
+
+## Statistics of Total Time Alive Given Initially in H State
+stats_total_time_alive=stats_produce_5(total_time_alive)
+stats_total_time_alive
+
+## Total Time Spend in H M D MD States Respectively
+total_time_H=total_time_stats_5(simulated_individual_path, 0)
+total_time_M=total_time_stats_5(simulated_individual_path, 1)
+total_time_D=total_time_stats_5(simulated_individual_path, 2)
+total_time_MD=total_time_stats_5(simulated_individual_path, 3)
+
+### Statistics of Total Time in Different States Given Initially in H State
+#### H
+stats_total_time_H=stats_produce_5(total_time_H)
+stats_total_time_H
+#### M
+stats_total_time_M=stats_produce_5(total_time_M)
+stats_total_time_M
+#### D
+stats_total_time_D=stats_produce_5(total_time_D)
+stats_total_time_D
+#### MD
+stats_total_time_MD=stats_produce_5(total_time_MD)
+stats_total_time_MD
+
+## Calculate Total Time Alive Given Initially in M State
+### Simulate the Life Paths, init_state=1 Indicating Initial State is M
+simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=1, params, gender, i, cohort = 10000, model=3)
+
+### Total Time Alive Given Initially in M State
+total_time_alive=total_time_stats_5(simulated_individual_path, 4)
+stats_total_time_alive=stats_produce_5(total_time_alive)
+stats_total_time_alive
 
 # ---------------------------------------------------------------------------- #
 # ---- Economic Scenario Generator
