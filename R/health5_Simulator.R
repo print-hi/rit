@@ -22,7 +22,7 @@
 #' @export simulate_individual_path_5
 #'
 #' @examples
-#' simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
+#' simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params=params_5_frailty, gender=0, i=8, cohort = 10000, model=3)
 simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, cohort = 10000, model) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
@@ -89,7 +89,7 @@ simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, 
 #' @export simulate_life_table_5
 #'
 #' @examples
-#' simulated_lifetable=simulate_life_table_5(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)
+#' simulated_lifetable=simulate_life_table_5(params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100, model=3)
 simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_sim=100, model){
     state_status_full=list() # full list of state status for all n simulations
     expected_time_state_full=c()
@@ -131,7 +131,7 @@ simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_s
             }
             state_status[age-init_age+2,1]=age+1
             if (model==3){
-                latent=latent+rnorm(1) # simulate the latent factor
+                latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
             }
             expected_time_state=colSums(state_status) # the order is H M D MD Dead
         }

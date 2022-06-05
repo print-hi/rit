@@ -18,7 +18,7 @@
 #' @export transition_rate_5
 #'
 #' @examples
-#' transition_rates=transition_rate_5(params, age, gender, i, latent, model=3)
+#' transition_rates=transition_rate_5(params=params_5_frailty, age=65, gender=0, i=8, latent=0, model=3)
 transition_rate_5=function(params,age,gender,i,latent,model){
     if (model==1){
         vari_x=matrix(c(1,age,gender),ncol=1) # construct a column vector of the variables
@@ -64,7 +64,7 @@ transition_rate_5=function(params,age,gender,i,latent,model){
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=transition_probability_5(params, age, gender, i, latent, model=3)
+#' transition_probabilities=transition_probability_5(params=params_5_frailty, age=65, gender=0, i=8, latent=0, model=3)
 transition_probability_5=function(params,age,gender,i,latent,model){
     trans_rate=transition_rate_5(params,age,gender,i,latent,model)
     trans_rate_matrix=rbind(c(-sum(trans_rate[1:4]),trans_rate[1],trans_rate[2],trans_rate[3],trans_rate[4]),
@@ -96,7 +96,7 @@ transition_probability_5=function(params,age,gender,i,latent,model){
 #' @export get_full_trans_prob_matrix_5
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params, init_age=65, gender, i, model=3)
+#' trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params=params_5_frailty, init_age=65, gender=0, i=8, model=3)
 get_full_trans_prob_matrix_5=function(params, init_age, gender, i, model){
     latent=0 # initial value of latent factor
     # list of 46 vectors of transition rates for this simulation
@@ -113,7 +113,7 @@ get_full_trans_prob_matrix_5=function(params, init_age, gender, i, model){
     for (a in init_age:110){
         trans_prob_matrix[[a-init_age+1]]=transition_probability_5(params,a,gender,i+(a-init_age)/2,latent, model) # calculate transition probability matrix for each age
         if (model==3){
-            latent=latent+rnorm(1) # simulate the latent factor
+            latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }
         average_time_state=colSums(state_status) # the order is H M D MD Dead
     }
