@@ -17,12 +17,15 @@ load_all(export_all=FALSE)
 
 # read data
 # load("~/Documents/GitHub/retirement-toolkit/demo/data/US_HRS_5.rda")
-params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
-params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
-params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
+#params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
+#params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
+#params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
 
 #save(US_HRS_5, file="data/US_HRS_5.rda")
 
+#save(params_5_static, file="data/params_5_static.rda")
+#save(params_5_trend, file="data/params_5_trend.rda")
+#save(params_5_frailty, file="data/params_5_frailty.rda")
 # select the parameter and model
 # model=1 no frailty model
 # model=2 no frailty model with trend

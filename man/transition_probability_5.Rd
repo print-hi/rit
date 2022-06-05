@@ -27,5 +27,5 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 function to get a matrix of transition probabilities at a certain age
 }
 \examples{
-transition_probabilities=transition_probability_5(params, age, gender, i, latent, model=3)
+transition_probabilities=transition_probability_5(params=params_5_frailty, age=65, gender=0, i=8, latent=0, model=3)
 }

@@ -94,9 +94,9 @@ library(devtools)
 load_all(export_all=FALSE)
 
 # read data
-params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
-params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
-params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
+# params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
+# params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
+# params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
 
 # select the parameter and model
 # model=1 no frailty model
