@@ -18,14 +18,16 @@
 #' @param n
 #' Number of paths to simulate (Monte-Carlo method)
 #' @param state
-#' Simulated state matrix via
+#' Simulated state matrix via Health-State / Aggregate Mortality
+#' @param econ_var
+#' Simulated economic variables via Economic Scenario Generator
 #' @return
 #' Matrix of cash flow vectors for each simulated path
 #' @export simulate_cf
 #' @examples
 #' ap <- create_policy_AP(400000, 60000)
 #' cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
-simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000, state = NULL) {
+simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = NULL, econ_var = NULL) {
 
     # Set cash flow function based on input policy
     cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
@@ -54,10 +56,14 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000, state 
 
     if (nrow(state) != n) {
         stop("Error: State matrix does not fit number of paths requested")
+    } else if (!is.null(econ_var) & ncol(state) > ncol(econ_var)) {
+        stop("Error: Duration of economic simulation is too short")
     }
 
+    period <- ncol(state) + 1 # Percentage change requires extra period
+
     # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy, age, seed, n)
+    data <- get_policy_scenario(policy, age, seed, n, period, econ_var)
 
     # Ensures that state <-> data has 1:1 match for each path at each time
     # DISABLED WHILE USING TEMP DATA, needs MAX_AGE defined !!!
@@ -88,16 +94,20 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 10000, state 
 #' Seed for random generator
 #' @param n
 #' Number of paths to simulate (Monte-Carlo method)
+#' @param econ_var
+#' Simulated economic variables via Economic Scenario Generator
 #' @return
 #' Matrix of cash flow vectors for each simulated path
 #'
 #' @return
 #' Data frame containing all variables generated using other modules
-get_policy_scenario <- function(policy, age, seed, n) {
+get_policy_scenario <- function(policy, age, seed, n, period, econ_var) {
 
-    MAX_AGE = 140   # NOTE: Projections will grow inaccurate for later years
-
-    var_sim <- get_var_simulations(MAX_AGE - age, n, frequency = 'year')
+    if (is.null(econ_var)) {
+        var_sim <- get_var_simulations(period, n, frequency = 'year')
+    } else {
+        var_sim <- econ_var
+    }
 
     if (policy$name[1] == "AP") {
 
@@ -244,9 +254,7 @@ get_inflation_rate <- function(var_sim) {
 }
 
 get_house_return <- function(var_sim) {
-
     house <- get_perc_change(var_sim$home_index)
-
     return(t(unname(house)))
 }
 
