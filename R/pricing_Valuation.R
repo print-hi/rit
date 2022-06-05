@@ -109,23 +109,10 @@ value_policy <- function(policy, cashflows, seed = 0) {
 ###############################################################################
 ###### Economic Scenario Generator Module
 
-# Temporary helper function, should link to economic module
-get_sdf <- function(n = 1000, period = 100) {
-    interest <- as.matrix(read.csv("lib/_pricing/R/data/sdf.csv", header = FALSE))
-    colnames(interest) <- NULL
-    rownames(interest) <- NULL
-
-    # remove later, ensure that the dimensions are equal
-    # if (sum(dim(cf) == c(1000, 200)) < 2) stop ....
-
-    m <- matrix(NA, n, period)
-    for (i in 1:n){
-        for (j in 1:period){
-            m[i,j] <- interest[i,j]
-        }
-    }
-
-    return(m)
+get_sdf <- function(n = 100, period = 100) {
+    var_sim <- get_var_simulations(period, n, frequency = 'year', return_sdf = TRUE)
+    sdf <- var_sim$discount_factors
+    return(t(unname(sdf)))
 }
 
 ###############################################################################
@@ -155,7 +142,6 @@ get_path_prices <- function(cashflows) {
     value <- rowSums(cashflows * cmsdf)
 
     return(value)
-
 
 }
 
