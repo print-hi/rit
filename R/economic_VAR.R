@@ -206,6 +206,8 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
                     function (y) {st[y,x] = st_expn(y,x)}, simplify = T)}, 
                     simplify = T)
         st = rbind(init_st,st)
+        
+        st = apply(st, 2, function (x) ifelse(x > 1.3,1.3,ifelse(x < 0.7, 0.7, x))) # trim the values
         row.names(st) = as.character(time_index)
         colnames(st) = path_index
         
