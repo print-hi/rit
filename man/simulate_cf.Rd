@@ -4,7 +4,15 @@
 \alias{simulate_cf}
 \title{Policy Cashflow Simulator}
 \usage{
-simulate_cf(policy, age = 17, sex = "F", seed = 0, n = 10000)
+simulate_cf(
+  policy,
+  age = 17,
+  sex = "F",
+  seed = 0,
+  n = 100,
+  state = NULL,
+  econ_var = NULL
+)
 }
 \arguments{
 \item{policy}{Policy type to simulate:
@@ -17,6 +25,10 @@ simulate_cf(policy, age = 17, sex = "F", seed = 0, n = 10000)
 \item{seed}{Seed for random generator}
 
 \item{n}{Number of paths to simulate (Monte-Carlo method)}
+
+\item{state}{Simulated state matrix via Health-State / Aggregate Mortality}
+
+\item{econ_var}{Simulated economic variables via Economic Scenario Generator}
 }
 \value{
 Matrix of cash flow vectors for each simulated path
