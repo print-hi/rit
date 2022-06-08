@@ -6,7 +6,8 @@
 \usage{
 simulate_path_mortality(
   init_age,
-  death_probs,
+  sex = "F",
+  death_probs = NULL,
   closure_age = 130,
   cohort = 10000
 )
@@ -14,7 +15,11 @@ simulate_path_mortality(
 \arguments{
 \item{init_age}{the initial age of the path}
 
-\item{death_probs}{a vector of 1-year death probabilities}
+\item{sex}{character string denoting the gender of individuals, "F" for female and "M" for male}
+
+\item{death_probs}{a vector of 1-year death probabilities. If not supplied, an M7 age-period-cohort
+model will be fitted on \code{mortality_AUS_data} to produce forecasted
+death probabilities for a cohort starting at init_age in 2022}
 
 \item{closure_age}{maximum life span}
 
