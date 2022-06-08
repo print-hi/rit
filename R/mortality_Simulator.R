@@ -54,6 +54,9 @@ simulate_path_mortality <- function(init_age, sex = "F", death_probs = NULL, clo
         if (length(death_probs) != closure_age - init_age + 1) {
             stop("number of death probabilities does not correspond to the given initial and max age")
         }
+        if (!dplyr::near(tail(death_probs, 1), 1)) {
+            stop("1-yr death probability at the maximum age must be 1")
+        }
     }
     # closure_age
     if (closure_age < 90 | closure_age != floor(closure_age)) {
