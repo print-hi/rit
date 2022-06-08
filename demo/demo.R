@@ -190,13 +190,13 @@ sim$stock_price$trajectory_83
 # ---- Policy Valuation
 
 # Creating Policy Object
-ap <- create_policy_AP(400000, 60000)
+ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
 
 # Simulating Cashflows
-cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
+cf <- simulate_cf(policy = ca, age = 65, sex = "M", n = 1000)
 
 # Pricing / Valuation
-v <- value_policy(ap, cf)
+v <- value_policy(ca, cf)
 
 # Other policies
 rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)

@@ -22,7 +22,12 @@
 #' value <- value_policy(policy_object)
 value_policy <- function(policy, cashflows, seed = 0) {
 
-    if (!is.matrix(cashflows)) stop("Invalid Cashflow object")
+    if (!is.list(cashflows)) stop("Invalid Cashflow object: not list")
+    if (!is.matrix(cashflows$cf)) stop("Invalid Cashflow object: cf is not matrix")
+    if (!is.matrix(cashflows$sdf)) stop("Invalid Cashflow object: sdf is not matrix")
+
+    if (nrow(cashflows$cf) > nrow(cashflows$sdf) || ncol(cashflows$cf) > ncol(cashflows$sdf))
+        stop("Invalid Cashflow Object: Inconsistent dimensions")
 
     # Calculate price of policy for each path
     paths <- get_path_prices(cashflows)
@@ -63,6 +68,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
     # Format introduction for output text
     msg <- c("========= Policy Details =========",
              paste("Type        :", attr_mapping[[policy$name[1]]]),
+             paste("Sample Size : ", (stat$size), sep = ""),
              "----------------------------------")
 
     # Format attribute elements of policy into output text
@@ -130,16 +136,21 @@ get_sdf <- function(n = 100, period = 100) {
 get_path_prices <- function(cashflows) {
 
     # Extract matrix dimensions
-    n_paths <- nrow(cashflows)
-    periods <- ncol(cashflows)
+    n_paths <- nrow(cashflows$cf)
+    periods <- ncol(cashflows$cf)
 
-    # Get Stochastic Discount Factors from ESG module and calculate
-    # cumulative product of factors
-    sdf <- get_sdf(n_paths, periods)
+    # Get Stochastic Discount Factors from ESG module
+    if (!is.null(cashflows$sdf)) {
+        sdf <- cashflows$sdf[1:n_paths, 1:periods]
+    } else {
+        sdf <- get_sdf(nrow(cashflows$cf), ncol(cashflows$cf))
+    }
+
+    # Calculate cumulative product of factors
     cmsdf <- rowCumprods((1/sdf))
 
     # Calculate discounted value of cashflows for each path
-    value <- rowSums(cashflows * cmsdf)
+    value <- rowSums(cashflows$cf * cmsdf)
 
     return(value)
 
@@ -160,7 +171,8 @@ get_price_stats <- function(prices) {
     probs = c(.25, .5, .75, .95, .99)
 
     # Calculate and organise summary statistics into list
-    stats <- list(mean = mean(prices),
+    stats <- list(size = length(prices),
+                  mean = mean(prices),
                   var = var(prices),
                   sd = sqrt(var(prices)),
                   min = min(prices),

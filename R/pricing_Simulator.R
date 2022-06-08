@@ -56,18 +56,20 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
 
     if (nrow(state) != n) {
         stop("Error: State matrix does not fit number of paths requested")
-    } else if (!is.null(econ_var) & ncol(state) > ncol(econ_var)) {
+    } else if (!is.null(econ_var) && ncol(state) > ncol(econ_var)) {
         stop("Error: Duration of economic simulation is too short")
     }
-
-    period <- ncol(state) + 1 # Percentage change requires extra period
-
-    # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy, age, seed, n, period, econ_var)
 
     # Ensures that state <-> data has 1:1 match for each path at each time
     # DISABLED WHILE USING TEMP DATA, needs MAX_AGE defined !!!
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
+    period <- ncol(state) + 1
+    if (is.null(econ_var)) {
+        econ_var <- get_var_simulations(period, n, frequency = 'year', return_sdf = TRUE)
+    }
+
+    # Get matrix of economic variables for each path
+    data <- get_policy_scenario(policy, age, seed, n, period, econ_var)
 
     # Initialize output matrix
     cf <- matrix(nrow = n, ncol = ncol(state))
@@ -75,7 +77,9 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
     # Generate cash flows for each state vector
     for (i in seq(1, n)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
 
-    return(cf)
+    result <- list(cf = cf, sdf = t(unname(econ_var$discount_factors)))
+
+    return(result)
 }
 
 
@@ -103,11 +107,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
 #' Data frame containing all variables generated using other modules
 get_policy_scenario <- function(policy, age, seed, n, period, econ_var) {
 
-    if (is.null(econ_var)) {
-        var_sim <- get_var_simulations(period, n, frequency = 'year')
-    } else {
-        var_sim <- econ_var
-    }
+    var_sim <- econ_var
 
     if (policy$name[1] == "AP") {
 
@@ -148,7 +148,7 @@ get_policy_scenario <- function(policy, age, seed, n, period, econ_var) {
         data <- list()
         for (i in seq(1, n)) {
             temp <- data.frame(pool_r = pool_r[i, ],
-                               pool_e = pool_e[i, ],
+                               pool_e = pool_e,
                                stock = stock[i, ])
             data <- append(data, list(temp))
         }
