@@ -26,8 +26,8 @@ death probabilities for a cohort starting at init_age in 2022}
 \item{cohort}{integer (default 10000) denoting number of people in the simulation}
 }
 \value{
-a matrix where each row represents a new individual, and the columns represent
-whether the individual is dead (-1) or alive (0)
+a matrix where each row represents an individual's dead (-1) or alive (0) status
+across the years
 }
 \description{
 Simulates the path each life takes in an initial cohort using 1-year death probabilities

@@ -16,8 +16,8 @@
 #' integer (default 10000) denoting number of people in the simulation
 #'
 #' @return
-#' a matrix where each row represents a new individual, and the columns represent
-#' whether the individual is dead (-1) or alive (0)
+#' a matrix where each row represents an individual's dead (-1) or alive (0) status
+#' across the years
 #'
 #' @export
 #'
