@@ -27,7 +27,7 @@ death probabilities for a cohort starting at init_age in 2022}
 }
 \value{
 a matrix where each row represents an individual's dead (-1) or alive (0) status
-across the years
+at each age
 }
 \description{
 Simulates the life path of an individual using 1-year death probabilities

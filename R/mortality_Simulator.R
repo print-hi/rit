@@ -17,7 +17,7 @@
 #'
 #' @return
 #' a matrix where each row represents an individual's dead (-1) or alive (0) status
-#' across the years
+#' at each age
 #'
 #' @export
 #'
@@ -91,6 +91,9 @@ sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age 
         # transitions cannot occur for dead individuals
         sim_path[sim_path[, i-1] == -1, i] <- -1
     }
+    # ensure all individuals die at max age
+    sim_path[, ncol(sim_path)] <- -1
+
     return(sim_path)
 
 }
@@ -115,7 +118,7 @@ sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age 
 #'
 #' @return
 #' a matrix where each row represents the number of individuals still alive
-#' from a given cohort across the years
+#' from a given cohort at each age
 #' @export
 #'
 #' @examples
@@ -196,8 +199,95 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
         }
     }
 
+    # ensure all individuals die at max age
+    sim_path[, ncol(sim_path)] <- 0
+
     return(sim_path)
 }
 
+#' Simulate Expected Cohort Life Path
+#'
+#' @param init_age
+#' the initial age of individuals
+#' @param sex
+#' character string denoting the gender of individuals, "F" for female and "M" for male
+#' @param death_probs
+#' a vector of 1-year death probabilities. If not supplied, an M7 age-period-cohort
+#' model will be fitted on \code{mortality_AUS_data} to produce forecasted
+#' death probabilities for a cohort starting at init_age in 2022
+#' @param closure_age
+#' maximum life span
+#' @param cohort
+#' initial cohort size
+#'
+#' @return
+#' vector of expected number of individuals still alive from a given cohort at each age
+#' @export
+#'
+#' @examples
+#'
+sim_cohort_path_expected <- function(init_age, sex = "F", death_probs = NULL,
+                                     closure_age = 130, cohort = 1000) {
+
+# Flagging errors ---------------------------------------------------------
+
+    # init_age
+    if (init_age < 55 | init_age > closure_age) {
+        stop("initial age must be between 55 and the maximum age")
+    }
+
+    if (init_age != floor(init_age)) {
+        stop("initial age must be an integer")
+    }
+
+    # sex
+    if (sex != "F" & sex != "M") {
+        stop("sex must be 'F' or 'M'")
+    }
+
+    # death_probs
+    if (!is.null(death_probs)) {
+        if (!is.vector(death_probs) | !is.numeric(death_probs)) {
+            stop("death probabilities must be a numeric vector")
+        }
+
+        if (any(death_probs < 0, na.rm = T) | any(death_probs > 1, na.rm = T) ) {
+            stop("1-yr death probabilities must be between 0 and 1")
+        }
+
+        if (length(death_probs) != closure_age - init_age + 1) {
+            stop("number of death probabilities does not correspond to the given initial and max age")
+        }
+        if (!dplyr::near(tail(death_probs, 1), 1)) {
+            stop("1-yr death probability at the maximum age must be 1")
+        }
+    }
+
+    # closure_age
+    if (closure_age < 90 | closure_age != floor(closure_age)) {
+        stop("maximum age must be an integer greater than 89")
+    }
+
+    # cohort
+    if (cohort <= 0 | cohort != floor(cohort)) {
+        stop('cohort must be a positive integer')
+    }
+
+
+# Implementation ----------------------------------------------------------
+
+    # Generating default death probabilities for males and females if required
+    if (is.null(death_probs)) {
+        death_probs <- generate_default_qx(init_age, sex, closure_age)
+    }
+
+    # cumulative survival probabilities
+    cum_surv_probs <- cumprod(c(1, 1 - death_probs))
+    names(cum_surv_probs) <- as.character(init_age:(closure_age + 1))
+
+    sim_path <- round(cohort * cum_surv_probs)
+
+    return(sim_path)
+}
 
 
