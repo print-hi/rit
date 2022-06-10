@@ -2,14 +2,14 @@
 % Please edit documentation in R/mortality_Simulator.R
 \name{simulate_path_mortality}
 \alias{simulate_path_mortality}
-\title{Simulate Cohort Life Path}
+\title{Simulate Individual Life Path}
 \usage{
 simulate_path_mortality(
   init_age,
   sex = "F",
   death_probs = NULL,
   closure_age = 130,
-  cohort = 10000
+  n_sim = 10000
 )
 }
 \arguments{
@@ -23,14 +23,15 @@ death probabilities for a cohort starting at init_age in 2022}
 
 \item{closure_age}{maximum life span}
 
-\item{cohort}{integer (default 10000) denoting number of people in the simulation}
+\item{n_sim}{integer (default 10000) denoting number of path simulations, which is equivalent
+to the number of people in the simulation}
 }
 \value{
 a matrix where each row represents an individual's dead (-1) or alive (0) status
 across the years
 }
 \description{
-Simulates the path each life takes in an initial cohort using 1-year death probabilities
+Simulates the life path of an individual using 1-year death probabilities
 }
 \examples{
 

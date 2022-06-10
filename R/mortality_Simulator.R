@@ -1,6 +1,6 @@
-#' Simulate Cohort Life Path
+#' Simulate Individual Life Path
 #'
-#' Simulates the path each life takes in an initial cohort using 1-year death probabilities
+#' Simulates the life path of an individual using 1-year death probabilities
 #'
 #' @param init_age
 #' the initial age of the path
@@ -12,8 +12,9 @@
 #' death probabilities for a cohort starting at init_age in 2022
 #' @param closure_age
 #' maximum life span
-#' @param cohort
-#' integer (default 10000) denoting number of people in the simulation
+#' @param n_sim
+#' integer (default 10000) denoting number of path simulations, which is equivalent
+#' to the number of people in the simulation
 #'
 #' @return
 #' a matrix where each row represents an individual's dead (-1) or alive (0) status
@@ -23,7 +24,7 @@
 #'
 #' @examples
 #'
-simulate_path_mortality <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, cohort = 10000) {
+simulate_path_mortality <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -63,67 +64,39 @@ simulate_path_mortality <- function(init_age, sex = "F", death_probs = NULL, clo
         stop("maximum age must be an integer greater than 89")
     }
 
-    # cohort
-    if (cohort <= 0 | cohort != floor(cohort)) {
-        stop('cohort must be a positive integer')
+    # n_sim
+    if (n_sim <= 0 | n_sim != floor(n_sim)) {
+        stop('number of simulations must be a positive integer')
     }
 
 # Implementation ----------------------------------------------------------
 
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
-        young_ages <- 55:89
-
-        if (sex == "F") {
-            AUS_StMoMo <- StMoMoData(mortality_AUS_data, series = "female")
-            rates_hist <- mortality_AUS_data$rate$female[as.character(young_ages), ]
-        } else {
-            AUS_StMoMo <- StMoMoData(mortality_AUS_data, series = "male")
-            rates_hist <- mortality_AUS_data$rate$male[as.character(young_ages), ]
-        }
-
-        # Using M7 model to Forecast Rates
-        M7 <- m7()
-        AUS_Ini_Data <- central2initial(AUS_StMoMo)
-        ages_fit <- young_ages
-        wxy <- genWeightMat(ages = ages_fit, years = AUS_Ini_Data$years, clip = 3)
-        M7_fit <- fit(M7, data = AUS_Ini_Data, ages.fit = ages_fit, wxt = wxy)
-        M7_for <- forecast(M7_fit, h = 100)
-
-        # Mortality Rate Completion with Kannisto Method
-        old_ages <- 90:closure_age
-        ages <- c(young_ages, old_ages)
-        kannisto_hist <- complete_old_age(rates = rates_hist, ages = young_ages,
-                                          old_ages = old_ages, fitted_ages = 80:89,
-                                          closure_age = closure_age,
-                                          method = "kannisto", type = "central")
-        kannisto_for <- complete_old_age(rates = M7_for$rates, ages = young_ages,
-                                         old_ages = old_ages, fitted_ages = 80:89,
-                                         closure_age = closure_age,
-                                         method = "kannisto", type = "central")
-
-        # Combine Historical and Forecasted Rates
-        kannisto_55_period <- cbind(kannisto_hist, kannisto_for)
-        qx_period <- rate2rate(kannisto_55_period, from = "central", to = "prob")
-        # Take year 2022
-        death_probs <- period2cohort(qx_period, ages = ages, init_age = init_age)[, "2022"]
-
+        death_probs <- generate_default_qx(init_age, sex, closure_age)
     }
 
-    # create empty matrix of simulated population
-    sim_pop <- matrix(0, nrow = cohort, ncol = closure_age - init_age+2)
+    # create empty matrix of simulated paths
+    sim_path <- matrix(NA, nrow = n_sim, ncol = closure_age - init_age+2)
+    # initialise as health
+    sim_path[,1] <- 0
+    colnames(sim_path) <- as.character(init_age:(closure_age + 1))
 
     # qx should be vector of length (closure_age - init_age + 1)
-    for (i in 2:ncol(sim_pop)) {
+    for (i in 2:ncol(sim_path)) {
         # Simulate TRUE/FALSE vector indicating if individual has died
         # during this transition
-        sim_death <- (runif(cohort) <= death_probs[i - 1])
+        sim_death <- (runif(n_sim) <= death_probs[i - 1])
         # Encoding to 0 for alive and -1 for dead
-        sim_pop[, i] <- -as.numeric(sim_death)
+        sim_path[, i] <- -as.numeric(sim_death)
         # transitions cannot occur for dead individuals
-        sim_pop[sim_pop[, i-1] == -1, i] <- -1
+        sim_path[sim_path[, i-1] == -1, i] <- -1
     }
-    return(sim_pop)
+    return(sim_path)
 
 }
+
+
+
+
 
