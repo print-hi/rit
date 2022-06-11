@@ -27,7 +27,7 @@
 #' @examples
 #' ap <- create_policy_AP(400000, 60000)
 #' cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
-simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = NULL, econ_var = NULL) {
+simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = NULL, econ_var = NULL) {
 
     # Set cash flow function based on input policy
     cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
@@ -63,13 +63,13 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
     # Ensures that state <-> data has 1:1 match for each path at each time
     # DISABLED WHILE USING TEMP DATA, needs MAX_AGE defined !!!
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
-    period <- ncol(state) + 1
+
     if (is.null(econ_var)) {
-        econ_var <- get_var_simulations(period, n, frequency = 'year', return_sdf = TRUE)
+        econ_var <- get_var_simulations(ncol(state), n, frequency = 'year', return_sdf = TRUE)
     }
 
     # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy, age, seed, n, period, econ_var)
+    data <- get_policy_scenario(policy, age, sex, seed, n, period, econ_var)
 
     # Initialize output matrix
     cf <- matrix(nrow = n, ncol = ncol(state))
@@ -94,6 +94,8 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
 #' Policy object containing necessary parameters (see create_policy_ )
 #' @param age
 #' Initial age of policyholder in years
+#' @param sex
+#' Sex of policyholder
 #' @param seed
 #' Seed for random generator
 #' @param n
@@ -105,7 +107,7 @@ simulate_cf <- function(policy, age = 17, sex = "F", seed = 0, n = 100, state = 
 #'
 #' @return
 #' Data frame containing all variables generated using other modules
-get_policy_scenario <- function(policy, age, seed, n, period, econ_var) {
+get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 
     var_sim <- econ_var
 
@@ -138,8 +140,8 @@ get_policy_scenario <- function(policy, age, seed, n, period, econ_var) {
     } else if (policy$name[1] == "PA") {
 
         # Get all relevant health variables for pool
-        pool_r <- get_pool_realised(age, seed, n)
-        pool_e <- get_pool_expected(age, seed, n)
+        pool_r <- get_pool_realised(age, sex, seed, n, policy$size)
+        pool_e <- get_pool_expected(age, sex, seed, policy$size)
 
         # Get all relevant economic variables
         stock <- get_stock_return(var_sim)
@@ -209,25 +211,25 @@ get_health_state_5 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
 
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    mortality <- as.matrix(read.csv("lib/_pricing/R/data/mortality.csv", header = FALSE))
-    colnames(mortality) <- NULL
-    rownames(mortality) <- NULL
+    capture.output(suppressWarnings(
+        mortality <- sim_indiv_path(age, sex, death_probs = NULL, closure_age = 130, n)
+    ))
     return(mortality)
 }
 
 # Temporary helper function, should link to mortality module
-get_pool_realised <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("lib/_pricing/R/data/pool.csv", header = FALSE))
-    colnames(pool) <- NULL
-    rownames(pool) <- NULL
+get_pool_realised <- function(age = 65, sex = "F", seed = 0, n = 1000, cohort = 1000) {
+    capture.output(suppressWarnings(
+        pool <- sim_cohort_path_realised(age, sex, death_probs = NULL, closure_age = 130, cohort, n)
+    ))
     return(pool)
 }
 
 # Temporary helper function, should link to mortality module
-get_pool_expected <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    pool <- as.matrix(read.csv("lib/_pricing/R/data/pool-exp.csv", header = FALSE))
-    colnames(pool) <- NULL
-    rownames(pool) <- NULL
+get_pool_expected <- function(age = 65, sex = "F", seed = 0, cohort = 1000) {
+    capture.output(suppressWarnings(
+        pool <- sim_cohort_path_expected(age, sex, death_probs = NULL, closure_age = 130, cohort)
+    ))
     return(pool)
 }
 

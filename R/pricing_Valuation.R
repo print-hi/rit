@@ -22,10 +22,6 @@
 #' value <- value_policy(policy_object)
 value_policy <- function(policy, cashflows, seed = 0) {
 
-    if (!is.list(cashflows)) stop("Invalid Cashflow object: not list")
-    if (!is.matrix(cashflows$cf)) stop("Invalid Cashflow object: cf is not matrix")
-    if (!is.matrix(cashflows$sdf)) stop("Invalid Cashflow object: sdf is not matrix")
-
     if (nrow(cashflows$cf) > nrow(cashflows$sdf) || ncol(cashflows$cf) > ncol(cashflows$sdf))
         stop("Invalid Cashflow Object: Inconsistent dimensions")
 

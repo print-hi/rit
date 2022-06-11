@@ -184,6 +184,7 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
     # empty matrix of simulated paths
     sim_path <- matrix(NA, nrow = n_sim, ncol = closure_age - init_age+2)
     colnames(sim_path) <- as.character(init_age:(closure_age + 1))
+
     # initialise cohort size
     sim_path[, 1] = cohort
     for (i in 1:nrow(sim_path)) {
@@ -191,7 +192,7 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
             still_alive <- sim_path[i, j - 1]
             if (still_alive) {
                 # simulate with 1-year survival probability
-                sim_path[i, j] <- rbinom(1, still_alive, 1 - death_probs[j - 1])
+                sim_path[i, j] <- round(rbinom(1, still_alive, 1 - death_probs[j - 1]))
             } else {
                 sim_path[i, j] <- 0
             }

@@ -229,8 +229,6 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' Proportion of the premium that can be withdrawn annually
 #' @param g_fee
 #' Continuous guarantee fees for GMWB
-#' @param s_fee
-#' (Optional) Surrender fees for contract
 #'
 #' @return
 #' Policy object
