@@ -24,6 +24,6 @@ cf_va <- simulate_cf(va)
 val_ap <- value_policy(ap, cf_ap)
 val_ca <- value_policy(ca, cf_ca)
 val_la <- value_policy(la, cf_la)
-val_rm <- value_policy(rm, cf_rm)
-val_va <- value_policy(va, cf_va)
-val_pa <- value_policy(pa, cf_pa)
+val_rm <- value_policy(rm, cf_rm) # needs debugging
+val_va <- value_policy(va, cf_va) # needs debugging
+val_pa <- value_policy(pa, cf_pa) # needs debugging
