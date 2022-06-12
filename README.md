@@ -30,5 +30,5 @@ Pricing is functional, but outputs for following products need further testing: 
 
 ## ToDo
 
-- All: Implemented seed parameter to allow for better control over simulations
+- All: Implement seed parameter to allow for better control over simulations
 - Pricing: Provide description on the algorithm for each product
