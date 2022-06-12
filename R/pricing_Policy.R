@@ -229,14 +229,12 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' Proportion of the premium that can be withdrawn annually
 #' @param g_fee
 #' Continuous guarantee fees for GMWB
-#' @param s_fee
-#' (Optional) Surrender fees for contract
 #'
 #' @return
 #' Policy object
 #' @export create_policy_VA
 #' @examples
-#' va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
+#' va <- create_policy_VA(100000, 40, 0.4, 0.02)
 create_policy_VA <- function(value, length, prop, g_fee) {
 
     if (length(prop) > 1)       stop("Invalid prop: length(prop) = 1")

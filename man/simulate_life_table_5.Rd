@@ -43,5 +43,5 @@ for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwi
 the function to get n_sim number of lifetables
 }
 \examples{
-simulated_lifetable=simulate_life_table_5(params,init_age,gender,i,latent,initial_state,n_sim=100, model=3)
+simulated_lifetable=simulate_life_table_5(params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100, model=3)
 }

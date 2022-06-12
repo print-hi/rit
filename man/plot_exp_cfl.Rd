@@ -13,7 +13,7 @@ Should be generated from \code{\link{exp_cfl}}}
 
 \item{years}{vector of years for \code{exp_cfl_rates}}
 
-\item{level}{desired confidence level with 95\\% as default}
+\item{level}{desired confidence level with 95\% as default}
 }
 \description{
 Plots simulated expected curtate future lifetime.

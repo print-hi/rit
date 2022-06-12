@@ -25,5 +25,5 @@ a list of 5 times 5 transition probability matrices, from the initial age to age
 the function to get a full list of transition probability matrices from the initial age to age 110
 }
 \examples{
-trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params, init_age=65, gender, i, model=3)
+trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params=params_5_frailty, init_age=65, gender=0, i=8, model=3)
 }

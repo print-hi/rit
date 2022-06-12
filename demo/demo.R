@@ -1,33 +1,64 @@
 # ---------------------------------------------------------------------------- #
 # ---- Aggregate Mortality
 
-# Mortality Rate Completion
-ages <- 30:90
-old_ages <- 91:130
-fitted_ages <- 76:90
+# Generate simulated rates with 'StMoMo' using Lee Carter Model
+# Install and load 'StMoMo' if necessary
+AUS_StMoMo <- StMoMoData(mortality_AUS_data, series = "male")
+LC <- lc(link = "logit")
+AUS_Male_Ini_Data <- central2initial(AUS_StMoMo)
+ages_fit <- 55:89
+wxy <- genWeightMat(ages = ages_fit, years = AUS_Male_Ini_Data$years, clip = 3)
+LC_fit <- fit(LC, data = AUS_Male_Ini_Data, ages.fit = ages_fit, wxt = wxy)
 
-completed_rates <- coale_kisker(mortality_rates, ages, old_ages)
-completed_qx <- denuit_goderniaux(mortality_rates, ages, old_ages)
-completed_rates <- kannisto(mortality_rates, ages, old_ages, fitted_ages)
+set.seed(1234)
+n_sim <- 10
+LC_sim <- simulate(LC_fit, nsim = n_sim, h = 100)
 
-# Rate Changing
-new_ages <- 30:130
-def_new_ages <- 50:130
+# Mortality Rate Completion with Kannisto Method
+young_ages <- LC_sim$ages # 55:89
+old_ages <- 90:130
+ages <- c(young_ages, old_ages)
 
-surv_func <- rate2survival(completed_rates, new_ages, from = 'central')
-mortality_rates <- survival2rate(surv_func, def_new_ages, to = 'prob')
+rates_hist <- mortality_AUS_data$rate$male[as.character(young_ages), ]
+years_hist <- as.numeric(colnames(rates_hist))
+years_sim <- LC_sim$years
+years <- c(years_hist, years_sim)
+
+kannisto_sim <- complete_old_age(rates = LC_sim$rates, ages = young_ages,
+                                 old_ages = old_ages, fitted_ages = 80:89,
+                                 method = "kannisto", type = "central")
+kannisto_hist <- complete_old_age(rates = rates_hist, ages = young_ages,
+                                  old_ages = old_ages, fitted_ages = 80:89,
+                                  method = "kannisto", type = "central")
+
+# Combine Historical and Simulated Rates
+kannisto_55_period <- combine_hist_sim(rates_hist = kannisto_hist,
+                                       rates_sim = kannisto_sim)
+
+# Convert to cohort rates for cohort starting from age 55
+kannisto_55 <- period2cohort(period_rates = kannisto_55_period, ages = ages)
+
+# Create survival function
+surv_55_P <- rate2survival(kannisto_55, ages, from = "central")
 
 # Risk Neutral Probability
-rn_surv_prob <- survivalP2Q(completed_qx, 'wang', 0.34)
+surv_55_Q <- survivalP2Q(surv_55_P, method = "wang", lambda = 1.5)
 
-# Summary Statistics
-psurv(surv_func, 10)
-qsurv(surv_func, 0.95)
-plot_surv_sim(surv_func, 50, 2022)
+# Survival function summary statistics (consider cohort aged 55 in 2030)
+psurv(surv_55_Q[, "2017", 1], 10)
+qsurv(surv_55_Q[, "2017", 1], 0.95)
+plot_surv_sim(surv_55_Q, 55, 2030)
 
-ecfl_historical <- exp_cfl(q_hist, ages)
-ecfl_sim <- exp_cfl(q_sim, ages)
-plot_exp_cfl(ecfl_historical, years_hist, ecfl_sim, years_sim)
+# Convert back to 1-yr death probabilities
+kannisto_55_q_Q <- survival2rate(surv_55_Q, ages)
+
+# Calculate expected curtate future lifetime
+exp_cfl_55 <- exp_cfl(qx = kannisto_55_q_Q, ages = ages)
+
+# Expected curtate future lifetime can only be computed for
+# the earlier (complete) cohorts
+exp_cfl_55 <- exp_cfl_55[, as.character(1970:2043)]
+plot_exp_cfl(exp_cfl_rates = exp_cfl_55, years = 1970:2043)
 
 # ---------------------------------------------------------------------------- #
 # ---- Health State: 3 State
@@ -39,7 +70,7 @@ trans_probs <- get_trans_probs('T', US_HRS, 65, 0, 2021)
 life_table <- create_life_table(trans_probs, 65, 0)
 
 # Simulating Life Paths
-SP <- simulate_paths(65, 0, trans_probs)
+SP <- simulate_path(65, 0, trans_probs)
 
 # Statistics
 afl(65, init_state = 0, trans_probs)
@@ -57,46 +88,119 @@ survival_statsF(65, init_state = 0, female = 0, 2022, US_HRS)
 # ---------------------------------------------------------------------------- #
 # ---- Health State: 5 State
 
+# ---------------------------------------------------------------------------- #
+# ---- Health State: 5 State
+library(devtools)
+load_all(export_all=FALSE)
+
+# read data
+# params_5_static <- US_HRS_5[1:3,3:ncol(US_HRS_5)] # static model
+# params_5_trend <- US_HRS_5[4:7,3:ncol(US_HRS_5)] # trend model
+# params_5_frailty <- US_HRS_5[8:12,3:ncol(US_HRS_5)] # frailty model
+
+# select the parameter and model
+# model=1 no frailty model
+# model=2 no frailty model with trend
+# model=3 frailty model
+params=params_5_frailty
+model=3
+
+# input characteristics of the individual at time 0
+init_age=65
+gender=0
+i=8 # wave index
+latent=0 # initial value of latent factor
+
+##### test model 3 #####
+
+# Transition Rates
+transition_rates=transition_rate_5(params, init_age, gender, i, latent, model=3)
+
 # Transition Probability Matrix
-trans_probs <- get_full_trans_prob_matrixfunction(params, init_age=65, gender=0, i, model=2)
+transition_probabilities=transition_probability_5(params, init_age, gender, i, latent, model=3)
 
-# Life Table Generation
-life_table <- simulate_life_table(params,init_age=65,gender,i,latent, initial_state=0, n_sim=100, model=3)
+# Full list of Transition Probability Matrices from Age 65 to 110
+trans_prob_matrix_age65to110=get_full_trans_prob_matrix_5(params, init_age=65, gender, i, model=3)
 
-# Simulating Life Paths
-simulated_path <- function(init_age=65, init_state=0, params, gender=0, i, cohort = 10000, model=3)
+# Life Table Generation Using Frailty Model
+simulated_lifetable=simulate_life_table_5(params,init_age=65,gender,i,latent,initial_state=0, n_sim=100, model=3) #model=3 in this case because this function is for simulating the latent factor, otherwise it will produce 100 same simulations, use n_sim=1 for model 1 and 2
+
+# Simulating Life Paths Given Initially in H State
+simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params, gender, i, cohort = 10000, model=3)
 
 # Statistics
-simulated_path <- simulate_individual_path(65, 0, params, 0, 19, model = 2)
-time_to_1 <- first_time_stats(simulated_path, 1)
-print(mean(time_to_1, na.rm = TRUE))
+## First Time Leaving The H State
+first_time_H=first_time_stats_5(simulated_individual_path, 0)
+
+### Statistics of First Time Leaving The H State
+stats_first_time_H=stats_produce_5(first_time_H)
+stats_first_time_H
+
+## Total Time Alive Given Initially in H State
+total_time_alive=total_time_stats_5(simulated_individual_path, 4)
+
+## Statistics of Total Time Alive Given Initially in H State
+stats_total_time_alive=stats_produce_5(total_time_alive)
+stats_total_time_alive
+
+## Total Time Spend in H M D MD States Respectively
+total_time_H=total_time_stats_5(simulated_individual_path, 0)
+total_time_M=total_time_stats_5(simulated_individual_path, 1)
+total_time_D=total_time_stats_5(simulated_individual_path, 2)
+total_time_MD=total_time_stats_5(simulated_individual_path, 3)
+
+### Statistics of Total Time in Different States Given Initially in H State
+#### H
+stats_total_time_H=stats_produce_5(total_time_H)
+stats_total_time_H
+#### M
+stats_total_time_M=stats_produce_5(total_time_M)
+stats_total_time_M
+#### D
+stats_total_time_D=stats_produce_5(total_time_D)
+stats_total_time_D
+#### MD
+stats_total_time_MD=stats_produce_5(total_time_MD)
+stats_total_time_MD
+
+## Calculate Total Time Alive Given Initially in M State
+### Simulate the Life Paths, init_state=1 Indicating Initial State is M
+simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=1, params, gender, i, cohort = 10000, model=3)
+
+### Total Time Alive Given Initially in M State
+total_time_alive=total_time_stats_5(simulated_individual_path, 4)
+stats_total_time_alive=stats_produce_5(total_time_alive)
+stats_total_time_alive
 
 # ---------------------------------------------------------------------------- #
 # ---- Economic Scenario Generator
 
 # Discrete Generator
-sim <- get_var_simulations(num_years = 10, num_paths = 10000, frequency = 'year')
+sim <- get_var_simulations(num_years = 10, num_paths = 100, frequency = 'year')
 sim$zcp3m_yield
-sim$zcp3m_yield$trajectory_103
+sim$zcp3m_yield$trajectory_83
 
 # Continuous Generator
-sim <- get_zcp_simulation(num_years = 10, num_paths = 10000, frequency = 'year')
+sim <- get_afns_simulation(num_years = 10, num_paths = 100, frequency = 'year', model = "interest_house_stock")
+sim$maturity_40qtrs$trajectory_83
+sim$house_index$trajectory_83
+sim$stock_price$trajectory_83
 
 # ---------------------------------------------------------------------------- #
 # ---- Policy Valuation
 
 # Creating Policy Object
-ap <- create_policy_AP(400000, 60000)
+ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
 
 # Simulating Cashflows
-cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
+cf <- simulate_cf(policy = ca, age = 65, sex = "M", n = 1000)
 
 # Pricing / Valuation
-v <- value_policy(ap, cf)
+v <- value_policy(ca, cf)
 
 # Other policies
 rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)
 la <- create_policy_LA(60000, 5, 0.04, 0.05)
 pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
 ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
-va <- create_policy_VA(100000, 40, 0.4, 0.02, 0.02)
+va <- create_policy_VA(100000, 40, 0.4, 0.02)

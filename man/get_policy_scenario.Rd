@@ -4,7 +4,7 @@
 \alias{get_policy_scenario}
 \title{Scenario Generator}
 \usage{
-get_policy_scenario(policy, age, seed, n)
+get_policy_scenario(policy, age, seed, n, period, econ_var)
 }
 \arguments{
 \item{policy}{Policy object containing necessary parameters (see create_policy_ )}
@@ -14,6 +14,8 @@ get_policy_scenario(policy, age, seed, n)
 \item{seed}{Seed for random generator}
 
 \item{n}{Number of paths to simulate (Monte-Carlo method)}
+
+\item{econ_var}{Simulated economic variables via Economic Scenario Generator}
 }
 \value{
 Matrix of cash flow vectors for each simulated path

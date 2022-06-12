@@ -5,7 +5,7 @@
 #' spread, (3) New South Wales houses value index, (4) New South Wales houses
 #' rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing
 #' price, (8) Australian dollar trade-weighted index, (9) Australia mortgage
-#' rate, (10) New South Wales unemployment rate (in %).
+#' rate, (10) New South Wales unemployment rate.
 #' Simulations are based on a Vector Autoregression model. This function uses
 #' the package `zoo` to convert the frequnency units.
 #' 
@@ -206,6 +206,8 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
                     function (y) {st[y,x] = st_expn(y,x)}, simplify = T)}, 
                     simplify = T)
         st = rbind(init_st,st)
+        
+        st = apply(st, 2, function (x) ifelse(x > 1.3,1.3,ifelse(x < 0.7, 0.7, x))) # trim the values
         row.names(st) = as.character(time_index)
         colnames(st) = path_index
         

@@ -22,7 +22,8 @@
 #' value <- value_policy(policy_object)
 value_policy <- function(policy, cashflows, seed = 0) {
 
-    if (!is.matrix(cashflows)) stop("Invalid Cashflow object")
+    if (nrow(cashflows$cf) > nrow(cashflows$sdf) || ncol(cashflows$cf) > ncol(cashflows$sdf))
+        stop("Invalid Cashflow Object: Inconsistent dimensions")
 
     # Calculate price of policy for each path
     paths <- get_path_prices(cashflows)
@@ -63,6 +64,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
     # Format introduction for output text
     msg <- c("========= Policy Details =========",
              paste("Type        :", attr_mapping[[policy$name[1]]]),
+             paste("Sample Size : ", (stat$size), sep = ""),
              "----------------------------------")
 
     # Format attribute elements of policy into output text
@@ -80,17 +82,17 @@ value_policy <- function(policy, cashflows, seed = 0) {
     # Format summary statistics
     msg <- c(msg, "",
              "======= Summary Statistics =======",
-             paste("Mean        : $", formatted(stat$mean), sep = ""),
-             paste("Std Dev     : $", formatted(stat$sd), sep = ""),
+             paste("Mean        : $ ", formatted(stat$mean), sep = ""),
+             paste("Std Dev     : $ ", formatted(stat$sd), sep = ""),
              "----------------------------------",
-             paste("Minimum     : $", formatted(stat$min), sep = ""),
-             paste("Maximum     : $", formatted(stat$max), sep = ""),
+             paste("Minimum     : $ ", formatted(stat$min), sep = ""),
+             paste("Maximum     : $ ", formatted(stat$max), sep = ""),
              "----------------------------------",
-             paste("P_0.25      : $", formatted(stat$quantile[1]), sep = ""),
-             paste("P_0.50      : $", formatted(stat$median), sep = ""),
-             paste("P_0.75      : $", formatted(stat$quantile[3]), sep = ""),
-             paste("P_0.95      : $", formatted(stat$quantile[4]), sep = ""),
-             paste("P_0.99      : $", formatted(stat$quantile[5]), sep = ""),
+             paste("P_0.25      : $ ", formatted(stat$quantile[1]), sep = ""),
+             paste("P_0.50      : $ ", formatted(stat$median), sep = ""),
+             paste("P_0.75      : $ ", formatted(stat$quantile[3]), sep = ""),
+             paste("P_0.95      : $ ", formatted(stat$quantile[4]), sep = ""),
+             paste("P_0.99      : $ ", formatted(stat$quantile[5]), sep = ""),
              "----------------------------------",
              paste("Skewness    : ", formatted(stat$skew), sep = ""),
              paste("Kurtosis    : ", formatted(stat$kurtosis), sep = ""),
@@ -109,23 +111,10 @@ value_policy <- function(policy, cashflows, seed = 0) {
 ###############################################################################
 ###### Economic Scenario Generator Module
 
-# Temporary helper function, should link to economic module
-get_sdf <- function(n = 1000, period = 100) {
-    interest <- as.matrix(read.csv("lib/_pricing/R/data/sdf.csv", header = FALSE))
-    colnames(interest) <- NULL
-    rownames(interest) <- NULL
-
-    # remove later, ensure that the dimensions are equal
-    # if (sum(dim(cf) == c(1000, 200)) < 2) stop ....
-
-    m <- matrix(NA, n, period)
-    for (i in 1:n){
-        for (j in 1:period){
-            m[i,j] <- interest[i,j]
-        }
-    }
-
-    return(m)
+get_sdf <- function(n = 100, period = 100) {
+    var_sim <- get_var_simulations(period, n, frequency = 'year', return_sdf = TRUE)
+    sdf <- var_sim$discount_factors
+    return(t(unname(sdf)))
 }
 
 ###############################################################################
@@ -143,19 +132,23 @@ get_sdf <- function(n = 1000, period = 100) {
 get_path_prices <- function(cashflows) {
 
     # Extract matrix dimensions
-    n_paths <- nrow(cashflows)
-    periods <- ncol(cashflows)
+    n_paths <- nrow(cashflows$cf)
+    periods <- ncol(cashflows$cf)
 
-    # Get Stochastic Discount Factors from ESG module and calculate
-    # cumulative product of factors
-    sdf <- get_sdf(n_paths, periods)
+    # Get Stochastic Discount Factors from ESG module
+    if (!is.null(cashflows$sdf)) {
+        sdf <- cashflows$sdf[1:n_paths, 1:periods]
+    } else {
+        sdf <- get_sdf(nrow(cashflows$cf), ncol(cashflows$cf))
+    }
+
+    # Calculate cumulative product of factors
     cmsdf <- rowCumprods((1/sdf))
 
     # Calculate discounted value of cashflows for each path
-    value <- rowSums(cashflows * cmsdf)
+    value <- rowSums(cashflows$cf * cmsdf)
 
     return(value)
-
 
 }
 
@@ -174,7 +167,8 @@ get_price_stats <- function(prices) {
     probs = c(.25, .5, .75, .95, .99)
 
     # Calculate and organise summary statistics into list
-    stats <- list(mean = mean(prices),
+    stats <- list(size = length(prices),
+                  mean = mean(prices),
                   var = var(prices),
                   sd = sqrt(var(prices)),
                   min = min(prices),

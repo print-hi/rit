@@ -259,7 +259,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #' @param years
 #' vector of years for \code{exp_cfl_rates}
 #' @param level
-#' desired confidence level with 95\% as default
+#' desired confidence level with 95% as default
 #'
 #' @export
 #'
@@ -349,7 +349,7 @@ plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 #' @param target_year
 #' year for which the survival function is plotted for
 #' @param level
-#' desired confidence level with 95\% as default
+#' desired confidence level with 95% as default
 #' @param years
 #' optional vector of years for `surv_sim`. If not supplied, then the column names
 #' of `surv_sim` will be preserved

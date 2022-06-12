@@ -2,7 +2,7 @@
 % Please edit documentation in R/economic_VAR.R
 \name{get_var_simulations}
 \alias{get_var_simulations}
-\title{get_discrete_simulations}
+\title{get_var_simulations}
 \usage{
 get_var_simulations(
   num_years = 5,
@@ -39,7 +39,7 @@ Returns the simulated paths for various economic and financial variables:
 spread, (3) New South Wales houses value index, (4) New South Wales houses
 rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing
 price, (8) Australian dollar trade-weighted index, (9) Australia mortgage
-rate, (10) New South Wales unemployment rate (in \%).
+rate, (10) New South Wales unemployment rate.
 Simulations are based on a Vector Autoregression model. This function uses
 the package \code{zoo} to convert the frequnency units.
 }
