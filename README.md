@@ -25,4 +25,4 @@ Pricing is functional, but outputs for following products need further testing: 
 
 - Account Based Pension shows trends in convergence plot.
 - Reverse Mortgage has large outliers in some simulations.
-- Variable Annuity and Pooled Annuity are not ready, priced incorrectly.
+- Variable Annuity and Pooled Annuity are priced incorrectly.
