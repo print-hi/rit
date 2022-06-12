@@ -17,8 +17,13 @@ load_all(export_all = FALSE)
 
 ## Documentation
 
+The documentation is available [here](https://print-hi.github.io/toolkit-live/).
 
+## Issues
 
+Pricing:
+- Reverse Mortgage has large outliers in some simulations.
+- Variable Annuity and Pooled Annuity are not ready, priced incorrectly.
 
 ## Toolkit Modules
 
