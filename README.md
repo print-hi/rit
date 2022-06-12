@@ -4,7 +4,7 @@ Toolkit of R modules for researchers to use in modelling retirement and age care
 
 ## Installation
 
-1. Clone repository or download ZIP 
+1. Clone repository via command line or download ZIP 
 2. In RStudio:
 ```
 File > Open project > /rit-main
