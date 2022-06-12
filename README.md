@@ -11,7 +11,8 @@ File > Open project > /rit-main
 ```
 4. In RStudio Console: 
 ```
-library(devtools)
+install.packages("devtools")
+library("devtools")
 load_all(export_all = FALSE)
 ```
 
