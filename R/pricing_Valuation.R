@@ -30,8 +30,8 @@ value_policy <- function(policy, cashflows, seed = 0) {
 
     # Produce statistics and plots for policy price
     stat <- get_price_stats(paths)
-    dist <- plot_convergence(paths, seed)
-    conv <- plot_distribution(paths)
+    dist <- plot_distribution(paths)
+    conv <- plot_convergence(paths, seed)
 
     # Maps 'colname' attribute to formatted title for output text
     attr_mapping <- list(
