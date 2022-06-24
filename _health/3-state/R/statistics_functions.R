@@ -65,7 +65,7 @@ afl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
       stop('initial age does not correspond with number of transition probability matrices')
     }
 
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
+    SP <- simulate_path(init_age, init_state, trans_probs, 50000)
   }
   # count time at death
   future_lifetimes <- rep(0, nrow(SP))
@@ -138,8 +138,8 @@ aflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   future_lifetimes <- rep(0, n*10000)
   for (x in 1:n) {
     # simulate new frailty path for each iteration
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    SP <- tshm::simulate_path(init_age, init_state, TP)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    SP <- simulate_path(init_age, init_state, TP)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i, ]
       future_lifetimes[(x-1)*10000+i] <- which(row_val == -1)[1]-1-0.5
@@ -213,7 +213,7 @@ hfl <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL)
     }
 
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
+    SP <- simulate_path(init_age, init_state, trans_probs, 50000)
   }
   healthy_lifetimes <- rep(0, nrow(SP))
   for (i in 1:nrow(SP)) {
@@ -286,8 +286,8 @@ hflF <- function(init_age, init_state, female, year, param_file, n = 1000) {
 
   healthy_lifetimes <- rep(0, n*10000)
   for (x in 1:n) {
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    SP <- tshm::simulate_path(init_age, init_state, TP)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    SP <- simulate_path(init_age, init_state, TP)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
       if (init_state == 0) {
@@ -368,7 +368,7 @@ afld <- function(init_age, init_state, trans_probs = NULL, simulated_path = NULL
     }
 
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
+    SP <- simulate_path(init_age, init_state, trans_probs, 50000)
   }
 
   disabled_lifetime <- rep(0, nrow(SP))
@@ -440,8 +440,8 @@ afldF <- function(init_age, init_state, female, year, param_file, n = 1000) {
   disabled_lifetime <- rep(0, n*10000)
   # simulate n unique latent factors
   for (x in 1:n) {
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    SP <- tshm::simulate_path(init_age, init_state, TP)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    SP <- simulate_path(init_age, init_state, TP)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
       if (init_state == 1) {
@@ -515,7 +515,7 @@ time_to_disabled <- function(init_age, trans_probs = NULL, simulated_path = NULL
     }
 
     # simulate path
-    SP <- tshm::simulate_path(init_age, 0, trans_probs, 50000)
+    SP <- simulate_path(init_age, 0, trans_probs, 50000)
   }
 
   first_time <- rep(0, nrow(SP))
@@ -583,8 +583,8 @@ time_to_disabledF <- function(init_age, female, year, param_file, n = 1000) {
   # create n unique latent factor paths
   first_time <- rep(0, n*10000)
   for (x in 1:n) {
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    SP <- tshm::simulate_path(init_age, 0, TP)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    SP <- simulate_path(init_age, 0, TP)
     for (i in nrow(SP)) {
       row_val <- SP[i,]
       if (1 %in% row_val) {
@@ -656,7 +656,7 @@ survival_stats <- function(init_age, init_state, trans_probs = NULL, simulated_p
     }
 
     # simulate path
-    SP <- tshm::simulate_path(init_age, init_state, trans_probs, 50000)
+    SP <- simulate_path(init_age, init_state, trans_probs, 50000)
   }
 
   # empty vectors to hold row datas
@@ -762,8 +762,8 @@ survival_statsF <- function(init_age, init_state, female, year, param_file, n = 
   first_disabled <- rep(0, n*10000)
 
   for (x in 1:n) {
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    SP <- tshm::simulate_path(init_age, init_state, TP)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    SP <- simulate_path(init_age, init_state, TP)
 
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
