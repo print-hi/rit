@@ -120,8 +120,8 @@ create_life_tableF <- function(init_age, female, year, param_file, init_state = 
 
   life_tables <- list()
   for (i in 1:n) {
-    TP <- tshm::get_trans_probs('F', param_file, init_age, female, year)
-    LT <- tshm::create_life_table(TP, init_age)
+    TP <- get_trans_probs('F', param_file, init_age, female, year)
+    LT <- create_life_table(TP, init_age)
     life_tables[[i]] <- LT
   }
   return(Reduce('+', life_tables)/n)
