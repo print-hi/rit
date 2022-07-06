@@ -6,7 +6,7 @@
 \usage{
 simulate_cf(
   policy,
-  age = 17,
+  age = 65,
   sex = "F",
   seed = 0,
   n = 100,
