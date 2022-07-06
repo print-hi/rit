@@ -4,12 +4,14 @@
 \alias{get_policy_scenario}
 \title{Scenario Generator}
 \usage{
-get_policy_scenario(policy, age, seed, n, period, econ_var)
+get_policy_scenario(policy, age, sex, seed, n, period, econ_var)
 }
 \arguments{
 \item{policy}{Policy object containing necessary parameters (see create_policy_ )}
 
 \item{age}{Initial age of policyholder in years}
+
+\item{sex}{Sex of policyholder}
 
 \item{seed}{Seed for random generator}
 

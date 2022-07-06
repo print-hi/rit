@@ -14,8 +14,6 @@ create_policy_VA(value, length, prop, g_fee)
 \item{prop}{Proportion of the premium that can be withdrawn annually}
 
 \item{g_fee}{Continuous guarantee fees for GMWB}
-
-\item{s_fee}{(Optional) Surrender fees for contract}
 }
 \value{
 Policy object

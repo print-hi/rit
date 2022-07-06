@@ -19,11 +19,11 @@
 #' @return
 #' 10000 rows of individual paths in the states, 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 #' for each row it starts from the initial age as an input, and end at age 110
-#' @export simulate_individual_path_5
+#' @export health5_simulate_individual_path
 #'
 #' @examples
-#' simulated_individual_path=simulate_individual_path_5(init_age=65, init_state=0, params=params_5_frailty, gender=0, i=8, cohort = 10000, model=3)
-simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, cohort = 10000, model) {
+#' simulated_individual_path=health5_simulate_individual_path(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, i=8, cohort = 10000)
+health5_simulate_individual_path <- function(model, init_age, init_state, params, gender, i, cohort = 10000) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
     # create empty matrix to contain simulated population
@@ -32,7 +32,7 @@ simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, 
     # initialise all individuals
     simulated_pop[, 1] <- init_state
 
-    trans_prob_matrix=get_full_trans_prob_matrix_5(params, init_age, gender, i, model)
+    trans_prob_matrix=health5_get_list_trans_prob_matrix(model, params, init_age, gender, i)
 
     for (i in 2:ncol(simulated_pop)) {
         simulated_pop[simulated_pop[,i-1] == 0, i] <- sample(c(0, 1, 2, 3, -1),
@@ -86,11 +86,11 @@ simulate_individual_path_5 <- function(init_age, init_state, params, gender, i, 
 #' for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
 #' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
 #' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
-#' @export simulate_life_table_5
+#' @export health5_get_life_table
 #'
 #' @examples
-#' simulated_lifetable=simulate_life_table_5(params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100, model=3)
-simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_sim=100, model){
+#' simulated_lifetable=health5_get_life_table(model='F', params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100)
+health5_get_life_table=function(model,params,init_age,gender,i,latent,initial_state,n_sim=100){
     state_status_full=list() # full list of state status for all n simulations
     expected_time_state_full=c()
     for (n in 1:100){ # 1000 simulations
@@ -117,7 +117,7 @@ simulate_life_table_5=function(params,init_age,gender,i,latent,initial_state,n_s
 
         for (age in init_age:110){
 
-            trans_prob_matrix[[age-init_age+1]]=transition_probability_5(params,age,gender,i+(age-init_age)/2,latent, model) # calculate transition probability matrix for each age
+            trans_prob_matrix[[age-init_age+1]]=health5_get_trans_probs(model,params,age,gender,i+(age-init_age)/2,latent) # calculate transition probability matrix for each age
 
             for (j in 2:6){
                 state_status[age-init_age+2,j]=state_status[age-init_age+1,2]*trans_prob_matrix[[age-init_age+1]][1,j-1]+
