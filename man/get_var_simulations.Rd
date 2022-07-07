@@ -9,7 +9,7 @@ get_var_simulations(
   num_paths = 10,
   frequency = "quarter",
   perc_change = FALSE,
-  return_sdf = FALSE
+  return_sdf = TRUE
 )
 }
 \arguments{

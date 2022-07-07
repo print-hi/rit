@@ -100,7 +100,7 @@ load_all(export_all=FALSE)
 # model=1 no frailty model
 # model=2 no frailty model with trend
 # model=3 frailty model
-params=params_5_frailty
+params=US_HRS_5
 model='F'
 
 # input characteristics of the individual at time 0
