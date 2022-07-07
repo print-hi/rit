@@ -30,7 +30,7 @@
 #' 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the
 #' first trajectory, type sim$noise$trajectory_1.
 #'
-get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = FALSE) {
+get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE) {
 
     ################
     # error messages 
