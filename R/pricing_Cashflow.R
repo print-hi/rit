@@ -253,7 +253,6 @@ cf_pooled_annuity <- function(policy, state, data) {
 # ----------------------------- Reverse Mortgage ----------------------------- #
 # ---------------------------------------------------------------------------- #
 
-
 #' Reverse Mortgage - Cashflow Simulator
 #'
 #' @param policy

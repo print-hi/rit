@@ -18,6 +18,4 @@ arr_apply(X, FUN)
 Returns a 3D array of matrices obtained by applying a function over each matrix
 of a 3D array.
 }
-\examples{
-
-}
+\keyword{internal}
