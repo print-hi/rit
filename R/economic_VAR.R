@@ -16,10 +16,10 @@
 #' which is the simulation frequency for the Vector Autoregression model. Linear
 #' interpolation will be used if the required frequency is higher, whereas
 #' arithmetic average will be used if the frequency is lower.
-#' @param perc_change If the outputs are expressed in terms of percentage
-#' change.Default is FALSE
+#' @param perc_change If the outputs are expressed in terms of period-by-period percentage
+#' change.Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
 #' @param return_sdf If the VAR-based stochastic discount factors are returned.
-#' Default is FALSE.
+#' Default is TRUE. 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for
 #' each economic variable, and a list of white noises in the VAR model.
@@ -257,7 +257,10 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     #############
     
     if (isTRUE(perc_change)) {
+        ref_level = lapply(output, function (x) {x = x[1,]; row.names(x) = paste("ref_level", row.names(x));x})
         output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        output = lapply(1:length(output), function (x) {rbind(ref_level[[x]][1,],output[[x]])}) # include the reference level in outputs
+        names(output) = names(sim)
     }
     
     return (output)

@@ -52,17 +52,17 @@ discrete_sim$zcp3m_yield$trajectory_37[1:9]
 discrete_sim$GDP$trajectory_37[1:9]
 discrete_sim$discount_factors$trajectory_37[1:9]
 
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp3m_yield, type = "l", ylab = "", main = "3-month zero-coupon yields", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp10y_spread, type = "l", ylab = "", main = "10-year zero-coupon spreads", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$home_index, type = "l", ylab = "", main = "NSW home value indexes", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$rental_yield, type = "l", ylab = "", main = "NSW rental yields", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$GDP, type = "l", ylab = "", main = "Australia GDP", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$CPI, type = "l", ylab = "", main = "Australia CPI", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$ASX200, type = "l", ylab = "", main = "S&P/ASX200 prices", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$AUD, type = "l", ylab = "", main = "AUD trade indexes", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$mortgage_rate, type = "l", ylab = "", main = "Mortgage rates", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$unemployment_rate, type = "l", ylab = "", main = "NSW unemployment rates", xlab="")
-matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$discount_factors, type = "l", ylab = "", main = "Australia stochastic discount factors", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$zcp3m_yield[-1,], type = "l", ylab = "", main = "3-month zero-coupon yields", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$zcp10y_spread[-1,], type = "l", ylab = "", main = "10-year zero-coupon spreads", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$home_index[-1,], type = "l", ylab = "", main = "NSW home value indexes", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$rental_yield[-1,], type = "l", ylab = "", main = "NSW rental yields", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$GDP[-1,],type = "l", ylab = "", main = "Australia GDP", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$CPI[-1,], type = "l", ylab = "", main = "Australia CPI", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$ASX200[-1,], type = "l", ylab = "", main = "S&P/ASX200 prices", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$AUD[-1,], type = "l", ylab = "", main = "AUD trade indexes", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$mortgage_rate[-1,], type = "l", ylab = "", main = "Mortgage rates", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$unemployment_rate[-1,], type = "l", ylab = "", main = "NSW unemployment rates", xlab="")
+matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$discount_factors[-1,], type = "l", ylab = "", main = "Australia stochastic discount factors", xlab="")
 
 #### test cont-time model: independent-factor interest rate term structure ####
 
@@ -108,7 +108,8 @@ cts_sim = get_afns_simulation(num_years = num_years,
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "independent", 
-                              model = "interest_house_stock")
+                              model = "interest_house_stock",
+                              perc_change = T)
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs)
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
@@ -130,21 +131,22 @@ cts_sim = get_afns_simulation(num_years = num_years,
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "correlated", 
-                              model = "interest_house_stock")
+                              model = "interest_house_stock",
+                              perc_change = T)
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs)
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
 cts_sim$maturity_40qtrs$trajectory_46[1:10]
-log(cts_sim$house_index$trajectory_46[1:10])
-log(cts_sim$stock_price$trajectory_46[1:10])
+cts_sim$house_index$trajectory_46[1:10]
+cts_sim$stock_price$trajectory_46[1:10]
 
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_1qtrs, type = "l", ylab = "", main = "3-month zero-coupon yields", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_2qtrs, type = "l", ylab = "", main = "6-month zero-coupon yields", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_4qtrs, type = "l", ylab = "", main = "1-year zero-coupon yields", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_20qtrs, type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),log(cts_sim$house_index), type = "l", ylab = "", main = "NSW log house value indexes", xlab = "")
-matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),log(cts_sim$stock_price), type = "l", ylab = "", main = "log S&P/ASX200 prices", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$maturity_1qtrs[-1,], type = "l", ylab = "", main = "3-month zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$maturity_2qtrs[-1,], type = "l", ylab = "", main = "6-month zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$maturity_4qtrs[-1,], type = "l", ylab = "", main = "1-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$maturity_20qtrs[-1,], type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$maturity_40qtrs[-1,], type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$house_index[-1,], type = "l", ylab = "", main = "NSW log house value indexes", xlab = "")
+matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$stock_price[-1,], type = "l", ylab = "", main = "log S&P/ASX200 prices", xlab = "")
 
 
 # please change frequency at line 13 to "year", "quarter", or "month" 
