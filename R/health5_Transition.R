@@ -20,6 +20,15 @@
 #' @examples
 #' transition_rates=health5_get_trans_rates(model='F',params=params_5_frailty, age=65, gender=0, i=8, latent=0)
 health5_get_trans_rates=function(model,params,age,gender,i,latent){
+    #
+    if (model == 'S') {
+        params <- params[1:3, 3:14]
+    } else if (model == 'T') {
+        params <- params[6:9, 3:14]
+    } else if (model == 'F') {
+        params <- params[11:15, 3:14]
+    }
+    #
     if (model== 'S'){
         vari_x=matrix(c(1,age,gender),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0))
@@ -67,6 +76,13 @@ health5_get_trans_rates=function(model,params,age,gender,i,latent){
 #' transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, i=8, latent=0)
 health5_get_trans_probs=function(model,params,age,gender,i,latent){
     trans_rate=health5_get_trans_rates(model,params,age,gender,i,latent)
+    if (model == 'S') {
+        params <- params[1:3, 3:14]
+    } else if (model == 'T') {
+        params <- params[6:9, 3:14]
+    } else if (model == 'F') {
+        params <- params[11:15, 3:14]
+    }
     trans_rate_matrix=rbind(c(-sum(trans_rate[1:4]),trans_rate[1],trans_rate[2],trans_rate[3],trans_rate[4]),
                             c(0,-sum(trans_rate[5:6]),0,trans_rate[5],trans_rate[6]),
                             c(trans_rate[7],trans_rate[8],-sum(trans_rate[c(7,8,9,10)]),trans_rate[9],trans_rate[10]),
