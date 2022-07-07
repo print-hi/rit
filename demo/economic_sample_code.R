@@ -16,7 +16,7 @@ freq = "year" # please change it to "year", "quarter", or "month"
 
 discrete_sim = get_var_simulations(num_years = num_years, 
                                    num_paths = num_paths, 
-                                   frequency = freq, 
+                                   frequency = "month", 
                                    perc_change = F, 
                                    return_sdf = T)
 sum(is.na(discrete_sim)) # check if there're NA's 
@@ -68,7 +68,7 @@ matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$discount_f
 
 cts_sim = get_afns_simulation(num_years = num_years, 
                               num_paths = num_paths, 
-                              frequency = freq, 
+                              frequency = "month", 
                               type = "independent", 
                               model = "interest_rate")
 sum(is.na(cts_sim)) # check if there're NA's 
