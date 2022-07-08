@@ -1,4 +1,4 @@
-#' get_afns_simulation
+#' esg_afns_simulation
 #' 
 #' Returns the simulated paths of the zero-coupon interest rate term structure. 
 #' The model is based on an Arbitrage-Free Nelson-Siegel (AFNS) model. 
@@ -22,13 +22,13 @@
 #' If model is `interest_house_stock`,the function returns a list containing 42 data frames 
 #' for the simulated trajectories for maturities from 1 quarter up to 10 years, 
 #' as well as NSW house value indexes and S&P/ASX200 closing prices. 
-#' @export get_afns_simulation
+#' @export esg_afns_simulation
 #'
-#' @examples sim = get_afns_simulations(num_years = 10, num_paths = 100, 
+#' @examples sim = esg_afns_simulations(num_years = 10, num_paths = 100, 
 #' frequency = "year", type = "correlated", model = "interest_rate"). To obtain trajectories of 
 #' Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. To obtain trajectories of 
 #' S&P/ASX200 closing prices, type sim$stock_price. 
-get_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate") {
+esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate") {
     
     ##################
     # error messages #

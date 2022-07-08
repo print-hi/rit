@@ -1,4 +1,4 @@
-#' get_var_simulations
+#' esg_var_simulations
 #'
 #' Returns the simulated paths for various economic and financial variables:
 #' (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon
@@ -23,14 +23,14 @@
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for
 #' each economic variable, and a list of white noises in the VAR model.
-#' @export get_var_simulations
+#' @export esg_var_simulations
 #'
-#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 100,
+#' @examples sim = esg_var_simulations(num_years = 10, num_paths = 100,
 #' frequency = "year", return_sdf = T). To obtain all trajectories of Australia
 #' 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the
 #' first trajectory, type sim$noise$trajectory_1.
 #'
-get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE) {
+esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE) {
 
     ################
     # error messages 
