@@ -2,7 +2,7 @@
 library(expm)
 library(MASS)
 library(zoo)
-source("economic_AFNS.R"); source("economic_Model.R"); source("economic_VAR.R");
+source("economic_AFNS.R"); source("economic_Model.R"); source("economic_VAR.R"); source("economic_summary.R")
 
 ##############
 # parameters #
@@ -14,7 +14,7 @@ freq = "year" # please change it to "year", "quarter", or "month"
 
 #### test discrete-time model ####
 
-discrete_sim = get_var_simulations(num_years = num_years, 
+discrete_sim = esg_var_simulations(num_years = num_years, 
                                    num_paths = num_paths, 
                                    frequency = "month", 
                                    perc_change = F, 
@@ -24,6 +24,8 @@ row.names(discrete_sim$zcp3m_yield)[1:10] # dates
 discrete_sim$zcp3m_yield$trajectory_37[1:10]
 discrete_sim$GDP$trajectory_37[1:10]
 discrete_sim$discount_factors$trajectory_37[1:10]
+
+discrete_summ = esg_summary(discrete_sim)
 
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp3m_yield, type = "l", ylab = "", main = "3-month zero-coupon yields", xlab="")
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp10y_spread, type = "l", ylab = "", main = "10-year zero-coupon spreads", xlab="")
@@ -41,7 +43,7 @@ matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$discount_facto
 # comments: interest rate at Q1 2020 was very low due to COVID, so the 
 # percentage change at the start could blow up. 
 
-discrete_sim = get_var_simulations(num_years = num_years, 
+discrete_sim = esg_var_simulations(num_years = num_years, 
                                    num_paths = num_paths, 
                                    frequency = freq, 
                                    perc_change = T, 
@@ -66,7 +68,7 @@ matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$discount_f
 
 #### test cont-time model: independent-factor interest rate term structure ####
 
-cts_sim = get_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulation(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = "month", 
                               type = "independent", 
@@ -85,7 +87,7 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type
 
 #### test cont-time model: correlated-factor interest rate term structure ####
 
-cts_sim = get_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulation(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "correlated", 
@@ -104,7 +106,7 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type
 
 #### test cont-time model: independent-factor term structure, house index, stock price ####
 
-cts_sim = get_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulation(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "independent", 
@@ -127,7 +129,7 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),log(cts_sim$stock_price), typ
 
 #### test cont-time model: correlated-factor term structure, house index, stock price ####
 
-cts_sim = get_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulation(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "correlated", 
