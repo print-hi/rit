@@ -25,8 +25,6 @@ discrete_sim$zcp3m_yield$trajectory_37[1:10]
 discrete_sim$GDP$trajectory_37[1:10]
 discrete_sim$discount_factors$trajectory_37[1:10]
 
-discrete_summ = esg_summary(discrete_sim)
-
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp3m_yield, type = "l", ylab = "", main = "3-month zero-coupon yields", xlab="")
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$zcp10y_spread, type = "l", ylab = "", main = "10-year zero-coupon spreads", xlab="")
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$home_index, type = "l", ylab = "", main = "NSW home value indexes", xlab="")
@@ -38,6 +36,22 @@ matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$AUD, type = "l
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$mortgage_rate, type = "l", ylab = "", main = "Mortgage rates", xlab="")
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$unemployment_rate, type = "l", ylab = "", main = "NSW unemployment rates", xlab="")
 matplot(as.Date(row.names(discrete_sim$zcp3m_yield)),discrete_sim$discount_factors, type = "l", ylab = "", main = "Australia stochastic discount factors", xlab="")
+
+discrete_summ = esg_summary(discrete_sim)
+sum(is.na(discrete_summ))
+colnames(discrete_summ$zcp3m_yield)
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$zcp3m_yield[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "3-month zero-coupon yields", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$zcp10y_spread[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "10-year zero-coupon spreads", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$home_index[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "NSW home value indexes", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$rental_yield[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "NSW rental yields", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$GDP[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "Australia GDP", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$CPI[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "Australia CPI", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$ASX200[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "S&P/ASX200 prices", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$AUD[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "AUD trade indexes", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$mortgage_rate[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "Mortgage rates", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$unemployment_rate[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "NSW unemployment rates", xlab="")
+matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$discount_factors[,-ncol(discrete_summ$zcp3m_yield)], type = "l", ylab = "", main = "Australia stochastic discount factors", xlab="")
+
 
 #### test discrete-time model: percentage change as outputs ####
 # comments: interest rate at Q1 2020 was very low due to COVID, so the 
@@ -104,6 +118,8 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_4qtrs, type 
 matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_20qtrs, type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
 matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
 
+esg_summary(cts_sim$maturity_38qtrs, na.rm = T)
+
 #### test cont-time model: independent-factor term structure, house index, stock price ####
 
 cts_sim = esg_afns_simulation(num_years = num_years, 
@@ -111,7 +127,7 @@ cts_sim = esg_afns_simulation(num_years = num_years,
                               frequency = freq, 
                               type = "independent", 
                               model = "interest_house_stock",
-                              perc_change = T)
+                              perc_change = F)
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs)
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
@@ -126,6 +142,17 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_20qtrs, type
 matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
 matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),log(cts_sim$house_index), type = "l", ylab = "", main = "NSW log house value indexes", xlab = "")
 matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),log(cts_sim$stock_price), type = "l", ylab = "", main = "log S&P/ASX200 prices", xlab = "")
+
+cts_summ = esg_summary(cts_sim, probs = seq(0,1,0.2))
+sum(is.na(cts_summ))
+colnames(cts_summ$maturity_1qtrs)
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$maturity_1qtrs[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "3-month zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$maturity_2qtrs[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "6-month zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$maturity_4qtrs[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "1-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$maturity_20qtrs[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$maturity_40qtrs[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$house_index[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "NSW log house value indexes", xlab = "")
+matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$stock_price[,-ncol(cts_summ$maturity_1qtrs)], type = "l", ylab = "", main = "log S&P/ASX200 prices", xlab = "")
 
 #### test cont-time model: correlated-factor term structure, house index, stock price ####
 
@@ -152,4 +179,11 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$stock_price[-1,],
 
 
 # please change frequency at line 13 to "year", "quarter", or "month" 
+
+#### test esg_summary
+
+test_data = as.data.frame(matrix(1:100, nrow = 4, byrow = T))
+test_data2 = as.data.frame(matrix(1001:2000, nrow = 40, byrow = T))
+test_list = list(test_data, test_data2)
+esg_summary(test_list)
 

@@ -18,16 +18,14 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
     ##################
     # error messages #
     ##################
-    if (!is.list(paths) | !is.data.frame(paths) | is.null(paths)) {
+    if (!is.list(paths) & !is.data.frame(paths) & is.null(paths)) {
         stop ("Paths must be a list or a dataframe. ")
     } else if (min(probs) < 0 | max(probs) > 1 | is.complex(probs)) {
         stop ("Probs must be between 0 and 1. ")
     }
     message("This function provides period-by-period summary statistics for time series data.")
-    message("Caution when using this function: ")
-    message("1. The rows must represent the time spots, while the columns must be the trajectories. ")
-    message("2. Any NAs will be ignored. ")
-    
+    message("Caution when using this function: the rows must represent the time spots, while the columns must be the trajectories. ")
+
     ###############
     # calculation #
     ###############
@@ -49,9 +47,9 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
         
     } else {
         output = data.frame(matrix(NA, nrow = nrow(paths), ncol = length(stats)))
-        output = t(rbind(apply(paths[[x]], 1, quantile, probs = probs, na.rm = na.rm),
-                         apply(paths[[x]], 1, mean, na.rm = na.rm),
-                         apply(paths[[x]], 1, sd, na.rm = na.rm)))
+        output = t(rbind(apply(paths, 1, quantile, probs = probs, na.rm = na.rm),
+                         apply(paths, 1, mean, na.rm = na.rm),
+                         apply(paths, 1, sd, na.rm = na.rm)))
         output = as.data.frame(output)
         colnames(output) = stats
     }
