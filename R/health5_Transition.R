@@ -128,7 +128,7 @@ health5_get_trans_probs=function(model, params, init_age, gender, wave_index, la
     #  }
 
     for (a in init_age:110){
-        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model, params,a,gender,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
+        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model,params,a,gender,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
         if (model=='F'){
             latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }
