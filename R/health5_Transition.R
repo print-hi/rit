@@ -69,12 +69,12 @@ health5_get_trans_rates=function(model,params,age,gender,wave_index,latent){
 #'
 #' @return
 #' 5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
-#' @export health5_get_trans_probs
+#' @export health5_get_trans_probs_at_age
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, wave_index=8, latent=0)
-health5_get_trans_probs=function(model,params,age,gender,wave_index,latent){
+#' transition_probabilities=health5_get_trans_probs_at_age(model='F', params=params_5_frailty, age=65, gender=0, wave_index=8, latent=0)
+health5_get_trans_probs_at_age=function(model,params,age,gender,wave_index,latent){
     trans_rate=health5_get_trans_rates(model,params,age,gender,wave_index,latent)
     if (model == 'S') {
         params <- params[1:3, 3:14]
@@ -106,15 +106,16 @@ health5_get_trans_probs=function(model,params,age,gender,wave_index,latent){
 #' the wave index
 #' @param model
 #' S for static model, T for trend model, F for frailty model
+#' @param latent
+#' initial value of latent factor, normally take the value 0
 #'
 #' @return a list of 5 times 5 transition probability matrices, from the initial age to age 110
 #' @import readxl expm
-#' @export health5_get_list_trans_prob_matrix
+#' @export health5_get_trans_probs
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F', params=params_5_frailty, init_age=65, gender=0, wave_index=8)
-health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, wave_index){
-    latent=0 # initial value of latent factor
+#' trans_prob_matrix_age65to110=health5_get_trans_probs(model='F', params=params_5_frailty, init_age=65, gender=0, wave_index=8)
+health5_get_trans_probs=function(model, params, init_age, gender, wave_index, latent=0){
     # list of 46 vectors of transition rates for this simulation
     trans_rate=list()
     # list of 46 matrices of transition probabilities for this simulation
@@ -127,8 +128,8 @@ health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, wav
     #  }
 
     for (a in init_age:110){
-        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs(model, params,a,gender,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
-        if (model==3){
+        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model, params,a,gender,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
+        if (model=='F'){
             latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }
         average_time_state=colSums(state_status) # the order is H M D MD Dead
