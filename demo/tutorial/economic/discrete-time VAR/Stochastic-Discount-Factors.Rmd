@@ -1,0 +1,371 @@
+---
+title: "Retirement Income Toolkit - Economic Scenario - Pricing Kernels"
+author: "Queenie Huang"
+output:
+ bookdown::html_document2:
+    toc: yes
+    toc_depth: '4'
+    number_sections: yes
+    fig_caption: yes
+    code_folding: hide
+urlcolor: blue
+header-includes: |    
+ \usepackage{amsmath,amsthm,amssymb,amsfonts, mathtools, empheq, bbm}
+ \newcommand{\vect}[1]{\boldsymbol{#1}}
+---
+
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 15px;
+  }
+td {  /* Table  */
+  font-size: 15px;
+}
+h1.title {
+  font-size: 30px;
+}
+h1 { /* Header 1 */
+  font-size: 26px;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 18px;
+  color: DarkBlue;
+}
+code.r{ /* Code block */
+    font-size: 15px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 15px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 1, digits = 6) # use 2 d.p. in output
+```
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(zoo)
+library(janitor)
+library(doParallel)
+e1 = as.matrix(c(1, rep(0,7)))
+```
+
+
+# Import Data 
+
+```{r}
+start_pc_date = as.Date("1993-04-01")
+end_date = as.Date("2021-03-31")
+max_maturity = 40
+n_index = c(1,4,8,20,40)
+maturities = c("Date", paste(1:max_maturity, "qtrs", sep = "_"))
+var_names = c("zcp3m_yield", "zcp10y_spread", "home_index_growth", "rental_yield", "GDP_growth", "CPI_growth", "ASX200_growth", "AUD_growth")
+
+
+#######################
+# import interest rates 
+zcp_old = read_excel("ZCP_till2008.xls")[-c(1:10), -2]
+zcp_new = read_excel("ZCP_from2008.xls")[-c(1:10), -2]
+names(zcp_old) = maturities
+names(zcp_new) = maturities
+zcp = rbind(zcp_old, zcp_new)
+rm(zcp_old, zcp_new)
+
+# cleaning 
+zcp = zcp %>% mutate_if(is.character, as.numeric)
+zcp$Date = as.Date(zcp$Date, origin = "1899-12-30")
+zcp = clean_names(zcp)
+
+# match the time window 
+zcp = zcp %>% filter(date <= end_date & date >= start_pc_date)
+zcp = zcp %>% mutate(Qtr = as.yearqtr(date)) %>% group_by(Qtr) %>% summarise_at(vars(-date), mean) 
+
+# add row names & change class()
+time_names_past = zcp$Qtr
+zcp_sdf = as.matrix(zcp[-1,n_index+1]) / 100
+zcp = as.matrix(zcp[-1,-1]) / 100
+row.names(zcp) = as.character(time_names_past[-1])
+row.names(zcp_sdf) = as.character(time_names_past[-1])
+
+###################
+# import zt vectors 
+all_data = read.csv("data/all_data.csv")[,-1]
+all_data = as.matrix(t(all_data))
+row.names(all_data) = var_names
+colnames(all_data) = as.character(time_names_past)
+all_data[1,] = all_data[1,] / 100
+all_data[2,] = all_data[2,] / 100
+
+##############
+# VAR Dynamics
+# intercept 
+intercept = matrix(c(-0.001656651,0.000142228,0.000697426,0.001208242,0.007404573,0.006936114,0.020845829, -0.001948064), nrow = 8, ncol = 1)
+# coefficient matrix in VAR(1)
+coef = data.frame(zcp3m_yield = c(0.339929,0.1137847,0.02865682, -0.1962058, -0.0213723,0.00446621,0.00991223,0.00654165),
+                  zcp10y_spread = c(-0.451455,0.8670374,0.02193637,0.0199211,0.0442296,0.05746370,-0.00562332,0.01852652),
+                  home_index = c(-0.661822,0.0568036,0.72566350,0.0746341,0.3094571, -0.17668326,0.03114352,0.00984050),
+                  rental_yield = c(0.150427, -0.1065600, -0.00245535,0.1967380, -0.0335203,0.04828259,0.00803609,0.00148116),
+                  GDP = c(-0.243469,0.1739440, -0.06584194,0.3091203, -0.0617071, -0.15061791,0.01758549,0.04417218),
+                  CPI = c(0.256898, -0.0754316,0.00615750, -0.1858264, -0.0911666,0.08844679,0.00387475, -0.00201055),
+                  ASX200 = c(-0.167551,0.1251294, -0.32533013, -1.1531345,0.1320861, -1.93119670,0.26973160,0.12588817),
+                  AUD = c(-2.216189,0.3490000,  0.26377394, -1.1205875,0.2365210, -0.77832396, -0.01069297,0.24006978),
+                  row.names = var_names)
+colnames(coef) = var_names
+coef = as.matrix(t(coef))
+
+# coefficient matrix in VAR(2)
+coef1 = matrix(0, nrow = 8, ncol = 8)
+coef1[1,1] = 1
+coef1[4,4] = 1
+coef1 = coef + coef1
+coef2 = matrix(0, nrow = 8, ncol = 8) 
+coef2[,1] = -coef[,1]
+coef2[,4] = -coef[,4]
+
+# residual covariance matrix 
+covres = data.frame(zcp3m_yield = c(1.47783e-05,-1.01017e-05,2.53209e-06,-2.71426e-06,6.60361e-06,4.41163e-06,0.0000432530,7.57409e-05),
+                    zcp10y_spread = c(-1.01017e-05,2.11857e-05,-6.23599e-07,-1.20674e-06, -4.37033e-06, -1.44520e-06, -0.0000266498, -4.78746e-05),
+                    home_index = c(2.53209e-06,-6.23599e-07,1.43124e-04,-6.82911e-06,8.61086e-06, -1.00958e-06,0.0001237822,4.30438e-05),
+                    rental_yield = c(-2.71426e-06,-1.20674e-06,-6.82911e-06,1.67679e-05, -3.35037e-08,  2.46972e-06, -0.0000480865, -2.81226e-05),
+                    GDP = c(6.60361e-06,-4.37033e-06,8.61086e-06,-3.35037e-08,9.90145e-05,2.00431e-05,0.0001435020,7.72833e-06),
+                    CPI = c(4.41163e-06,-1.44520e-06,-1.00958e-06,2.46972e-06,2.00431e-05,3.09181e-05,0.0000535892,2.50834e-05),
+                    ASX200 = c(4.32530e-05,-2.66498e-05,1.23782e-04,-4.80865e-05,1.43502e-04,5.35892e-05,0.0029571153,9.07070e-04),
+                    AUD = c(7.57409e-05,-4.78746e-05,4.30438e-05,-2.81226e-05,7.72833e-06,2.50834e-05,0.0009070698,1.45155e-03),
+                    row.names = var_names)
+colnames(covres) = var_names
+covres = as.matrix(t(covres))
+```
+
+# Model - estimate lambda_0, lambda_1 (historical data)
+
+```{r}
+######################
+# calculate An, Bn, Cn
+
+get_ABC = function (lambda_0, lambda_1) {
+  lambda_0 = as.matrix(lambda_0)
+  lambda_1 = as.matrix(lambda_1)
+  
+  # initialise dataframes to store An, Bn, Cn
+  An = matrix(NA, nrow = 1, ncol = max_maturity)
+  Bn = matrix(NA, nrow = length(intercept), ncol = max_maturity)
+  Cn = matrix(NA, nrow = length(intercept), ncol = max_maturity)
+  
+  # initial values A1, B1, C1
+  An[1] = 0
+  Bn[,1] = -e1
+  Cn[,1] = rep(0,length(intercept))
+  
+  # terminal values A40, B40, C40
+  # An[max_maturity] = 0
+  # Bn[,max_maturity] = -max_maturity * e1 - max_maturity * c(0,1,rep(0,length(intercept)-2))
+  # Cn[,max_maturity] = rep(0,length(intercept))
+  # 
+  # calculate recursively
+  for (n in 1:(max_maturity-1)) {
+    An[n+1] = An[n] + t(Bn[,n]) %*% (intercept - chol(covres) %*% lambda_0) + 1/2 * t(Bn[,n]) %*% covres %*% Bn[,n]
+    Bn[,n+1] = -e1 + t(coef1 - chol(covres) %*% lambda_1) %*% Bn[,n] + Cn[,n]
+    Cn[,n+1] = t(coef2) %*% Bn[,n]
+  }
+  
+  # output 
+  output = list(An, Bn, Cn)
+  names(output) = c("An", "Bn", "Cn")
+  output = lapply(output, function(x){x = as.matrix(x)})
+  output = lapply(output, function(x){colnames(x) = colnames(zcp); return (x)})
+  return (output)
+}
+
+#############################################
+# calculate sum (r(n)t hat - r(n)t) ^ 2 stats
+
+# only for r(1), r(4), r(8), r(20), r(40)
+# get_rnt = function (lambda_0, lambda_1) {
+#   # An, Bn, Cn 
+#   ABCn = get_ABC(lambda_0, lambda_1)
+#   An = ABCn$An
+#   Bn = ABCn$Bn
+#   Cn = ABCn$Cn
+#   
+#   # zt: all_data
+#   
+#   # initialise dataframe to store historical r_t^(n)
+#   rnt = matrix(NA, nrow = length(time_names_past), ncol = max_maturity)
+#   row.names(rnt) = as.character(time_names_past)
+#   colnames(rnt) = maturities[-1]
+#   
+#   # r(n)t hat  
+#   for (t in 2:length(time_names_past)) {
+#     for (n in n_index) {
+#       rnt[t,n] = -An[n] / n - t(Bn[,n]) %*% all_data[,t] / n - t(Cn[,n]) %*% all_data[,t-1] / n
+#     }
+#   }
+#   
+#   return (rnt[-1,n_index])
+# }
+
+# r(1), r(2), ..., r(40)
+get_rnt = function (lambda_0, lambda_1) {
+  # An, Bn, Cn
+  ABCn = get_ABC(lambda_0, lambda_1)
+  An = ABCn$An
+  Bn = ABCn$Bn
+  Cn = ABCn$Cn
+  
+  # zt: all_data
+  
+  # initialise dataframe to store historical r_t^(n)
+  rnt = matrix(NA, nrow = length(time_names_past), ncol = max_maturity)
+  row.names(rnt) = as.character(time_names_past)
+  colnames(rnt) = maturities[-1]
+  
+  # r(n)t hat  
+  for (t in 2:length(time_names_past)) {
+    for (n in 1:max_maturity) {
+      rnt[t,n] = -An[n] / n - t(Bn[,n]) %*% all_data[,t] / n - t(Cn[,n]) %*% all_data[,t-1] / n
+    }
+  }
+  
+  return (rnt[-1,])
+}
+
+get_sse = function (lambda_list) {
+  # reorganise parameters
+  lambda_0 = matrix(lambda_list[1:8], nrow = 8)
+  lambda_1 = matrix(lambda_list[-c(1:8)], nrow = 8, ncol = 8, byrow = T)
+  
+  rnt_hat = get_rnt(lambda_0, lambda_1)
+  sum((rnt_hat - zcp) ^ 2)
+}
+
+#################################
+# minimise for lambda_0, lambda_1
+# lambda_list = list(lambda0_1=0, lambda0_2=0, lambda0_3=0, lambda0_4=0, lambda0_5=0, lambda0_6=0, lambda0_7=0, lambda0_8=0,
+#                    lambda1_11=0, lambda1_12=0, lambda1_13=0, lambda1_14=0, lambda1_15=0, lambda1_16=0, lambda1_17=0, lambda1_18=0,
+#                    lambda1_21=0, lambda1_22=0, lambda1_23=0, lambda1_24=0,  lambda1_25=0, lambda1_26=0, lambda1_27=0, lambda1_28=0,
+#                    lambda1_31=0, lambda1_32=0, lambda1_33=0, lambda1_34=0, lambda1_35=0, lambda1_36=0,  lambda1_37=0, lambda1_38=0,
+#                    lambda1_41=0, lambda1_42=0, lambda1_43=0, lambda1_44=0, lambda1_45=0, lambda1_46=0, lambda1_47=0, lambda1_48=0,
+#                    lambda1_51=0, lambda1_52=0, lambda1_53=0, lambda1_54=0, lambda1_55=0, lambda1_56=0, lambda1_57=0, lambda1_58=0,
+#                    lambda1_61=0, lambda1_62=0, lambda1_63=0, lambda1_64=0, lambda1_65=0, lambda1_66=0, lambda1_67=0, lambda1_68=0,
+#                    lambda1_71=0, lambda1_72=0, lambda1_73=0, lambda1_74=0,  lambda1_75=0, lambda1_76=0, lambda1_77=0, lambda1_78=0,
+#                    lambda1_81=0, lambda1_82=0, lambda1_83=0, lambda1_84=0, lambda1_85=0, lambda1_86=0,  lambda1_87=0, lambda1_88=0)
+# 
+# optim_ctrl = list(maxit = 500)
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# lambdas = optim(lambda_list, get_sse, control = optim_ctrl)
+# stopCluster(cl)
+# lambdas
+# 
+# save(lambdas, file = "data/lambdas.RData")
+# load("data/lambdas.RData")
+lambda_0 = as.matrix(read.csv("data/lambda_0.csv")[,-1])
+lambda_1 = as.matrix(read.csv("data/lambda_1.csv")[,-1])
+```
+
+# Model - fitted s_t
+
+```{r}
+############
+# fitted VAR 
+# zt_fitted = matrix(NA, nrow = 8, ncol = 112)
+# zt_fitted[,1:2] = all_data[,1:2]
+# zt_fitted[1:2,1:2] = all_data[1:2, 1:2] * 100
+# for (i in 3:112) {
+#   zt_fitted[,i] = intercept + coef1 %*% zt_fitted[,i-1] + coef2 %*% zt_fitted[,i-2]
+# }
+zt_fitted = read.csv("data/all_data_fitted.csv")[,-1]
+row.names(zt_fitted) = var_names
+colnames(zt_fitted) = time_names_past
+zt_fitted[1:2,] = zt_fitted[1:2,] / 100
+
+###########
+# fitted st
+lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% zt_fitted[,x]}, simplify = T)
+st_fit = sapply(1:112, function (x) {exp(-zt_fitted[1,x] - 1/2 * sum(lambda_t[,x]^2))})
+plot(time_names_past, st_fit * 100, "l", main = "Fitted SDFs", xlab = "", ylab = "")
+```
+
+# Model - historical s_t
+
+```{r}
+lambda_t = sapply(1:112, function (x) {lambda_0 + lambda_1 %*% all_data[,x]}, simplify = T)
+st_past = sapply(1:112, function (x) {exp(-all_data[1,x] - 1/2 * sum(lambda_t[,x]^2))})
+
+##############
+# correlations
+# cor(st_past, all_data[1,])
+# cor(st_past, all_data[2,])
+# cor(st_past, all_data[3,])
+# cor(st_past, all_data[4,])
+# cor(st_past, all_data[5,])
+# cor(st_past, all_data[6,])
+# cor(st_past, all_data[7,])
+# cor(st_past, all_data[8,])
+```
+
+
+# Testing: get_var_simulations
+
+```{r}
+num_paths = 10
+num_years = 20
+
+source("../SDF_Simulation.R")
+source("../VAR.R")
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+sdf = get_var_simulations(num_paths = num_paths, num_years = num_years, return_sdf = T)
+stopCluster(cl)
+
+par(mfrow = c(2,2))
+
+#######
+# zcp3m
+plot_date = c(as.Date(time_names_past), row.names(sdf$zcp3m_yield)[-1])
+plot_data = c(all_data[1,], sdf$zcp3m_yield[-1,1])
+plot(plot_date, plot_data, "l", main = "zcp3m", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(all_data[1,], sdf$zcp3m_yield[-1,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+########
+# zcp10y
+plot_data = c(all_data[2,], sdf$zcp10y_spread[-1,1])
+plot(plot_date, plot_data, "l", main = "zcp10y", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(all_data[2,], sdf$zcp10y_spread[-1,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+######
+# rent 
+plot_date = c(as.Date(time_names_past), row.names(sdf$rental_yield)[-1])
+plot_data = c(all_data[4,], sdf$rental_yield[-1,1])
+plot(plot_date, plot_data, "l", main = "rent", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(all_data[4,], sdf$rental_yield[-1,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+#####
+# sdf 
+plot_data = c(st_past, sdf$discount_factors[-1,i])
+plot(plot_date, plot_data, "l", main = "SDFs", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(st_past, sdf$discount_factors[-1,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+```
