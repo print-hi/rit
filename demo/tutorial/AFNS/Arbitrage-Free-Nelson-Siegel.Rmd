@@ -1,0 +1,1916 @@
+---
+title: "Retirement Income Toolkit - Economic Scenario - AFNS"
+author: "Queenie Huang"
+output:
+ bookdown::html_document2:
+    toc: yes
+    toc_depth: '4'
+    number_sections: yes
+    fig_caption: yes
+    code_folding: hide
+urlcolor: blue
+header-includes: |    
+ \usepackage{amsmath,amsthm,amssymb,amsfonts, mathtools, empheq, bbm}
+ \newcommand{\vect}[1]{\boldsymbol{#1}}
+---
+
+```{=html}
+<style type="text/css">
+
+body{ /* Normal  */
+      font-size: 15px;
+  }
+td {  /* Table  */
+  font-size: 15px;
+}
+h1.title {
+  font-size: 30px;
+}
+h1 { /* Header 1 */
+  font-size: 26px;
+  color: DarkBlue;
+}
+h2 { /* Header 2 */
+    font-size: 22px;
+  color: DarkBlue;
+}
+h3 { /* Header 3 */
+  font-size: 18px;
+  color: DarkBlue;
+}
+code.r{ /* Code block */
+    font-size: 15px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 15px;
+}
+</style>
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 1, digits = 6) # use 2 d.p. in output
+```
+
+```{r}
+library(expm)
+library(numDeriv)
+library(tidyverse)
+library(doParallel)
+library(janitor)
+library(xts)
+library(lubridate)
+library(doParallel)
+library(pracma)
+library(MASS)
+
+start_pc_date = as.Date("1992-07-01")
+end_date = as.Date("2021-06-01")
+optim_ctrl = list(maxit = 5000)
+num_years = 50
+num_paths = 100
+h = 1/12 # monthly simulations 
+num_pred = num_years / h
+time_index_sim = seq(from = end_date, length.out = num_years / h, by = "month")
+```
+
+# Import Data
+
+```{r}
+#######
+# zcp # 
+#######
+
+zcp = read.csv("data/zcp.csv")
+zcp$date = as.Date(zcp$date)
+zcp[,-1] = zcp[,-1] / 100 
+zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
+# daily data to weekly data
+month = as.Date(cut(zcp$date, "month"))
+zcp_month = aggregate(. ~ month, zcp, mean)
+zcp_month = zcp_month %>% dplyr::select(-date)
+dt = 1/12 # monthly
+
+# divide date and data
+nf = 3 # 3 state vars 
+v.ymd = zcp_month$month
+v.mat = seq(from = 3, to = 120, by = 3) / 12
+m.spot = as.matrix(zcp_month[,-1])
+nmat = length(v.mat) # # of maturities
+nobs = nrow(m.spot)  # # of observations
+
+AFNS.C = function(sigma, lambda, tau) {
+    # yield-adj term A(t,T) / (T - t) = A(tau) / tau, where tau = (t-T)
+    # using the analytical formula on p.7 of Christensen, Diebold (2011)
+    s = sigma; la = lambda
+    
+    s11 = s[1,1]; s12 = s[1,2]; s13 = s[1,3]
+    s21 = s[2,1]; s22 = s[2,2]; s23 = s[2,3]
+    s31 = s[3,1]; s32 = s[3,2]; s33 = s[3,3]
+  
+    A = s11^2+s12^2+s13^2; D = s11*s21+s12*s22+s13*s23
+    B = s21^2+s22^2+s23^2; E = s11*s31+s12*s32+s13*s33 
+    C = s31^2+s32^2+s33^2; F = s21*s31+s22*s32+s23*s33
+    
+    r1 = A * tau^2 / 6; 
+    r2 = B * (1 / (2*la^2) - (1 - exp(-la*tau)) / (la^3 * tau) + (1 - exp(-2*la*tau)) / (4 * la^3 * tau))
+    r3 = C * (1 / (2*la^2) + exp(-la*tau) / (la^2) - tau * exp(-2*la*tau) / (4*la) - 3 * exp(-2*la*tau) / (4*la^2) - 2 * (1 - exp(-la*tau)) / (la^3*tau) + 5 * (1 - exp(-2*la*tau)) / (8*la^3*tau))
+    r4 = D * (tau / (2*la) + exp(-la*tau) / (la^2) - (1 - exp(-la*tau)) / (la^3*tau))
+    r5 = E * (3 * exp(-la*tau) / (la^2) + tau / (2*la) + tau * exp(-la*tau) / (la) - 3 * (1 - exp(-la*tau)) / (la^3*tau))
+    r6 = F * (1 / (la^2) + exp(-la*tau) / (la^2) - exp(-2*la*tau) / (2*la^2) - 3 * (1 - exp(-la*tau)) / (la^3*tau) + 3 * (1 - exp(-2*la*tau)) / (4*la^3 * tau))
+    
+    # returns A(t,T) / (T - t) = A(tau) / tau
+    return(r1+r2+r3+r4+r5+r6)
+}
+```
+
+# Term Structure Arbitrage-Free Nelson-Siegel Model
+
+```{r}
+NS.B = function(lambda, tau) {
+    # the B matrix in the measurement equation 
+    col1 = rep.int(1,length(tau))
+    col2 = (1 - exp(-lambda * tau)) / (lambda * tau)
+    col3 = col2 - exp(-lambda*tau) 
+    return(cbind(col1,col2,col3))
+}
+```
+
+## Independent Factor
+
+### Estimation
+
+```{r}
+# factor estimates
+# Xt_indep_fitted = matrix(0,nobs,nf)
+# colnames(Xt_indep_fitted) = c("level", "slope", "curvature")
+# row.names(Xt_indep_fitted) = zcp_month$month
+
+trans = function(b) {
+    # parameter restrictions of independent factor
+    bb = b
+    bb[1] = 1/(1+exp(b[1]))  # kappa11
+    bb[4:6] = b[4:6] ^ 2 # sigma 
+    bb[10] = b[10]^2          # lambda
+    bb[11:npara] = b[11:npara]^2          # measurement error
+    return(bb)
+}
+
+##############
+# likelihood #
+##############
+
+# log likelihood function
+loglike = function(para_un, m.spot) {
+    # parameter restrictions
+    para = trans(para_un)
+    
+    # restricted parameters (table 1 of Christensen, Diebold (2011))
+    kappa  = rbind(c(para[1],0,0),
+                    c(0,para[2],0),
+                    c(0,0,para[3]))
+    sigma  = rbind(c(para[4],0,0),
+                    c(0,para[5],0),
+                    c(0,0,para[6]))
+    theta  = para[7:9]
+    lambda = para[10]
+    H      = diag(para[11:npara])
+   
+    B  = NS.B(lambda,v.mat) # factor loading matrix
+    C  = -AFNS.C(sigma,lambda,v.mat)     # yield adjustment
+  
+    # Conditional and Unconditional covariance matrix : Q, Q0 (Christensen 2015)
+    m    = eigen(kappa)
+    eval = m$values 
+    evec = m$vectors
+    ievec = solve(evec) # inverse 
+    Smat = ievec %*% sigma %*% t(sigma) %*% t(ievec)
+    Vdt  = Vinf = matrix(0,nf,nf)
+    
+    for(i in 1:nf) { 
+        for(j in 1:nf) {
+            Vdt[i,j] = Smat[i,j] * (1-exp(-(eval[i]+eval[j])*dt)) / (eval[i]+eval[j]) # conditional Var(XT | Xt)
+            Vinf[i,j] = Smat[i,j] * (1-exp(-(eval[i]+eval[j])*10)) / (eval[i]+eval[j])
+            # Vinf[i,j] = Smat[i,j] / (eval[i]+eval[j]) # unconditional Var(Xt)
+        }
+    }
+    
+    # Analytical Covariance matrix
+    # Q : conditional, Q0 : unconditional
+    Q_est = evec %*% Vdt %*% t(evec)
+    Q0 = evec %*% Vinf %*% t(evec)
+    
+    # initialzation of vector and matrix
+    prevX = theta; prevV = Q0
+    Phi1  = expm(-kappa * dt)
+    Phi0  = (diag(nf) - Phi1) %*% theta
+    loglike = 0 # log likelihood function
+    
+    for(i in 1:nobs) {
+        Xhat = Phi0 + Phi1 %*% prevX        # predicted state X_{t|t-1}
+        Vhat = Phi1 %*% prevV %*% t(Phi1) + Q_est # predicted cov Sigma_{t|t-1}
+        
+        y        = m.spot[i,] # the observed yield
+        yimplied = B %*% Xhat + C # the model-implied yields
+        er       = y - yimplied # prediction error vt
+ 
+        # updating 
+        ev = B %*% Vhat %*% t(B) + H # Cov(vt) 
+        iev = solve(ev) # inverse 
+        KG = Vhat %*% t(B) %*% iev # Kalman Gain
+        
+        prevX = Xhat + KG %*% er       # E[X|y_t] = Xt updated state 
+        prevV = Vhat - KG %*% B %*% Vhat # Cov[X|y_t] updated cov
+        
+        # log likelihood function
+        loglike = loglike - 0.5*(nmat) * log(2*pi)- 0.5*log(det(ev))-0.5 * t(er) %*% iev %*% er
+        Xt_indep_fitted[i,] <<- prevX
+    }
+    
+    return(-loglike)
+}
+
+##############
+# estimation #
+##############
+
+load("data/Xt_indep_fitted.RData")
+load("data/param_indep.RData")
+# init_para_un = param_indep$par
+
+# init_para_un = c(
+#     1.226637,  0.840692,  0.603496, # kappa
+#     0.006327,  0.003441,  0.010891, # sigma
+#     0.032577, -0.012536, -0.002748, # theta 
+#     0.5     ,                       # lambda
+#     rep(0.000524,nmat)              # measurement error
+# )
+# npara = length(init_para_un) # # of observations
+# 
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_indep = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
+# param_indep$par = trans(param_indep$par)
+# save(param_indep, file = "data/param_indep2.RData")
+# save(Xt_indep_fitted, file = "data/Xt_indep_fitted2.RData")
+# # 
+# prev_likev = param_indep$value
+# v.likev = param_indep$value
+
+##########
+# fitted #
+########## 
+
+KP_est = diag(param_indep$par[1:3])
+Sigma_est = diag(param_indep$par[4:6])
+theta_est = as.matrix(param_indep$par[7:9])
+lambda_est = param_indep$par[10]
+Q_est = diag(c(5.10007e-06, 9.88515e-06, 0.0000148928)) # monthly
+
+# fitted Xt 
+matplot(Xt_indep_fitted, type = "l", ylab = "L,S,C", lty = 1, main = "AFNS 3 Factor Estimates (L,S,C)", lwd = 2)
+legend("topright", legend = c("level", "slope", "curvature"), col = 1:3, lty = 1)
+
+# compare fitted yields 
+B_indep_fitted = NS.B(lambda_est, v.mat)
+A_indep_fitted = AFNS.C(Sigma_est, lambda_est, v.mat)
+zcp_indep_fitted = t(B_indep_fitted %*% t(Xt_indep_fitted)) - A_indep_fitted
+
+par(mfrow = c(1,2))
+plot(zcp_month$month, zcp_indep_fitted[,1], "l", main = "Historical vs fitted \n 3-month zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x1_qtrs, col = "blue")
+legend("topright", legend = c("fitted", "historic"), col = c("black", "blue"), lty = 1)
+
+plot(zcp_month$month, zcp_indep_fitted[,40], "l", main = "Historical vs fitted \n 10-year zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x40_qtrs, col = "blue")
+```
+
+### Simulation
+
+```{r}
+###############
+# simulate Xt # 
+###############
+
+# simulation 
+Xt_indep_sim = replicate(n = num_paths,
+                         expr = {data.frame(matrix(NA, nrow = nf, ncol = num_years/h+1))},
+                         simplify = F)
+Xt_indep_sim = lapply(Xt_indep_sim, function (x) {x[,1] = Xt_indep_fitted[nrow(Xt_indep_fitted),]; return (x)})
+
+for (path in 1:num_paths) { 
+    for (i in 2:(num_pred+1)) {
+        eta = as.matrix(mvrnorm(mu = c(0,0,0), Sigma = Q_est))
+        Xt = as.matrix(Xt_indep_sim[[path]][,i-1])
+        Xt_indep_sim[[path]][,i] = (diag(3) - expm(-h * KP_est)) %*% theta_est + expm(-h * KP_est) %*% Xt + eta
+    }
+}
+
+# for (path in 1:num_paths) { # discretisation
+#   for (i in 2:(num_years/h+1)) {
+#     e = as.matrix(rnorm(nf))
+#     Xt = as.matrix(Xt_indep_sim[[path]][,i-1])
+#     Xt_indep_sim[[path]][,i] = h * KP_est %*% (theta_est - Xt) + Xt + sqrt(h) * Sigma_est %*% e
+#   }
+# }
+
+# mean 
+Xt_indep_mean = data.frame(matrix(NA, nrow = nf, ncol = num_years/h+1))
+Xt_indep_mean[,1] = Xt_indep_fitted[nrow(Xt_indep_fitted),]
+for (i in 2:(num_years/h+1)) {
+  Xt = Xt_indep_mean[,i-1]
+  Xt_indep_mean[,i] = (diag(3) - expm(-h * KP_est)) %*% theta_est + expm(-h * KP_est) %*% Xt
+}
+
+###########
+# plot Xt #
+###########
+par(mfrow = c(1,3))
+plot_date = seq(from = start_pc_date, to = max(time_index_sim), by = "month")
+
+#######
+# level
+# sim 
+plot_data = c(Xt_indep_fitted[,1], Xt_indep_sim[[1]][1,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Level Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_indep_fitted[,1], Xt_indep_sim[[i]][1,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_indep_fitted[,1], Xt_indep_mean[1,-1])
+lines(plot_date, plot_data)
+
+########
+# slope
+# sim 
+plot_data = c(Xt_indep_fitted[,2], Xt_indep_sim[[1]][2,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Slope Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_indep_fitted[,2], Xt_indep_sim[[i]][2,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_indep_fitted[,2], Xt_indep_mean[2,-1])
+lines(plot_date, plot_data)
+
+###########
+# curvature
+# sim 
+plot_data = c(Xt_indep_fitted[,3], Xt_indep_sim[[1]][3,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Curvature Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_indep_fitted[,3], Xt_indep_sim[[i]][3,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_indep_fitted[,3], Xt_indep_mean[3,-1])
+lines(plot_date, plot_data)
+
+
+##############
+# compute yt # 
+##############
+
+# simulations
+zcp_indep_sim = replicate(n = num_paths,
+                         expr = {matrix(NA, nrow = num_years/h+1, ncol = 40)},
+                         simplify = F)
+for (path in 2:num_paths) {
+  zcp_indep_sim[[path]] = t(B_indep_fitted %*% as.matrix(Xt_indep_sim[[path]])) - A_indep_fitted
+}
+zcp_indep_sim = lapply(zcp_indep_sim, function(x){ x = as.data.frame(x); x[1,] = zcp_month[nrow(zcp_month), -1]; return (x)})
+zcp_indep_sim = lapply(zcp_indep_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
+
+# mean
+zcp_indep_mean = t(B_indep_fitted %*% as.matrix(Xt_indep_mean)) - A_indep_fitted
+zcp_indep_mean = as.data.frame(zcp_indep_mean)
+row.names(zcp_indep_mean) = c("2021-05-01", as.character(time_index_sim))
+colnames(zcp_indep_mean) = colnames(zcp)[-1]
+zcp_indep_mean[1,] = zcp_month[nrow(zcp_month),-1]
+
+###########
+# plot yt #
+###########
+par(mfrow = c(1,2))
+#######
+# zcp3m
+# sim
+plot_data = c(zcp_month$x1_qtrs, zcp_indep_sim[[1]][-1,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_indep_sim[[i]][-1,1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x1_qtrs, zcp_indep_mean[-1,1])
+lines(plot_date, plot_data)
+
+########
+# zcp10y
+# sim
+plot_data = c(zcp_month$x40_qtrs, zcp_indep_sim[[1]][-1,40])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_indep_sim[[i]][-1,40])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x40_qtrs, zcp_indep_mean[-1,40])
+lines(plot_date, plot_data)
+```
+
+### get_afns_simulation testing 
+
+```{r}
+source("../AFNS.R")
+source("../Model.R")
+
+par(mfrow = c(3,2))
+
+###########
+# monthly # 
+###########
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "independent", model = "interest_rate")
+stopCluster(cl)
+
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+#############
+# quarterly #
+#############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "quarter", type = "independent", model = "interest_rate")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+############
+# annually #
+############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "year", type = "independent", model = "interest_rate")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+```
+
+## Correlated Factor
+
+### Estimation
+
+Nelder-Mead degeneracy. Possible reasons: independent factors are already good enough. 
+
+```{r}
+# factor estimates
+# Xt_corr_fitted = matrix(0,nobs,nf)
+# colnames(Xt_corr_fitted) = c("level", "slope", "curvature")
+# row.names(Xt_corr_fitted) = zcp_month$month
+
+trans = function(b) {
+    # parameter restrictions of independent factor
+    bb = b
+   bb[1] = 1/(1+exp(b[1]))  # kappa11
+    bb[10] = b[10]^2; bb[12] = b[12]^2; bb[15] = b[15]^2; # sigma
+    bb[19] = b[19]^2          # lambda
+    bb[20:npara] = b[20:npara]^2          # measurement error
+    return(bb)
+}
+
+##############
+# likelihood #
+##############
+
+# log likelihood function
+loglike = function(para_un, m.spot) {
+    # parameter restrictions
+    para = trans(para_un)
+
+    # restricted parameters (table 1 of Christensen, Diebold (2011))
+    kappa  = rbind(c(para[1],para[2],para[3]),
+                   c(para[4],para[5],para[6]),
+                   c(para[7],para[8],para[9]))
+    sigma  = rbind(c(para[10],0,0),
+                    c(para[11],para[12],0),
+                    c(para[13],para[14],para[15]))
+    theta  = para[16:18]
+    lambda = para[19]
+    H      = diag(para[20:npara])
+
+    B  = NS.B(lambda,v.mat) # factor loading matrix
+    C  = -AFNS.C(sigma,lambda,v.mat)     # yield adjustment
+
+    # Conditional and Unconditional covariance matrix : Q, Q0 (Christensen 2015)
+    m    = eigen(exp(kappa))
+    eval = m$values
+    evec = m$vectors
+    ievec = solve(evec) # inverse
+    Smat = ievec %*% sigma %*% t(sigma) %*% t(ievec)
+    Vdt  = Vinf = matrix(0,nf,nf)
+
+    for(i in 1:nf) {
+        for(j in 1:nf) {
+            Vdt[i,j] = Smat[i,j] * (1-exp(-(eval[i]+eval[j])*dt)) / (eval[i]+eval[j]) # conditional Var(XT | Xt)
+            # Vinf[i,j] = Smat[i,j] * (1-exp(-(eval[i]+eval[j])*10)) / (eval[i]+eval[j]) # conditional Var(XT | Xt)
+            Vinf[i,j] = Smat[i,j] / (eval[i]+eval[j]) # unconditional Var(Xt)
+        }
+    }
+
+    # Analytical Covariance matrix
+    # Q : conditional, Q0 : unconditional
+    Q_corr_est = evec %*% Vdt %*% t(evec)
+    Q0 = evec %*% Vinf %*% t(evec)
+
+    # initialzation of vector and matrix
+    prevX = theta; prevV = Q0
+    Phi1  = expm(-kappa * dt)
+    Phi0  = (diag(nf) - Phi1) %*% theta
+    loglike = 0 # log likelihood function
+
+    i = 1
+    while (i <= nobs) {
+        Xhat = Phi0 + Phi1 %*% prevX        # predicted state X_{t|t-1}
+        Vhat = Phi1 %*% prevV %*% t(Phi1) + Q_corr_est # predicted cov Sigma_{t|t-1}
+
+        y        = m.spot[i,] # the observed yield
+        yimplied = B %*% Xhat + C # the model-implied yields
+        er       = y - yimplied # prediction error vt
+
+        # updating
+        ev = B %*% Vhat %*% t(B) + H # Cov(vt)
+        iev = solve(ev) # inverse
+        KG = Vhat %*% t(B) %*% iev # Kalman Gain
+
+        prevX = Xhat + KG %*% er       # E[X|y_t] = Xt updated state
+        prevV = Vhat - KG %*% B %*% Vhat # Cov[X|y_t] updated cov
+
+        # log likelihood function
+        loglike = loglike - 0.5*(nmat) * log(2*pi)- 0.5*log(det(Re(ev)))-0.5 * t(er) %*% iev %*% er
+        Xt_corr_fitted[i,] <<- prevX
+        i = i + 1
+    }
+
+    return(-loglike)
+}
+
+##############
+# estimation #
+##############
+
+load("data/Xt_corr_fitted.RData")
+load("data/param_corr.RData")
+init_para_un = param_corr$par
+npara = length(init_para_un) # # of observations
+
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_corr = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
+# save(param_corr, file = "data/param_corr.RData")
+# save(Xt_corr_fitted, file = "data/Xt_corr_fitted.RData")
+param_corr$par = trans(param_corr$par)
+
+##########
+# fitted #
+########## 
+
+KP_corr_est = matrix(c(param_corr$par[1],param_corr$par[2],param_corr$par[3],
+                param_corr$par[4],param_corr$par[5],param_corr$par[6],
+                param_corr$par[7],param_corr$par[8],param_corr$par[9]), byrow = T, nrow = 3)
+Sigma_corr_est = matrix(c(param_corr$par[10],0,0,
+                     param_corr$par[11],param_corr$par[12],0,
+                     param_corr$par[13],param_corr$par[14],param_corr$par[15]), byrow = T, nrow = 3)
+theta_corr_est = as.matrix(param_corr$par[16:18],nrow = 3)
+lambda_corr_est = param_corr$par[19]
+Q_corr_est = matrix(c(0.0000722608, -0.0000614619, -0.000162393,
+                                     -0.0000614619,  0.0000544916,  0.000124538,
+                                     -0.0001623930,  0.0001245380,  0.000603918), nrow = 3, byrow = T)
+                    
+
+# fitted Xt
+matplot(Xt_corr_fitted, type = "l", ylab = "L,S,C", lty = 1, main = "AFNS 3 Factor Estimates (L,S,C)", lwd = 2)
+legend("topright", legend = c("level", "slope", "curvature"), col = 1:3, lty = 1)
+
+# compare fitted yields
+B_corr_fitted = NS.B(lambda_corr_est, v.mat)
+A_corr_fitted = AFNS.C(Sigma_corr_est, lambda_corr_est, v.mat)
+zcp_corr_fitted = t(B_corr_fitted %*% t(Xt_corr_fitted)) - A_corr_fitted
+
+par(mfrow = c(1,2))
+plot(zcp_month$month, zcp_corr_fitted[,1], "l", main = "Historical vs fitted \n 3-month zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x1_qtrs, col = "blue")
+
+plot(zcp_month$month, zcp_corr_fitted[,40], "l", main = "Historical vs fitted \n 10-year zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x40_qtrs, col = "blue")
+```
+
+### Simulation
+
+```{r}
+###############
+# simulate Xt #
+###############
+
+# simulation
+Xt_corr_sim = replicate(n = num_paths,
+                         expr = {data.frame(matrix(NA, nrow = nf, ncol = num_years/h+1))},
+                         simplify = F)
+Xt_corr_sim = lapply(Xt_corr_sim, function (x) {x[,1] = Xt_corr_fitted[nrow(Xt_corr_fitted),]; return (x)})
+
+for (path in 1:num_paths) { 
+    for (i in 2:(num_pred+1)) {
+        eta = as.matrix(mvrnorm(mu = c(0,0,0), Sigma = Q_corr_est))
+        Xt = as.matrix(Xt_corr_sim[[path]][,i-1])
+        Xt_corr_sim[[path]][,i] = (diag(nf) - expm(-h * KP_corr_est)) %*% theta_corr_est + expm(-h * KP_corr_est) %*% Xt + eta
+    }
+}
+
+# mean
+Xt_corr_mean = data.frame(matrix(NA, nrow = nf, ncol = num_years/h+1))
+Xt_corr_mean[,1] = Xt_corr_fitted[nrow(Xt_corr_fitted),] 
+for (i in 2:(num_years/h+1)) {
+  Xt = Xt_corr_mean[,i-1]
+  Xt_corr_mean[,i] = (diag(nf) - expm(-KP_corr_est * h)) %*% theta_corr_est + expm(-h * KP_corr_est) %*% Xt
+}
+
+
+###########
+# plot Xt #
+###########
+par(mfrow = c(1,3))
+plot_date = seq(from = start_pc_date, to = max(time_index_sim), by = "month")
+
+#######
+# level
+# sim
+plot_data = c(Xt_corr_fitted[,1], Xt_corr_sim[[1]][1,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Level Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_corr_fitted[,1], Xt_corr_sim[[i]][1,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(Xt_corr_fitted[,1], Xt_corr_mean[1,-1])
+lines(plot_date, plot_data)
+
+########
+# slope
+# sim
+plot_data = c(Xt_corr_fitted[,2], Xt_corr_sim[[1]][2,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Slope Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_corr_fitted[,2], Xt_corr_sim[[i]][2,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(Xt_corr_fitted[,2], Xt_corr_mean[2,-1])
+lines(plot_date, plot_data)
+
+###########
+# curvature
+# sim
+plot_data = c(Xt_corr_fitted[,3], Xt_corr_sim[[1]][3,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Curvature Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_corr_fitted[,3], Xt_corr_sim[[i]][3,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(Xt_corr_fitted[,3], Xt_corr_mean[3,-1])
+lines(plot_date, plot_data)
+
+##############
+# compute yt #
+##############
+
+# simulations
+zcp_corr_sim = replicate(n = num_paths,
+                         expr = {matrix(NA, nrow = num_years/h+1, ncol = 40)},
+                         simplify = F)
+for (path in 2:num_paths) {
+  zcp_corr_sim[[path]] = t(B_corr_fitted %*% as.matrix(Xt_corr_sim[[path]])) - A_corr_fitted
+}
+zcp_corr_sim = lapply(zcp_corr_sim, function(x){ x = as.data.frame(x); x[1,] = zcp_month[nrow(zcp_month), -1]; return (x)})
+zcp_corr_sim = lapply(zcp_corr_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
+
+# mean
+zcp_corr_mean = t(B_corr_fitted %*% as.matrix(Xt_corr_mean)) - A_corr_fitted
+zcp_corr_mean = as.data.frame(zcp_corr_mean)
+row.names(zcp_corr_mean) = c("2021-05-01", as.character(time_index_sim))
+colnames(zcp_corr_mean) = colnames(zcp)[-1]
+zcp_corr_mean[1,] = zcp_month[nrow(zcp_month),-1]
+
+###########
+# plot yt #
+###########
+par(mfrow = c(1,2))
+#######
+# zcp3m
+# sim
+plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[1]][-1,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_corr_sim[[i]][-1,1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x1_qtrs, zcp_corr_mean[-1,1])
+lines(plot_date, plot_data)
+
+########
+# zcp10y
+# sim
+plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[1]][-1,40])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_corr_sim[[i]][-1,40])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x40_qtrs, zcp_corr_mean[-1,40])
+lines(plot_date, plot_data)
+```
+
+### get_afns_simulation testing 
+
+```{r}
+par(mfrow = c(3,2))
+###########
+# monthly # 
+###########
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "correlated", model = "interest_rate")
+stopCluster(cl)
+
+# load("data/zcp_sim.RData")
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+#############
+# quarterly #
+#############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "quarter", type = "correlated", model = "interest_rate")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+############
+# annually #
+############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "year", type = "correlated", model = "interest_rate")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+rm(list=ls())
+```
+
+# Term Structure, Home Value Index, Stock Price AFNS
+
+```{r}
+start_pc_date = as.Date("1993-01-01")
+end_date = as.Date("2021-06-01")
+optim_ctrl = list(maxit = 10000)
+
+num_year = 50
+num_years = 50
+num_paths = 100
+h = 1/12 # monthly simulations 
+time_index_sim = seq(from = end_date, length.out = num_year / h, by = "month")
+
+#######
+# zcp # 
+#######
+
+zcp = read.csv("data/zcp.csv")
+zcp$date = as.Date(zcp$date)
+zcp[,-1] = zcp[,-1] / 100 
+zcp = zcp %>% filter(date < end_date & date >= start_pc_date)
+
+# daily data to weekly data
+month = as.Date(cut(zcp$date, "month"))
+zcp_month = aggregate(. ~ month, zcp, mean)
+zcp_month = zcp_month %>% dplyr::select(-date)
+dt = 1/12 # monthly
+
+# divide date and data
+nf = 3 # 3 state vars 
+v.ymd = zcp_month$month
+v.mat = seq(from = 3, to = 120, by = 3) / 12
+m.spot = as.matrix(zcp_month[,-1])
+nmat = length(v.mat) # # of maturities
+nobs = nrow(m.spot)  # # of observations
+
+#########
+# house # 
+#########
+
+properties = read.csv("data/Market_Trends_Data.csv")
+properties = clean_names(properties)
+properties = properties %>% mutate_if(is.character, as.factor)
+properties$value_at_date = as.Date(properties$value_at_date, format =  "%d/%m/%Y")
+
+home_value_houses_nsw = properties %>% 
+    filter(state == "NSW", property_type == "Houses") %>% 
+    group_by(value_at_date) %>% 
+    summarise(index = mean(hedonic_home_value_index, na.rm = T))
+home_value_houses_nsw = home_value_houses_nsw %>% 
+    filter(value_at_date <= end_date & value_at_date >= start_pc_date) %>% 
+    mutate(log_index = log(index))
+
+
+##########
+# ASX200 #
+##########
+
+asx200 = read.csv("data/asx200_price.csv")
+asx200$exchange_date = as.Date(asx200$exchange_date)
+asx200 = asx200 %>% filter(exchange_date <= end_date & exchange_date >= start_pc_date)
+asx200$month = format(asx200$exchange_date, "%Y-%m")
+asx200 = asx200 %>% group_by(month) %>% summarize(asx200_price = mean(close, na.rm = T)) %>% as.data.frame
+asx200$log_price = log(asx200$asx200_price)
+
+AFNS.C = function(sigma, lambda, tau) {
+    # yield-adj term A(t,T) / (T - t) = A(tau) / tau, where tau = (T-t)
+    # using the analytical formula on p.7 of Christensen, Diebold (2011)
+    s = sigma; la = lambda
+    
+    s11 = s[1,1]; s12 = s[1,2]; s13 = s[1,3]
+    s21 = s[2,1]; s22 = s[2,2]; s23 = s[2,3]
+    s31 = s[3,1]; s32 = s[3,2]; s33 = s[3,3]
+  
+    A = s11^2+s12^2+s13^2; D = s11*s21+s12*s22+s13*s23
+    B = s21^2+s22^2+s23^2; E = s11*s31+s12*s32+s13*s33 
+    C = s31^2+s32^2+s33^2; F = s21*s31+s22*s32+s23*s33
+    
+    r1 = A * tau^2 / 6; 
+    r2 = B * (1 / (2*la^2) - (1 - exp(-la*tau)) / (la^3 * tau) + (1 - exp(-2*la*tau)) / (4 * la^3 * tau))
+    r3 = C * (1 / (2*la^2) + exp(-la*tau) / (la^2) - tau * exp(-2*la*tau) / (4*la) - 3 * exp(-2*la*tau) / (4*la^2) - 2 * (1 - exp(-la*tau)) / (la^3*tau) + 5 * (1 - exp(-2*la*tau)) / (8*la^3*tau))
+    r4 = D * (tau / (2*la) + exp(-la*tau) / (la^2) - (1 - exp(-la*tau)) / (la^3*tau))
+    r5 = E * (3 * exp(-la*tau) / (la^2) + tau / (2*la) + tau * exp(-la*tau) / (la) - 3 * (1 - exp(-la*tau)) / (la^3*tau))
+    r6 = F * (1 / (la^2) + exp(-la*tau) / (la^2) - exp(-2*la*tau) / (2*la^2) - 3 * (1 - exp(-la*tau)) / (la^3*tau) + 3 * (1 - exp(-2*la*tau)) / (4*la^3 * tau))
+    
+    # returns A(t,T) / (T - t) = A(tau) / tau
+    return(r1+r2+r3+r4+r5+r6)
+}
+```
+
+
+```{r}
+nf = 5 
+nmat = 42
+
+NS.B = function(lambda, tau) {
+    # the B matrix in the measurement equation 
+    col1 = c(rep.int(1,length(tau)),0,0)
+    col2 = c((1 - exp(-lambda * tau)) / (lambda * tau),0,0)
+    col3 = c(col2[1:length(tau)] - exp(-lambda*tau),0,0)
+    col4 = c(rep(0,length(tau)),1,0)
+    col5 = c(rep(0,length(tau)),0,1)
+    return(cbind(col1,col2,col3,col4,col5))
+}
+
+m.spot = cbind(m.spot, home_value_houses_nsw$log_index, asx200$log_price)
+```
+
+## Independent Factor
+
+### Estimation
+
+```{r}
+# factor estimates
+Xt_gindep_fitted = matrix(0,nobs,nf)
+colnames(Xt_gindep_fitted) = c("level", "slope", "curvature", "house", "stock")
+row.names(Xt_gindep_fitted) = zcp_month$month
+
+trans = function(b) {
+    # parameter restrictions of independent factor
+    bb = b
+    bb[1] = 1/(1+exp(b[1]))  # kappa11
+    # bb[4:10] = 1/(1+exp(b[4:10])) # rhos 
+    bb[c(4:6,10,15)] = b[c(4:6,10,15)] ^ 2 # sigmas 
+    bb[21] = b[21]^2          # lambda
+    bb[22:npara] = b[22:npara]^2          # measurement error
+    return(bb)
+}
+
+##############
+# likelihood #
+##############
+
+# log likelihood function
+loglike = function(para_un, m.spot) {
+    # parameter restrictions
+    para = trans(para_un)
+    
+    # restricted parameters (table 1 of Christensen, Diebold (2011))
+    kappa  = rbind(c(para[1],0,0,0,0),
+                    c(0,para[2],0,0,0),
+                    c(0,0,para[3],0,0),
+                    c(-1,-1,0,0,0),
+                    c(-1,-1,0,0,0))
+    sigma  = rbind(c(para[4],0,0,0,0),
+                    c(0,para[5],0,0,0),
+                    c(0,0,para[6],0,0),
+                    c(para[7],para[8],para[9],para[10],0),
+                    c(para[11],para[12],para[13],para[14],para[15]))
+    theta  = as.matrix(para[16:20])
+    lambda = para[21]
+    H      = diag(c(rep(para[22],40), para[23:24])) # diag(para[22:npara])
+   
+    B  = NS.B(lambda,v.mat) # factor loading matrix
+    C  = as.matrix(c(-AFNS.C(sigma[1:3,1:3],lambda,v.mat),0,0))    # yield adjustment
+  
+    # # Conditional and Unconditional covariance matrix : Q, Q0 
+    Q_integrand = function(s) { expm(-s * kappa) %*% sigma %*% t(sigma) %*% expm(-s * t(kappa)) }
+    xt_term_integrand = function(s) {expm(-s * kappa)}
+    integrate_matrix = function (from = 0, to, num_step = 100) {
+      results = 0
+      step = (to-from)/num_step
+      res_step = step
+      for (i in seq(from = from+step, to = to, by = step) ) {
+        results = results + Q_integrand(res_step)*step 
+        res_step = res_step + step 
+      }
+      return(results)
+    }
+    integrate_matrix2 = function (from = 0, to, num_step = 100) {
+      results = 0
+      step = (to-from)/num_step
+      res_step = step
+      for (i in seq(from = from+step, to = to, by = step) ) {
+        results = results + xt_term_integrand(res_step)*step 
+        res_step = res_step + step 
+      }
+      return(results)
+    }
+    Q = integrate_matrix(from = 0, to = dt, num_step = 10)
+    Q0 = integrate_matrix(from = 0, to = 20, num_step = 480)
+    xt_term = integrate_matrix2(from = 0, to = dt, num_step = 10)
+      
+    # initialzation of vector and matrix
+    prevX = c(solve(kappa[1:3,1:3]) %*% theta[1:3], home_value_houses_nsw$log_index[1], asx200$log_price[1])
+    prevV = Q0
+    Phi1  = expm(-kappa * dt)
+    Phi0  = xt_term %*% theta
+    loglike = 0 # log likelihood function
+    
+    i = 1
+    while (i <= nobs ) {
+        Xhat = Phi0 + Phi1 %*% prevX        # predicted state X_{t|t-1}
+        Vhat = Phi1 %*% prevV %*% t(Phi1) + Q # predicted cov Sigma_{t|t-1}
+        
+        y        = m.spot[i,] # the observed yield
+        yimplied = B %*% Xhat + C # the model-implied yields
+        er       = y - yimplied # prediction error vt
+ 
+        # updating 
+        ev = B %*% Vhat %*% t(B) + H # Cov(vt) 
+        iev = solve(ev) # inverse 
+        KG = Vhat %*% t(B) %*% iev # Kalman Gain
+        
+        prevX = Xhat + KG %*% er         # E[X|y_t] = Xt updated state 
+        prevV = Vhat - KG %*% B %*% Vhat # Cov[X|y_t] updated cov
+        
+        # log likelihood function
+        loglike = loglike - 0.5*(nmat) * log(2*pi)- 0.5*log(det(ev))-0.5 * t(er) %*% iev %*% er
+        Xt_gindep_fitted[i,] <<- prevX
+        i = i + 1
+    }
+    
+    return(-loglike)
+}
+
+##############
+# estimation #
+##############
+
+load("data/param_gindep.RData")
+load("data/Xt_gindep_fitted.RData")
+init_para_un = param_gindep$par
+npara = length(init_para_un) # # of observations
+
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gindep = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
+# save(param_gindep, file = "data/param_gindep.RData")
+# save(Xt_gindep_fitted, file = "data/Xt_gindep_fitted.RData")
+param_gindep$par = trans(param_gindep$par)
+
+##########
+# fitted #
+########## 
+
+kappa_est = rbind(c(param_gindep$par[1],0,0,0,0),
+                  c(0,param_gindep$par[2],0,0,0),
+                  c(0,0,param_gindep$par[3],0,0),
+                  c(-1,-1,0,0,0),
+                  c(-1,-1,0,0,0))
+Sigma_est = rbind(c(param_gindep$par[4],0,0,0,0),
+                  c(0,param_gindep$par[5],0,0,0),
+                  c(0,0,param_gindep$par[6],0,0),
+                  c(param_gindep$par[7],param_gindep$par[8],param_gindep$par[9],param_gindep$par[10],0),
+                  c(param_gindep$par[11],param_gindep$par[12],param_gindep$par[13],param_gindep$par[14],param_gindep$par[15]))
+theta_est  = as.matrix(param_gindep$par[16:20])
+lambda_est = param_gindep$par[21]
+
+# fitted Xt 
+matplot(Xt_gindep_fitted[,1:3], type = "l", ylab = "L,S,C", lty = 1, main = "AFNS 5 Factor Estimates (L,S,C)", lwd = 2)
+legend("topright", legend = c("level", "slope", "curvature"), col = 1:3, lty = 1)
+
+# compare fitted yields 
+B_gindep_fitted = NS.B(lambda_est, v.mat)
+A_gindep_fitted = c(AFNS.C(Sigma_est, lambda_est, v.mat),0,0)
+zcp_gindep_fitted = t(B_gindep_fitted %*% t(Xt_gindep_fitted)) - A_gindep_fitted
+
+par(mfrow = c(1,2))
+plot(zcp_month$month, zcp_gindep_fitted[,1], "l", main = "Historical vs fitted \n 3-month zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x1_qtrs, col = "blue")
+legend("topright", legend = c("fitted", "historic"), col = c("black", "blue"), lty = 1)
+
+plot(zcp_month$month, zcp_gindep_fitted[,40], "l", main = "Historical vs fitted \n 10-year zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x40_qtrs, col = "blue")
+
+plot(zcp_month$month, Xt_gindep_fitted[,4], "l", main = "Historical vs fitted \n log NSW House Indexes", xlab = "", ylab = "")
+lines(zcp_month$month, m.spot[,41], col = "blue")
+legend("topleft", legend = c("fitted", "historic"), col = c("black", "blue"), lty = 1)
+
+plot(zcp_month$month, Xt_gindep_fitted[,5], "l", main = "Historical vs fitted \n log ASX/S&P200 Price", xlab = "", ylab = "")
+lines(zcp_month$month, m.spot[,42], col = "blue")
+```
+
+### Simulation 
+
+```{r}
+###############
+# simulate Xt # 
+###############
+
+# simulation 
+Xt_gindep_sim = replicate(n = num_paths,
+                         expr = {data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))},
+                         simplify = F)
+Xt_gindep_sim = lapply(Xt_gindep_sim, function (x) {x[,1] = Xt_gindep_fitted[nrow(Xt_gindep_fitted),]; return (x)})
+
+for (path in 1:num_paths) { # discretisation
+  for (i in 2:(num_year/h+1)) {
+    e = as.matrix(rnorm(nf)) # as.matrix(MASS::mvrnorm(mu = rep(0,5), Sigma = Q)) 
+    Xt = as.matrix(Xt_gindep_sim[[path]][,i-1])
+    Xt_gindep_sim[[path]][,i] =  Xt + (theta_est - kappa_est %*% Xt) * h + sqrt(h) * Sigma_est %*% e # xt_term %*% theta_est + expm(-h * KP_est) %*% Xt + e 
+  }
+}
+
+# mean 
+Xt_gindep_mean = data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))
+Xt_gindep_mean[,1] = Xt_gindep_fitted[nrow(Xt_gindep_fitted),]
+for (i in 2:(num_year/h+1)) {
+  Xt = as.matrix(Xt_gindep_mean[,i-1])
+  Xt_gindep_mean[,i] = Xt + h * (theta_est - kappa_est %*% Xt) 
+}
+
+###########
+# plot Xt #
+###########
+par(mfrow = c(1,3))
+plot_date = seq(from = start_pc_date, to = max(time_index_sim), by = "month")
+
+#######
+# level
+# sim 
+plot_data = c(Xt_gindep_fitted[,1], Xt_gindep_sim[[1]][1,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Level Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gindep_fitted[,1], Xt_gindep_sim[[i]][1,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gindep_fitted[,1], Xt_gindep_mean[1,-1])
+lines(plot_date, plot_data)
+
+########
+# slope
+# sim 
+plot_data = c(Xt_gindep_fitted[,2], Xt_gindep_sim[[1]][2,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Slope Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gindep_fitted[,2], Xt_gindep_sim[[i]][2,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gindep_fitted[,2], Xt_gindep_mean[2,-1])
+lines(plot_date, plot_data)
+
+###########
+# curvature
+# sim 
+plot_data = c(Xt_gindep_fitted[,3], Xt_gindep_sim[[1]][3,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Curvature Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gindep_fitted[,3], Xt_gindep_sim[[i]][3,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gindep_fitted[,3], Xt_gindep_mean[3,-1])
+lines(plot_date, plot_data)
+
+par(mfrow = c(1,2))
+
+########
+# house
+# sim
+plot_data = c(m.spot[,41], Xt_gindep_sim[[1]][4,-1])
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], Xt_gindep_sim[[i]][4,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(m.spot[,41], Xt_gindep_mean[4,-1])
+lines(plot_date, plot_data)
+
+########
+# stock
+# sim
+plot_data = c(m.spot[,42], Xt_gindep_sim[[1]][5,-1])
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], Xt_gindep_sim[[i]][5,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(m.spot[,42], Xt_gindep_mean[5,-1])
+lines(plot_date, plot_data)
+
+
+##############
+# compute yt #
+##############
+
+# simulations
+zcp_gindep_sim = replicate(n = num_paths,
+                         expr = {matrix(NA, nrow = num_year/h+1, ncol = 42)},
+                         simplify = F)
+for (path in 2:num_paths) {
+  zcp_gindep_sim[[path]] = t(B_gindep_fitted %*% as.matrix(Xt_gindep_sim[[path]])) - A_gindep_fitted
+}
+zcp_gindep_sim = lapply(zcp_gindep_sim, function(x){ x = as.data.frame(x); x[1,] = m.spot[nrow(m.spot),]; return (x)})
+zcp_gindep_sim = lapply(zcp_gindep_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
+
+# mean
+zcp_gindep_mean = t(B_gindep_fitted %*% as.matrix(Xt_gindep_mean)) - A_gindep_fitted
+zcp_gindep_mean = as.data.frame(zcp_gindep_mean)
+row.names(zcp_gindep_mean) = c("2021-05-01", as.character(time_index_sim))
+colnames(zcp_gindep_mean) = colnames(zcp)[-1]
+zcp_gindep_mean[1,] = zcp_month[nrow(zcp_month),-1]
+
+
+###########
+# plot yt #
+###########
+
+#######
+# zcp3m
+# sim
+plot_data = c(zcp_month$x1_qtrs, zcp_gindep_sim[[1]][-1,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_gindep_sim[[i]][-1,1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x1_qtrs, zcp_gindep_mean[-1,1])
+lines(plot_date, plot_data)
+
+########
+# zcp10y
+# sim
+plot_data = c(zcp_month$x40_qtrs, zcp_gindep_sim[[1]][-1,40])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_gindep_sim[[i]][-1,40])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x40_qtrs, zcp_gindep_mean[-1,40])
+lines(plot_date, plot_data)
+```
+
+### get_afns_simulation testing 
+
+```{r}
+source("../AFNS.R")
+source("../Model.R")
+par(mfrow = c(2,2))
+
+###########
+# monthly # 
+###########
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "independent", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x1_qtrs, zcp_sim$maturity_1qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_sim$maturity_1qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x40_qtrs, zcp_sim$maturity_40qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_sim$maturity_40qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+
+#############
+# quarterly #
+#############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "quarter", type = "independent", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+############
+# annually #
+############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "year", type = "independent", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey",)
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+```
+
+
+
+## Correlated Factor
+
+### Estimation
+
+```{r}
+# factor estimates
+Xt_gcorr_fitted = matrix(0,nobs,nf)
+colnames(Xt_gcorr_fitted) = c("level", "slope", "curvature", "house", "stock")
+row.names(Xt_gcorr_fitted) = zcp_month$month
+
+trans = function(b) {
+    # parameter restrictions of independent factor
+    bb = b
+    # bb[1] = 1/(1+exp(b[1])) # kappa11
+    bb[c(10,12,15,16,20)] = b[c(10,12,15,16,20)] ^ 2 # bb[c(10,12,15,19,24)] = b[c(10,12,15,19,24)] ^ 2 # sigmas
+    bb[c(17:19,21:24)] = 2/(1+exp(b[c(17:19,21:24)])) - 1
+    bb[30] = b[30]^2          # lambda
+    bb[31:npara] = b[31:npara]^2          # measurement error
+    return(bb)
+}
+
+##############
+# likelihood #
+##############
+
+# log likelihood function
+loglike = function(para_un, m.spot) {
+    # parameter restrictions
+    para = trans(para_un)
+    
+    # restricted parameters (table 1 of Christensen, Diebold (2011))
+    kappa  = rbind(c(para[1],para[2],para[3],0,0),
+                    c(para[4],para[5],para[6],0,0),
+                    c(para[7],para[8],para[9],0,0),
+                    c(-1,-1,0,0,0),
+                    c(-1,-1,0,0,0))
+    sigma4=para[16]; sigma5=para[20]
+    sigma  = rbind(c(para[10],0,0,0,0),
+                   c(para[11],para[12],0,0,0),
+                   c(para[13],para[14],para[15],0,0),
+                   c(sigma4*para[17],sigma4*para[18],sigma4*para[19],sigma4*sqrt(1-para[17]^2-para[18]^2-para[19]^2),0),
+                   c(sigma5*para[21],sigma5*para[22],sigma5*para[23],sigma5*para[24],sigma5*sqrt(1-para[21]^2-para[22]^2-para[23]^2-para[24]^2)))
+                   # c(para[16],para[17],para[18],para[19],0),
+                   # c(para[20],para[21],para[22],para[23],para[24]))
+    theta  = as.matrix(para[25:29])
+    lambda = para[30]
+    H      = diag(c(rep(para[31],40), para[32:33])) # diag(para[22:npara])
+   
+    B  = NS.B(lambda,v.mat) # factor loading matrix
+    C  = as.matrix(c(-AFNS.C(sigma[1:3,1:3],lambda,v.mat),0,0))    # yield adjustment
+  
+    # # Conditional and Unconditional covariance matrix : Q, Q0 
+    Q_integrand = function(s) { expm(-s * kappa) %*% sigma %*% t(sigma) %*% expm(-s * t(kappa)) }
+    xt_term_integrand = function(s) {expm(-s * kappa)}
+    integrate_matrix = function (from = 0, to, num_step = 100) {
+      results = 0
+      step = (to-from)/num_step
+      res_step = step
+      for (i in seq(from = from+step, to = to, by = step) ) {
+        results = results + Q_integrand(res_step)*step 
+        res_step = res_step + step 
+      }
+      return(results)
+    }
+    integrate_matrix2 = function (from = 0, to, num_step = 100) {
+      results = 0
+      step = (to-from)/num_step
+      res_step = step
+      for (i in seq(from = from+step, to = to, by = step) ) {
+        results = results + xt_term_integrand(res_step)*step 
+        res_step = res_step + step 
+      }
+      return(results)
+    }
+    Q = integrate_matrix(from = 0, to = dt, num_step = 10)
+    Q0 = integrate_matrix(from = 0, to = 5, num_step = 120)
+    xt_term = integrate_matrix2(from = 0, to = dt, num_step = 10)
+      
+    # initialzation of vector and matrix
+    prevX = c(solve(kappa[1:3,1:3]) %*% theta[1:3], home_value_houses_nsw$log_index[1], asx200$log_price[1])
+    prevV = Q0
+    Phi1  = expm(-kappa * dt)
+    Phi0  = xt_term %*% thetanction
+    
+    loglike = 0 # log likelihood fu
+    i = 1
+    while (i <= nobs ) {
+        Xhat = Phi0 + Phi1 %*% prevX        # predicted state X_{t|t-1}
+        Vhat = Phi1 %*% prevV %*% t(Phi1) + Q # predicted cov Sigma_{t|t-1}
+        
+        y        = m.spot[i,] # the observed yield
+        yimplied = B %*% Xhat + C # the model-implied yields
+        er       = y - yimplied # prediction error vt
+ 
+        # updating 
+        ev = B %*% Vhat %*% t(B) + H # Cov(vt) 
+        iev = solve(ev) # inverse 
+        KG = Vhat %*% t(B) %*% iev # Kalman Gain
+        
+        prevX = Xhat + KG %*% er         # E[X|y_t] = Xt updated state 
+        prevV = Vhat - KG %*% B %*% Vhat # Cov[X|y_t] updated cov
+        
+        # log likelihood function
+        loglike = loglike - 0.5*(nmat) * log(2*pi)- 0.5*log(det(ev))-0.5 * t(er) %*% iev %*% er
+        Xt_gcorr_fitted[i,] <<- prevX
+        i = i + 1
+    }
+    
+    return(-loglike)
+}
+
+##############
+# estimation #
+##############
+
+load("data/Xt_gcorr_fitted.RData")
+load("data/param_gcorr.RData")
+init_para_un = param_gcorr$par[1:33]
+npara = length(init_para_un) # # of observations
+
+# cl <- makeCluster(detectCores())
+# registerDoParallel(cl)
+# param_gcorr = optim(init_para_un, loglike,
+#           control = optim_ctrl,
+#           method = c("Nelder-Mead"), m.spot = m.spot)
+# stopCluster(cl)
+# save(param_gcorr, file = "data/param_gcorr_shorter.RData")
+# save(Xt_gcorr_fitted, file = "data/Xt_gcorr_fitted_shorter.RData")
+param_gcorr$par = trans(param_gcorr$par)
+
+##########
+# fitted #
+########## 
+
+kappa_est = rbind(c(param_gcorr$par[1],param_gcorr$par[2],param_gcorr$par[3],0,0),
+                  c(param_gcorr$par[4],param_gcorr$par[5],param_gcorr$par[6],0,0),
+                  c(param_gcorr$par[7],param_gcorr$par[8],param_gcorr$par[9],0,0),
+                  c(-1,-1,0,0,0),
+                  c(-1,-1,0,0,0))
+Sigma_est = rbind(c(param_gcorr$par[10],0,0,0,0),
+                  c(param_gcorr$par[11],param_gcorr$par[12],0,0,0),
+                  c(param_gcorr$par[13],param_gcorr$par[14],param_gcorr$par[15],0,0),
+                  c(param_gcorr$par[16]*param_gcorr$par[17],param_gcorr$par[16]*param_gcorr$par[18],param_gcorr$par[16]*param_gcorr$par[19],param_gcorr$par[16]*sqrt(1-param_gcorr$par[17]^2-param_gcorr$par[18]^2-param_gcorr$par[19]^2),0),
+                  c(param_gcorr$par[20]*param_gcorr$par[21],param_gcorr$par[20]*param_gcorr$par[22],param_gcorr$par[20]*param_gcorr$par[23],param_gcorr$par[20]*param_gcorr$par[24],param_gcorr$par[20]*sqrt(1-param_gcorr$par[21]^2-param_gcorr$par[22]^2-param_gcorr$par[23]^2-param_gcorr$par[24]^2)))
+                  # c(param_gcorr$par[16],param_gcorr$par[17],param_gcorr$par[18],param_gcorr$par[19],0),
+                  # c(param_gcorr$par[20],param_gcorr$par[21],param_gcorr$par[22],param_gcorr$par[23],param_gcorr$par[24]))
+theta_est  = as.matrix(param_gcorr$par[25:29])
+lambda_est = param_gcorr$par[30]
+
+# fitted Xt 
+matplot(Xt_gcorr_fitted[,1:3], type = "l", ylab = "L,S,C", lty = 1, main = "AFNS 5 Factor Estimates (L,S,C)", lwd = 2)
+legend("topright", legend = c("level", "slope", "curvature"), col = 1:3, lty = 1)
+
+# compare fitted yields 
+B_gcorr_fitted = NS.B(lambda_est, v.mat)
+A_gcorr_fitted = c(AFNS.C(Sigma_est, lambda_est, v.mat),0,0)
+zcp_gcorr_fitted = t(B_gcorr_fitted %*% t(Xt_gcorr_fitted)) - A_gcorr_fitted
+
+par(mfrow = c(1,2))
+plot(zcp_month$month, zcp_gcorr_fitted[,1], "l", main = "Historical vs fitted \n 3-month zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x1_qtrs, col = "blue")
+
+plot(zcp_month$month, zcp_gcorr_fitted[,40], "l", main = "Historical vs fitted \n 10-year zero-coupon yields", xlab = "", ylab = "")
+lines(zcp_month$month, zcp_month$x40_qtrs, col = "blue")
+
+plot(zcp_month$month, Xt_gcorr_fitted[,4], "l", main = "Historical vs fitted \n log NSW House Indexes", xlab = "", ylab = "")
+lines(zcp_month$month, m.spot[,41], col = "blue")
+
+plot(zcp_month$month, Xt_gcorr_fitted[,5], "l", main = "Historical vs fitted \n log ASX/S&P200 Price", xlab = "", ylab = "")
+lines(zcp_month$month, m.spot[,42], col = "blue")
+```
+
+### Simulation
+
+```{r}
+###############
+# simulate Xt # 
+###############
+
+# simulation 
+Xt_gcorr_sim = replicate(n = num_paths,
+                         expr = {data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))},
+                         simplify = F)
+Xt_gcorr_sim = lapply(Xt_gcorr_sim, function (x) {x[,1] = Xt_gcorr_fitted[nrow(Xt_gcorr_fitted),]; return (x)})
+for (path in 1:num_paths) { # discretisation
+  for (i in 2:(num_year/h+1)) {
+    e = as.matrix(rnorm(nf)) # as.matrix(MASS::mvrnorm(mu = rep(0,5), Sigma = Q)) 
+    Xt = as.matrix(Xt_gcorr_sim[[path]][,i-1])
+    Xt_gcorr_sim[[path]][,i] =  Xt +  (theta_est -kappa_est %*%Xt) * h + sqrt(h) * Sigma_est %*% e # xt_term %*% theta_est + expm(-h * KP_est) %*% Xt + e 
+  }
+}
+# mean 
+Xt_gcorr_mean = data.frame(matrix(NA, nrow = nf, ncol = num_year/h+1))
+Xt_gcorr_mean[,1] = Xt_gcorr_fitted[nrow(Xt_gcorr_fitted),]
+for (i in 2:(num_year/h+1)) {
+  Xt = as.matrix(Xt_gcorr_mean[,i-1])
+  Xt_gcorr_mean[,i] = Xt + h *(theta_est -   kappa_est %*% Xt) 
+}
+
+###########
+# plot Xt #
+
+###########
+par(mfrow = c(1,3))
+plot_date = seq(from = start_pc_date, to = max(time_index_sim), by = "month")
+
+#######
+# level
+# sim 
+plot_data = c(Xt_gcorr_fitted[,1], Xt_gcorr_sim[[1]][1,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Level Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gcorr_fitted[,1], Xt_gcorr_sim[[i]][1,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gcorr_fitted[,1], Xt_gcorr_mean[1,-1])
+lines(plot_date, plot_data)
+
+########
+# slope
+# sim 
+plot_data = c(Xt_gcorr_fitted[,2], Xt_gcorr_sim[[1]][2,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Slope Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gcorr_fitted[,2], Xt_gcorr_sim[[i]][2,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gcorr_fitted[,2], Xt_gcorr_mean[2,-1])
+lines(plot_date, plot_data)
+
+###########
+# curvature
+# sim 
+plot_data = c(Xt_gcorr_fitted[,3], Xt_gcorr_sim[[1]][3,-1])
+plot(plot_date, plot_data, "l", main = "Simulated Latent Curvature Factor", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(Xt_gcorr_fitted[,3], Xt_gcorr_sim[[i]][3,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean 
+plot_data = c(Xt_gcorr_fitted[,3], Xt_gcorr_mean[3,-1])
+lines(plot_date, plot_data)
+
+par(mfrow = c(1,2))
+
+########
+# house
+# sim
+plot_data = c(m.spot[,41], Xt_gcorr_sim[[1]][4,-1])
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], Xt_gcorr_sim[[i]][4,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(m.spot[,41], Xt_gcorr_mean[4,-1])
+lines(plot_date, plot_data)
+
+########
+# stock
+# sim
+plot_data = c(m.spot[,42], Xt_gcorr_sim[[1]][5,-1])
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], Xt_gcorr_sim[[i]][5,-1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(m.spot[,42], Xt_gcorr_mean[5,-1])
+lines(plot_date, plot_data)
+
+##############
+# compute yt #
+##############
+
+# simulations
+zcp_gcorr_sim = replicate(n = num_paths,
+                         expr = {matrix(NA, nrow = num_year/h+1, ncol = 42)},
+                         simplify = F)
+for (path in 2:num_paths) {
+  zcp_gcorr_sim[[path]] = t(B_gcorr_fitted %*% as.matrix(Xt_gcorr_sim[[path]])) - A_gcorr_fitted
+}
+zcp_gcorr_sim = lapply(zcp_gcorr_sim, function(x){ x = as.data.frame(x); x[1,] = m.spot[nrow(m.spot),]; return (x)})
+zcp_gcorr_sim = lapply(zcp_gcorr_sim, function(x){row.names(x) = c("2021-05-01", as.character(time_index_sim)); colnames(x) = colnames(zcp)[-1]; return (x)})
+
+# mean
+zcp_gcorr_mean = t(B_gcorr_fitted %*% as.matrix(Xt_gcorr_mean)) - A_gcorr_fitted
+zcp_gcorr_mean = as.data.frame(zcp_gcorr_mean)
+row.names(zcp_gcorr_mean) = c("2021-05-01", as.character(time_index_sim))
+colnames(zcp_gcorr_mean) = colnames(zcp)[-1]
+zcp_gcorr_mean[1,] = zcp_month[nrow(zcp_month),-1]
+
+###########
+# plot yt #
+###########
+
+#######
+# zcp3m
+# sim
+plot_data = c(zcp_month$x1_qtrs, zcp_gcorr_sim[[1]][-1,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_gcorr_sim[[i]][-1,1])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x1_qtrs, zcp_gcorr_mean[-1,1])
+lines(plot_date, plot_data)
+
+########
+# zcp10y
+# sim
+plot_data = c(zcp_month$x40_qtrs, zcp_gcorr_sim[[1]][-1,40])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_gcorr_sim[[i]][-1,40])
+  lines(plot_date, plot_data, col = "grey")
+}
+# mean
+plot_data = c(zcp_month$x40_qtrs, zcp_gcorr_mean[-1,40])
+lines(plot_date, plot_data)
+```
+
+### get_afns_simulation 
+
+```{r}
+par(mfrow = c(2,2))
+
+###########
+# monthly # 
+###########
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "month", type = "correlated", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x1_qtrs, zcp_sim$maturity_1qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 3-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x1_qtrs, zcp_sim$maturity_1qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x40_qtrs, zcp_sim$maturity_40qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 10-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x40_qtrs, zcp_sim$maturity_40qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+
+#############
+# quarterly #
+#############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "quarter", type = "correlated", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+############
+# annually #
+############
+
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+set.seed(1)
+zcp_sim = get_afns_simulation(num_years = num_years, num_paths = num_paths, frequency = "year", type = "correlated", model = "interest_house_stock")
+stopCluster(cl)
+
+# 6-month 
+plot_date = c(zcp_month$month, row.names(zcp_sim[[1]]))
+plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 6-month zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x2_qtrs, zcp_sim$maturity_2qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# 5-year
+plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,1])
+plot(plot_date, plot_data, "l", main = "Simulated 5-year zero-coupon yields", xlab = "", ylab = "", col = "grey", ylim = c(-0.04,0.1))
+for (i in 2:num_paths) {
+  plot_data = c(zcp_month$x20_qtrs, zcp_sim$maturity_20qtrs[,i])
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# house 
+plot_data = c(m.spot[,41], log(zcp_sim$house_index[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log house indexes", xlab = "", ylab = "", col = "grey")
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,41], log(zcp_sim$house_index[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+
+# stock 
+plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,1]))
+plot(plot_date, plot_data, "l", main = "Simulated log stock prices", xlab = "", ylab = "", col = "grey",)
+for (i in 2:num_paths) {
+  plot_data = c(m.spot[,42], log(zcp_sim$stock_price[,i]))
+  lines(plot_date, plot_data, col = "grey")
+}
+```
