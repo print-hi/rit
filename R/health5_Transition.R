@@ -7,7 +7,7 @@
 #' age of the individual
 #' @param gender
 #' gender 1 if female, 0 if male
-#' @param i
+#' @param wave_index
 #' the wave index
 #' @param latent
 #' initial value of latent factor, normally take the value 0
@@ -18,8 +18,8 @@
 #' @export health5_get_trans_rates
 #'
 #' @examples
-#' transition_rates=health5_get_trans_rates(model='F',params=params_5_frailty, age=65, gender=0, i=8, latent=0)
-health5_get_trans_rates=function(model,params,age,gender,i,latent){
+#' transition_rates=health5_get_trans_rates(model='F',params=params_5_frailty, age=65, gender=0, wave_index=8, latent=0)
+health5_get_trans_rates=function(model,params,age,gender,wave_index,latent){
     #
     if (model == 'S') {
         params <- params[1:3, 3:14]
@@ -34,11 +34,11 @@ health5_get_trans_rates=function(model,params,age,gender,i,latent){
         vari_x1=vari_x+cbind(c(0,1,0))
     }
     if (model== 'T'){
-        vari_x=matrix(c(1,age,gender,i),ncol=1) # construct a column vector of the variables
+        vari_x=matrix(c(1,age,gender,wave_index),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0,0))
     }
     if (model== 'F'){
-        vari_x=matrix(c(1,age,gender,i,latent),ncol=1) # construct a column vector of the variables
+        vari_x=matrix(c(1,age,gender,wave_index,latent),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0,0,0))
     }
     ln_trans_rate_x=t(params)%*%vari_x # do matrix calculation to get a column vector of the ln transition rates
@@ -60,7 +60,7 @@ health5_get_trans_rates=function(model,params,age,gender,i,latent){
 #' age of the individual
 #' @param gender
 #' gender 1 if female, 0 if male
-#' @param i
+#' @param wave_index
 #' the wave index
 #' @param latent
 #' initial value of latent factor, normally take the value 0
@@ -73,9 +73,9 @@ health5_get_trans_rates=function(model,params,age,gender,i,latent){
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, i=8, latent=0)
-health5_get_trans_probs=function(model,params,age,gender,i,latent){
-    trans_rate=health5_get_trans_rates(model,params,age,gender,i,latent)
+#' transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, wave_index=8, latent=0)
+health5_get_trans_probs=function(model,params,age,gender,wave_index,latent){
+    trans_rate=health5_get_trans_rates(model,params,age,gender,wave_index,latent)
     if (model == 'S') {
         params <- params[1:3, 3:14]
     } else if (model == 'T') {
@@ -102,7 +102,7 @@ health5_get_trans_probs=function(model,params,age,gender,i,latent){
 #' the initial age of the transition probability matrices
 #' @param gender
 #' gender 1 if female, 0 if male
-#' @param i
+#' @param wave_index
 #' the wave index
 #' @param model
 #' S for static model, T for trend model, F for frailty model
@@ -112,8 +112,8 @@ health5_get_trans_probs=function(model,params,age,gender,i,latent){
 #' @export health5_get_list_trans_prob_matrix
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F', params=params_5_frailty, init_age=65, gender=0, i=8)
-health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, i){
+#' trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F', params=params_5_frailty, init_age=65, gender=0, wave_index=8)
+health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, wave_index){
     latent=0 # initial value of latent factor
     # list of 46 vectors of transition rates for this simulation
     trans_rate=list()
@@ -127,7 +127,7 @@ health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, i){
     #  }
 
     for (a in init_age:110){
-        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs(model, params,a,gender,i+(a-init_age)/2,latent) # calculate transition probability matrix for each age
+        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs(model, params,a,gender,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
         if (model==3){
             latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }

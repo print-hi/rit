@@ -36,18 +36,18 @@ model='F'
 # input characteristics of the individual at time 0
 init_age=65
 gender=0
-i=8 # wave index
+wave_index=8 # wave index
 latent=0 # initial value of latent factor
 
 ##### test frailty model #####
-transition_rates=health5_get_trans_rates(model='F', params, init_age, gender, i, latent)
-transition_probabilities=health5_get_trans_probs(model='F',params, init_age, gender, i, latent)
+transition_rates=health5_get_trans_rates(model='F', params, init_age, gender, wave_index, latent)
+transition_probabilities=health5_get_trans_probs(model='F',params, init_age, gender, wave_index, latent)
 ###
-trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F',params, init_age=65, gender, i)
+trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F',params, init_age=65, gender, wave_index)
 ###
-simulated_lifetable=health5_get_life_table(model='F',params,init_age=65,gender,i,latent,initial_state=0, n_sim=100) #model='F in this case because this function is for simulating the latent factor, otherwise it will produce 100 same simulations, use n_sim=1 for model='S' or model='T'
+simulated_lifetable=health5_get_life_table(model='F',params,init_age=65,gender,wave_index,latent,initial_state=0, n_sim=100) #model='F in this case because this function is for simulating the latent factor, otherwise it will produce 100 same simulations, use n_sim=1 for model='S' or model='T'
 ###
-simulated_individual_path=health5_simulate_individual_path(model='F',init_age=65, init_state=0, params, gender, i, cohort = 10000)
+simulated_individual_path=health5_simulate_individual_path(model='F',init_age=65, init_state=0, params, gender, wave_index, cohort = 10000)
 ###
 first_time_H=health5_first_time_stats(simulated_individual_path, 0)
 total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
@@ -79,7 +79,7 @@ stats_total_time_alive=health5_stats_produce(total_time_alive)
 stats_total_time_alive
 
 ### future life time given in M state
-simulated_individual_path=health5_simulate_individual_path(model='F',init_age=65, init_state=1, params, gender, i, cohort = 10000)
+simulated_individual_path=health5_simulate_individual_path(model='F',init_age=65, init_state=1, params, gender, wave_index, cohort = 10000)
 total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
 stats_total_time_alive=health5_stats_produce(total_time_alive)
 stats_total_time_alive
@@ -87,13 +87,13 @@ stats_total_time_alive
 # detach("package:fivestate", unload=TRUE)
 
 ##### test static model #####
-transition_rates=health5_get_trans_rates(model='S', params, init_age, gender, i, latent)
-transition_probabilities=health5_get_trans_probs(model='S', params, init_age, gender, i, latent)
+transition_rates=health5_get_trans_rates(model='S', params, init_age, gender, wave_index, latent)
+transition_probabilities=health5_get_trans_probs(model='S', params, init_age, gender, wave_index, latent)
 ###
-trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='S', params, init_age=65, gender, i)
-simulated_lifetable=health5_get_life_table(model='S',params,init_age=65,gender,i,latent,initial_state=0,n_sim=1) #it will produce same simulations for model='S' or model='T', so n_sim is set to be 1
+trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='S', params, init_age=65, gender, wave_index)
+simulated_lifetable=health5_get_life_table(model='S',params,init_age=65,gender,wave_index,latent,initial_state=0,n_sim=1) #it will produce same simulations for model='S' or model='T', so n_sim is set to be 1
 ###
-simulated_individual_path=health5_simulate_individual_path(model='S',init_age=65, init_state=0, params, gender, i, cohort = 10000)
+simulated_individual_path=health5_simulate_individual_path(model='S',init_age=65, init_state=0, params, gender, wave_index, cohort = 10000)
 ###
 first_time_H=health5_first_time_stats(simulated_individual_path, 0)
 total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
@@ -122,13 +122,13 @@ stats_total_time_4=health5_stats_produce(total_time_4)
 stats_total_time_4
 
 ##### test trend model #####
-transition_rates=health5_get_trans_rates(model='T',params, init_age, gender, i, latent)
-transition_probabilities=health5_get_trans_probs(model='T',params, init_age, gender, i, latent)
+transition_rates=health5_get_trans_rates(model='T',params, init_age, gender, wave_index, latent)
+transition_probabilities=health5_get_trans_probs(model='T',params, init_age, gender, wave_index, latent)
 ###
-trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='T',params, init_age=65, gender, i)
-simulated_lifetable=health5_get_life_table(model='T',params,init_age=65,gender,i,latent,initial_state=0,n_sim=1) #it will produce same simulations for model='S' or model='T'
+trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='T',params, init_age=65, gender, wave_index)
+simulated_lifetable=health5_get_life_table(model='T',params,init_age=65,gender,wave_index,latent,initial_state=0,n_sim=1) #it will produce same simulations for model='S' or model='T'
 ###
-simulated_individual_path=health5_simulate_individual_path(model='T',init_age=65, init_state=0, params, gender, i, cohort = 10000)
+simulated_individual_path=health5_simulate_individual_path(model='T',init_age=65, init_state=0, params, gender, wave_index, cohort = 10000)
 ###
 first_time_H=health5_first_time_stats(simulated_individual_path, 0)
 total_time_alive=health5_total_time_stats(simulated_individual_path, 4)

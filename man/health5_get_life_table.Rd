@@ -9,7 +9,7 @@ health5_get_life_table(
   params,
   init_age,
   gender,
-  i,
+  wave_index,
   latent,
   initial_state,
   n_sim = 100
@@ -25,13 +25,13 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 
 \item{gender}{gender 1 if female, 0 if male}
 
-\item{i}{the wave index = (interview year - 1998)/2 + 1}
-
 \item{latent}{initial value of latent factor, normally take the value 0}
 
 \item{initial_state}{0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 
 \item{n_sim}{the number of simulations}
+
+\item{i}{the wave index = (interview year - 1998)/2 + 1}
 }
 \value{
 a list of n_sum number of life table matrices
@@ -43,5 +43,5 @@ for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwi
 the function to get n_sim number of lifetables
 }
 \examples{
-simulated_lifetable=health5_get_life_table(model='F', params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100)
+simulated_lifetable=health5_get_life_table(model='F', params=params_5_frailty,init_age=65,gender=0,wave_index=8,latent=0,initial_state=0,n_sim=100)
 }

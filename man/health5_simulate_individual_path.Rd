@@ -10,7 +10,7 @@ health5_simulate_individual_path(
   init_state,
   params,
   gender,
-  i,
+  wave_index,
   cohort = 10000
 )
 }
@@ -26,9 +26,9 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 
 \item{gender}{gender 1 if female, 0 if male}
 
-\item{i}{the wave index}
-
 \item{cohort}{the number of simulations, set to be 10000}
+
+\item{i}{the wave index}
 }
 \value{
 10000 rows of individual paths in the states, 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
@@ -38,5 +38,5 @@ for each row it starts from the initial age as an input, and end at age 110
 function to get the path of 10000 individuals
 }
 \examples{
-simulated_individual_path=health5_simulate_individual_path(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, i=8, cohort = 10000)
+simulated_individual_path=health5_simulate_individual_path(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, wave_index=8, cohort = 10000)
 }

@@ -11,7 +11,7 @@
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param gender
 #' gender 1 if female, 0 if male
-#' @param i
+#' @param wave_index
 #' the wave index
 #' @param model
 #' 1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model
@@ -22,8 +22,8 @@
 #' @export health5_simulate_individual_path
 #'
 #' @examples
-#' simulated_individual_path=health5_simulate_individual_path(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, i=8, cohort = 10000)
-health5_simulate_individual_path <- function(model, init_age, init_state, params, gender, i, cohort = 10000) {
+#' simulated_individual_path=health5_simulate_individual_path(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, wave_index=8, cohort = 10000)
+health5_simulate_individual_path <- function(model, init_age, init_state, params, gender, wave_index, cohort = 10000) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
     # create empty matrix to contain simulated population
@@ -32,7 +32,7 @@ health5_simulate_individual_path <- function(model, init_age, init_state, params
     # initialise all individuals
     simulated_pop[, 1] <- init_state
 
-    trans_prob_matrix=health5_get_list_trans_prob_matrix(model, params, init_age, gender, i)
+    trans_prob_matrix=health5_get_list_trans_prob_matrix(model, params, init_age, gender, wave_index)
 
     for (i in 2:ncol(simulated_pop)) {
         simulated_pop[simulated_pop[,i-1] == 0, i] <- sample(c(0, 1, 2, 3, -1),
@@ -69,7 +69,7 @@ health5_simulate_individual_path <- function(model, init_age, init_state, params
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param gender
 #' gender 1 if female, 0 if male
-#' @param i
+#' @param wave_index
 #' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
@@ -89,8 +89,8 @@ health5_simulate_individual_path <- function(model, init_age, init_state, params
 #' @export health5_get_life_table
 #'
 #' @examples
-#' simulated_lifetable=health5_get_life_table(model='F', params=params_5_frailty,init_age=65,gender=0,i=8,latent=0,initial_state=0,n_sim=100)
-health5_get_life_table=function(model,params,init_age,gender,i,latent,initial_state,n_sim=100){
+#' simulated_lifetable=health5_get_life_table(model='F', params=params_5_frailty,init_age=65,gender=0,wave_index=8,latent=0,initial_state=0,n_sim=100)
+health5_get_life_table=function(model,params,init_age,gender,wave_index,latent,initial_state,n_sim=100){
     state_status_full=list() # full list of state status for all n simulations
     expected_time_state_full=c()
     for (n in 1:100){ # 1000 simulations
@@ -117,7 +117,7 @@ health5_get_life_table=function(model,params,init_age,gender,i,latent,initial_st
 
         for (age in init_age:110){
 
-            trans_prob_matrix[[age-init_age+1]]=health5_get_trans_probs(model,params,age,gender,i+(age-init_age)/2,latent) # calculate transition probability matrix for each age
+            trans_prob_matrix[[age-init_age+1]]=health5_get_trans_probs(model,params,age,gender,wave_index+(age-init_age)/2,latent) # calculate transition probability matrix for each age
 
             for (j in 2:6){
                 state_status[age-init_age+2,j]=state_status[age-init_age+1,2]*trans_prob_matrix[[age-init_age+1]][1,j-1]+
