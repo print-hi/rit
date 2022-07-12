@@ -13,16 +13,16 @@ health5_create_life_table(list_trans_probs, init_age, init_state, n_sim = 100)
 
 \item{n_sim}{the number of simulations}
 
-\item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
-\item{gender}{gender 1 if female, 0 if male}
+\item{female}{female 1 if female, 0 if male}
 
 \item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
 
-\item{model}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
+\item{model_type}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
 }
 \value{
 a list of n_sum number of life table matrices

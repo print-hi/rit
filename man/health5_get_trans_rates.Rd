@@ -4,17 +4,24 @@
 \alias{health5_get_trans_rates}
 \title{function to calculate transition rates at a certain age}
 \usage{
-health5_get_trans_rates(model, params, age, gender, wave_index, latent)
+health5_get_trans_rates(
+  model_type,
+  param_file,
+  age,
+  female,
+  wave_index,
+  latent
+)
 }
 \arguments{
-\item{model}{S for static model, T for trend model, F for frailty model}
+\item{model_type}{S for static model, T for trend model, F for frailty model}
 
-\item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
+\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
 \item{age}{age of the individual}
 
-\item{gender}{gender 1 if female, 0 if male}
+\item{female}{female 1 if female, 0 if male}
 
 \item{wave_index}{the wave index}
 
@@ -27,5 +34,5 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=health5_get_trans_rates(model='F',params=params_5_frailty, age=65, gender=0, wave_index=8, latent=0)
+transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
 }

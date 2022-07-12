@@ -7,9 +7,9 @@
 #' string that selects model type; S for Static, T for Trend and F for Frailty
 #' @param param_file
 #' string for file path of parameter file OR a tibble/dataframe of parameters
-#' @param age
+#' @param init_age
 #' integer denoting age of policy holder
-#' @param gender
+#' @param female
 #' takes values 1 or 0, where 1 indicates policyholder is female
 #' @param year
 #' integer denoting current year
@@ -28,8 +28,8 @@
 #' @import expm
 #' @examples example
 #'
-get_trans_probs <- function(n_states, model_type, param_file, age, gender, year = 2012, wave_index = 8, latent = 0) {
-  
+get_trans_probs <- function(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0) {
+
   if (year != 2012) {
     wave_index = (year - 1998) / 2 + 1
   }
@@ -38,11 +38,11 @@ get_trans_probs <- function(n_states, model_type, param_file, age, gender, year 
   }
 
   if (n_states == 3) {
-    return(health3_get_trans_probs(model_type, param_file, age, gender, year))
+    return(health3_get_trans_probs(model_type, param_file, init_age, female, year))
   }
- 
+
   if (n_states == 5) {
-    return(health5_get_trans_probs(model_type, param_file, age, gender, wave_index, latent))
+    return(health5_get_trans_probs(model_type, param_file, init_age, female, wave_index, latent))
   }
 
   stop('invalid n_states')
@@ -72,12 +72,12 @@ get_trans_probs <- function(n_states, model_type, param_file, age, gender, year 
 #'
 create_life_table <- function(model_type, trans_probs, init_age, init_state = 0, cohort = 100000) {
 
-  if (length(trans_probs) == 3) {
-    return(health3_get_life_table(trans_probs, init_age, init_state, cohort))
+  if (length(trans_probs[[1]][1,]) == 3) {
+    return(health3_create_life_table(trans_probs, init_age, init_state, cohort))
   }
- 
-  if (length(trans_probs) == 5) {
-    return(health5_get_life_table(trans_probs, init_age, init_state, cohort))
+
+  if (length(trans_probs[[1]][1,]) == 5) {
+    return(health5_create_life_table(trans_probs, init_age, init_state, cohort))
   }
 
   stop('invalid dimensions: trans_probs')
@@ -95,7 +95,7 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #' string for file path of parameter file OR a tibble/dataframe of parameters
 #' @param age
 #' integer denoting age of policy holder
-#' @param gender
+#' @param female
 #' takes values 1 or 0, where 1 indicates policyholder is female
 #' @param year
 #' integer denoting current year
@@ -115,14 +115,14 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #'
 #' @examples example
 #'
-simulate_life_table <- function(n_states, param_file, age, gender, year = 2012, wave_index = 8, n_sim = 10000, mean = TRUE) {
-  
+simulate_life_table <- function(model_type, param_file, female,year = 2012,wave_index = 8,latent=0,init_age,init_state=0,n_sim=100, mean=FALSE) {
+
   if (n_states == 3) {
-    return(health3_simulate_life_table(param_file, age, gender, year, n_sim, mean))
+    return(health3_simulate_life_table(init_age, female, year, param_file, init_state, n_sim, mean))
   }
- 
+
   if (n_states == 5) {
-    return(health5_simulate_life_table(param_file, age, gender, wave_index, n_sim, mean))
+    return(health5_simulate_life_table(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, mean))
   }
 
   stop('invalid n_states')
@@ -153,13 +153,13 @@ simulate_life_table <- function(n_states, param_file, age, gender, year = 2012, 
 #'
 #' @examples example
 simulate_health_state_paths <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
-  
-  if (length(trans_probs) == 3) {
+
+  if (length(trans_probs[[1]][1,]) == 3) {
     return(health3_simulate_paths(trans_probs, init_age, init_state, cohort))
   }
- 
-  if (length(trans_probs) == 5) {
-    return(health5_simulate_paths(trans_probs, init_age, init_state, cohortt))
+
+  if (length(trans_probs[[1]][1,]) == 5) {
+    return(health5_simulate_paths(trans_probs, init_age, init_state, cohort))
   }
 
   stop('invalid dimensions: trans_probs')

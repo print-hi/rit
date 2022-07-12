@@ -6,14 +6,14 @@
 #' the initial state of all individuals
 #' @param cohort
 #' the number of simulations, set to be 10000
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
-#' @param gender
-#' gender 1 if female, 0 if male
+#' @param female
+#' female 1 if female, 0 if male
 #' @param wave_index
 #' the wave index
-#' @param model
+#' @param model_type
 #' 1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model
 #'
 #' @return
@@ -22,7 +22,7 @@
 #' @export health5_simulate_paths
 #'
 #' @examples
-#' simulated_individual_path=health5_simulate_paths(model='F', init_age=65, init_state=0, params=params_5_frailty, gender=0, wave_index=8, cohort = 10000)
+#' simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
 health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohort = 10000) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
@@ -62,18 +62,18 @@ health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohor
 
 #' the function to get n_sim number of lifetables
 #'
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
-#' @param gender
-#' gender 1 if female, 0 if male
+#' @param female
+#' female 1 if female, 0 if male
 #' @param wave_index
 #' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
 #' @param n_sim
 #' the number of simulations
-#' @param model
+#' @param model_type
 #' 1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model
 #' @param init_state
 #' 0 for H state, 1 for M state, 2 for D state, 3 for MD state
@@ -119,7 +119,7 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=10
                 # then take the sum of all possible initial states of this year
             }
             state_status[age-init_age+2,1]=age+1
-            if (model=='F'){
+            if (model_type=='F'){
                 latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
             }
             expected_time_state=colSums(state_status) # the order is H M D MD Dead
@@ -130,18 +130,18 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=10
 
 #' the function to get n_sim number of lifetables
 #'
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
-#' @param gender
-#' gender 1 if female, 0 if male
+#' @param female
+#' female 1 if female, 0 if male
 #' @param wave_index
 #' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
 #' @param n_sim
 #' the number of simulations
-#' @param model
+#' @param model_type
 #' 1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model
 #' @param init_state
 #' 0 for H state, 1 for M state, 2 for D state, 3 for MD state
@@ -152,24 +152,24 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=10
 #' for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
 #' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
 #' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
-#' @export health5_simulate_life_tables
+#' @export health5_simulate_life_table
 #'
 #' @examples
-#' simulated_lifetable=health5_simulate_life_tables(model='F', params, gender, wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
-health5_simulate_life_tables=function(model, params, gender, wave_index,latent=0,init_age,init_state,n_sim=100,return_expected=0){
-    if (model != 'F') {
+#' simulated_lifetable=health5_simulate_life_table(model_type='F', param_file, female, wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
+health5_simulate_life_table=function(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, mean){
+    if (model_type != 'F') {
         stop('use frailty model to simulate lifetables')
     }
     state_status_full=list()
     for (i in 1: n_sim){
-    list_trans_probs=health5_get_trans_probs(model, params, init_age, gender, wave_index, latent)
+    list_trans_probs=health5_get_trans_probs(model_type, param_file, init_age, female, wave_index, latent)
     state_status=health5_create_life_table(list_trans_probs,init_age,init_state)
     state_status_full=append(state_status_full,list(state_status))
     }
-    if (return_expected==0){
+    if (mean != TRUE){
         return(state_status_full)
     }
-    if(return_expected==1){
+    if(mean == TRUE){
         return(Reduce('+', state_status_full)/n_sim)
     }
 }

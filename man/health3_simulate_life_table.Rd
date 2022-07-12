@@ -9,9 +9,9 @@ health3_simulate_life_table(
   female,
   year,
   param_file,
-  init_state = 0,
-  n = 3000,
-  mean = TRUE
+  init_state,
+  n_sim,
+  mean
 )
 }
 \arguments{

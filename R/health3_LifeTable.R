@@ -109,24 +109,24 @@ health3_create_life_table <- function(trans_probs, init_age, init_state = 0, coh
 #' @export simulate_life_table
 #'
 #' @examples example
-health3_simulate_life_table <- function(init_age, female, year, param_file, init_state = 0, n = 3000, mean = TRUE) {
-  if (as.integer(n) != n) {
-    stop('n must be an integer')
+health3_simulate_life_table <- function(init_age, female, year, param_file, init_state, n_sim, mean) {
+  if (as.integer(n_sim) != n_sim) {
+    stop('n_sim must be an integer')
   }
 
-  if (n <= 0) {
-    stop('n must be a positive integer')
+  if (n_sim <= 0) {
+    stop('n_sim must be a positive integer')
   }
 
   life_tables <- list()
-  for (i in 1:n) {
+  for (i in 1:n_sim) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
     LT <- health3_create_life_table(TP, init_age)
     life_tables[[i]] <- LT
   }
 
   if (mean == TRUE) {
-    return(Reduce('+', life_tables)/n)
+    return(Reduce('+', life_tables)/n_sim)
   } else {
     return(life_tables)
   }

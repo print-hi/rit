@@ -5,34 +5,36 @@
 \title{Simulate life table for frailty model}
 \usage{
 simulate_life_table(
-  n_states,
+  model_type,
   param_file,
-  age,
-  gender,
+  female,
   year = 2012,
   wave_index = 8,
-  n_sim = 10000,
-  mean = TRUE
+  latent = 0,
+  init_age,
+  init_state = 0,
+  n_sim = 100,
+  mean = FALSE
 )
 }
 \arguments{
+\item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
+
 \item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
-\item{age}{integer denoting age of policy holder}
-
-\item{gender}{takes values 1 or 0, where 1 indicates policyholder is female}
+\item{female}{takes values 1 or 0, where 1 indicates policyholder is female}
 
 \item{year}{integer denoting current year}
 
 \item{wave_index}{the wave index}
 
+\item{latent}{initial value of latent factor, normally take the value 0}
+
 \item{n_sim}{number of simulations}
 
 \item{mean}{return expected life table}
 
-\item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
-
-\item{latent}{initial value of latent factor, normally take the value 0}
+\item{age}{integer denoting age of policy holder}
 }
 \value{
 list of life tables (default) or expected life table (mean == TRUE)

@@ -8,8 +8,8 @@ get_trans_probs(
   n_states,
   model_type,
   param_file,
-  age,
-  gender,
+  init_age,
+  female,
   year = 2012,
   wave_index = 8,
   latent = 0
@@ -20,9 +20,9 @@ get_trans_probs(
 
 \item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 
-\item{age}{integer denoting age of policy holder}
+\item{init_age}{integer denoting age of policy holder}
 
-\item{gender}{takes values 1 or 0, where 1 indicates policyholder is female}
+\item{female}{takes values 1 or 0, where 1 indicates policyholder is female}
 
 \item{year}{integer denoting current year}
 
