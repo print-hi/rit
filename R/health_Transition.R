@@ -22,6 +22,9 @@
 #' list of transition probability matrices
 #'
 #' @export get_trans_probs
+#'
+#'
+#' @export get_trans_probs
 #' @import expm
 #' @examples example
 #'
@@ -67,7 +70,7 @@ get_trans_probs <- function(n_states, model_type, param_file, age, gender, year 
 #'
 #' @examples example
 #'
-get_life_table <- function(model_type, trans_probs, init_age, init_state = 0, cohort = 100000) {
+create_life_table <- function(model_type, trans_probs, init_age, init_state = 0, cohort = 100000) {
 
   if (length(trans_probs) == 3) {
     return(health3_get_life_table(trans_probs, init_age, init_state, cohort))
@@ -108,6 +111,8 @@ get_life_table <- function(model_type, trans_probs, init_age, init_state = 0, co
 #' @return
 #' list of life tables (default) or expected life table (mean == TRUE)
 #'
+#' @export simulate_life_table
+#'
 #' @examples example
 #'
 simulate_life_table <- function(n_states, param_file, age, gender, year = 2012, wave_index = 8, n_sim = 10000, mean = TRUE) {
@@ -144,7 +149,7 @@ simulate_life_table <- function(n_states, param_file, age, gender, year = 2012, 
 #'
 #' -1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 #'
-#' @export simulate_path
+#' @export simulate_health_state_paths
 #'
 #' @examples example
 simulate_health_state_paths <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
