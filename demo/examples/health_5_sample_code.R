@@ -13,9 +13,9 @@ n_states=5
 
 trans_probs_5state=get_trans_probs(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0)
 
-lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
+lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 1)
 
-lifetable_simulated_5state=simulate_life_table(model_type, param_file, female,year = 2012,wave_index = 8,latent=0,init_age,init_state=0,n_sim=100, mean=FALSE)
+lifetable_simulated_5state=simulate_life_table(model_type, param_file, female,year = 2012,wave_index = 8,latent=0,init_age,init_state=0,n_sim=100,cohort = 1,mean=FALSE)
 
 simulated_paths_5state=simulate_health_state_paths(trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
 ###
@@ -56,7 +56,7 @@ model_type='S'
 
 trans_probs_5state=get_trans_probs(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0)
 
-lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
+lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 1)
 
 simulated_paths_5state=simulate_health_state_paths(trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
 ###
@@ -90,7 +90,7 @@ stats_total_time_4
 model_type='T'
 trans_probs_5state=get_trans_probs(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0)
 
-lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
+lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 1)
 
 simulated_paths_5state=simulate_health_state_paths(trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
 ###
