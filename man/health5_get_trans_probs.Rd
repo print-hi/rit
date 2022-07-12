@@ -2,9 +2,16 @@
 % Please edit documentation in R/health5_Transition.R
 \name{health5_get_trans_probs}
 \alias{health5_get_trans_probs}
-\title{function to get a matrix of transition probabilities at a certain age}
+\title{the function to get a full list of transition probability matrices from the initial age to age 110}
 \usage{
-health5_get_trans_probs(model, params, age, gender, i, latent)
+health5_get_trans_probs(
+  model,
+  params,
+  init_age,
+  gender,
+  wave_index,
+  latent = 0
+)
 }
 \arguments{
 \item{model}{S for static model, T for trend model, F for frailty model}
@@ -12,20 +19,20 @@ health5_get_trans_probs(model, params, age, gender, i, latent)
 \item{params}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
 
-\item{age}{age of the individual}
+\item{init_age}{the initial age of the transition probability matrices}
 
 \item{gender}{gender 1 if female, 0 if male}
 
-\item{i}{the wave index}
+\item{wave_index}{the wave index}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
 }
 \value{
-5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
+a list of 5 times 5 transition probability matrices, from the initial age to age 110
 }
 \description{
-function to get a matrix of transition probabilities at a certain age
+the function to get a full list of transition probability matrices from the initial age to age 110
 }
 \examples{
-transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, i=8, latent=0)
+trans_prob_matrix_age65to110=health5_get_trans_probs(model='F', params=params_5_frailty, init_age=65, gender=0, wave_index=8)
 }

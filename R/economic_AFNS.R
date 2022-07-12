@@ -1,4 +1,4 @@
-#' get_afns_simulation
+#' esg_afns_simulation
 #' 
 #' Returns the simulated paths of the zero-coupon interest rate term structure. 
 #' The model is based on an Arbitrage-Free Nelson-Siegel (AFNS) model. 
@@ -9,6 +9,8 @@
 #' @param num_years Number of years to forecast, counting from 2021-06-01. Default is 5 years. 
 #' @param num_paths Number of simulation paths. Default is 10 paths. 
 #' @param frequency One of "year", "quarter", and "month" (default).  
+#' @param perc_change If the outputs are expressed in terms of period-by-period percentage
+#' change.Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
 #' @param type Either "independent" (default) or "correlated". Independent-factor 
 #' model assumes independence between the latent factors for interest rates. 
 #' @param model Either "interest_rate" (default) or "interest_house_stock". 
@@ -20,13 +22,13 @@
 #' If model is `interest_house_stock`,the function returns a list containing 42 data frames 
 #' for the simulated trajectories for maturities from 1 quarter up to 10 years, 
 #' as well as NSW house value indexes and S&P/ASX200 closing prices. 
-#' @export get_afns_simulation
+#' @export esg_afns_simulation
 #'
-#' @examples sim = get_afns_simulations(num_years = 10, num_paths = 100, 
+#' @examples sim = esg_afns_simulations(num_years = 10, num_paths = 100, 
 #' frequency = "year", type = "correlated", model = "interest_rate"). To obtain trajectories of 
 #' Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. To obtain trajectories of 
 #' S&P/ASX200 closing prices, type sim$stock_price. 
-get_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", type = "independent", model = "interest_rate") {
+esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate") {
     
     ##################
     # error messages #
@@ -43,6 +45,8 @@ get_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
         
     } else if (!model %in% c("interest_rate", "interest_house_stock")) {
         stop ("Model must be either 'interest_rate' or 'interest_house_stock'. ") 
+    } else if (!is.logical(perc_change)) {
+        stop ("perc_change must be logical. ")
         
     }
     
@@ -123,6 +127,18 @@ get_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
         output[[41]] = exp(output[[41]])
         output[[42]] = exp(output[[42]])
     }
+    
+    #############
+    # Adj units # 
+    #############
+    
+    if (isTRUE(perc_change)) {
+        ref_level = lapply(output, function (x) {x = x[1,]; row.names(x) = paste("ref_level", row.names(x));x})
+        output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        output = lapply(1:length(output), function (x) {rbind(ref_level[[x]][1,],output[[x]])}) # include the reference level in outputs
+        names(output) = mat_qtrs
+    }
+    
 
     return (output)
 } 

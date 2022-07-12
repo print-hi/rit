@@ -1,4 +1,4 @@
-#' get_var_simulations
+#' esg_var_simulations
 #'
 #' Returns the simulated paths for various economic and financial variables:
 #' (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon
@@ -16,21 +16,21 @@
 #' which is the simulation frequency for the Vector Autoregression model. Linear
 #' interpolation will be used if the required frequency is higher, whereas
 #' arithmetic average will be used if the frequency is lower.
-#' @param perc_change If the outputs are expressed in terms of percentage
-#' change.Default is FALSE
+#' @param perc_change If the outputs are expressed in terms of period-by-period percentage
+#' change.Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
 #' @param return_sdf If the VAR-based stochastic discount factors are returned.
-#' Default is FALSE.
+#' Default is TRUE. 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for
 #' each economic variable, and a list of white noises in the VAR model.
-#' @export get_var_simulations
+#' @export esg_var_simulations
 #'
-#' @examples sim = get_discrete_simulations(num_years = 10, num_paths = 100,
+#' @examples sim = esg_var_simulations(num_years = 10, num_paths = 100,
 #' frequency = "year", return_sdf = T). To obtain all trajectories of Australia
 #' 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the
 #' first trajectory, type sim$noise$trajectory_1.
 #'
-get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = FALSE) {
+esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE) {
 
     ################
     # error messages 
@@ -257,7 +257,10 @@ get_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     #############
     
     if (isTRUE(perc_change)) {
+        ref_level = lapply(output, function (x) {x = x[1,]; row.names(x) = paste("ref_level", row.names(x));x})
         output = lapply(output, function (x) {(x[-1,] - x[-nrow(x),]) / x[-nrow(x), ]})
+        output = lapply(1:length(output), function (x) {rbind(ref_level[[x]][1,],output[[x]])}) # include the reference level in outputs
+        names(output) = names(sim)
     }
     
     return (output)

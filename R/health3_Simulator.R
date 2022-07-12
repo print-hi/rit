@@ -4,13 +4,13 @@
 #'
 #' Simulates the path each life takes in an initial cohort using transition probabilities
 #'
+#' @param trans_probs
+#' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
 #' @param init_age
 #' integer between 65 and 110 denoting current age. This has to the be same as the initial
 #' age used in the generation of transition probability matrices.
 #' @param init_state
 #' 0 for healthy, 1 for disabled
-#' @param trans_probs
-#' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
 #' @param cohort
 #' integer (default 10000) denoting number of people in the simulation
 #'
@@ -23,7 +23,7 @@
 #' @export simulate_path
 #'
 #' @examples example
-simulate_path <- function(init_age, init_state, trans_probs, cohort = 10000) {
+health3_simulate_paths <- function(trans_probs, init_age, init_state, cohort = 10000) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, 0 for healthy and 1 for disabled')
