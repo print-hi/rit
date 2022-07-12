@@ -18,3 +18,35 @@ lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5
 lifetable_simulated_5state=simulate_life_table(model_type, param_file, female,year = 2012,wave_index = 8,latent=0,init_age,init_state=0,n_sim=100, mean=FALSE)
 
 simulated_paths_5state=simulate_health_state_paths(trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 100000)
+###
+first_time_H=health5_first_time_stats(simulated_paths_5state, 0)
+total_time_alive=health5_total_time_stats(simulated_paths_5state, 4)
+###
+stats_first_time_H=health5_stats_produce(first_time_H)
+stats_first_time_H
+### future life time given in H state
+stats_total_time_alive=health5_stats_produce(total_time_alive)
+stats_total_time_alive
+###
+total_time_1=health5_total_time_stats(simulated_paths_5state, 0)
+total_time_2=health5_total_time_stats(simulated_paths_5state, 1)
+total_time_3=health5_total_time_stats(simulated_paths_5state, 2)
+total_time_4=health5_total_time_stats(simulated_paths_5state, 3)
+###
+stats_total_time_1=health5_stats_produce(total_time_1)
+stats_total_time_1
+#
+stats_total_time_2=health5_stats_produce(total_time_2)
+stats_total_time_2
+#
+stats_total_time_3=health5_stats_produce(total_time_3)
+stats_total_time_3
+#
+stats_total_time_4=health5_stats_produce(total_time_4)
+stats_total_time_4
+
+### future life time given in M state
+simulated_paths_5state=simulate_health_state_paths(trans_probs=trans_probs_5state, init_age, init_state = 1, cohort = 100000)
+total_time_alive=health5_total_time_stats(simulated_paths_5state, 4)
+stats_total_time_alive=health5_stats_produce(total_time_alive)
+stats_total_time_alive
