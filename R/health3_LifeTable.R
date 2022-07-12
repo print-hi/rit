@@ -106,7 +106,7 @@ health3_create_life_table <- function(trans_probs, init_age, init_state = 0, coh
 #' @return
 #' Dataframe containing life table
 #'
-#' @export create_life_tableF
+#' @export simulate_life_table
 #'
 #' @examples example
 health3_simulate_life_table <- function(init_age, female, year, param_file, init_state = 0, n = 3000, mean = TRUE) {
@@ -125,7 +125,7 @@ health3_simulate_life_table <- function(init_age, female, year, param_file, init
     life_tables[[i]] <- LT
   }
 
-  if (mean = TRUE) {
+  if (mean == TRUE) {
     return(Reduce('+', life_tables)/n)
   } else {
     return(life_tables)
