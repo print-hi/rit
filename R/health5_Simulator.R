@@ -88,7 +88,7 @@ health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohor
 #'
 #' @examples
 #' created_lifetable=health5_create_life_table(trans_probs_5,init_age=65,init_state=0)
-health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=100){
+health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
         # list of 46 matrices of transition probabilities for this simulation
         #list of lifetables
         state_status=matrix(nrow = 110-init_age+2, ncol = 6)
@@ -125,6 +125,7 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=10
             expected_time_state=colSums(state_status) # the order is H M D MD Dead
         }
         # the size of the lists will be large
+        state_status[,c(2:6)]=state_status[,c(2:6)]*cohort
     return(state_status)
 }
 
@@ -156,14 +157,14 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,n_sim=10
 #'
 #' @examples
 #' simulated_lifetable=health5_simulate_life_table(model_type='F', param_file, female, wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
-health5_simulate_life_table=function(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, mean){
+health5_simulate_life_table=function(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, cohort, mean){
     if (model_type != 'F') {
         stop('use frailty model to simulate lifetables')
     }
     state_status_full=list()
     for (i in 1: n_sim){
     list_trans_probs=health5_get_trans_probs(model_type, param_file, init_age, female, wave_index, latent)
-    state_status=health5_create_life_table(list_trans_probs,init_age,init_state)
+    state_status=health5_create_life_table(list_trans_probs,init_age,init_state, cohort)
     state_status_full=append(state_status_full,list(state_status))
     }
     if (mean != TRUE){

@@ -11,6 +11,7 @@ health3_simulate_life_table(
   param_file,
   init_state,
   n_sim,
+  cohort,
   mean
 )
 }

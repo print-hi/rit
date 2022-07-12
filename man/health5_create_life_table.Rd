@@ -4,14 +4,12 @@
 \alias{health5_create_life_table}
 \title{the function to get n_sim number of lifetables}
 \usage{
-health5_create_life_table(list_trans_probs, init_age, init_state, n_sim = 100)
+health5_create_life_table(list_trans_probs, init_age, init_state, cohort)
 }
 \arguments{
 \item{init_age}{the initial age of the life table}
 
 \item{init_state}{0 for H state, 1 for M state, 2 for D state, 3 for MD state}
-
-\item{n_sim}{the number of simulations}
 
 \item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
@@ -21,6 +19,8 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 \item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
+
+\item{n_sim}{the number of simulations}
 
 \item{model_type}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
 }

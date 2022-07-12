@@ -21,7 +21,7 @@
 #'
 #' @examples example
 #'
-health3_create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
+health3_create_life_table <- function(trans_probs, init_age, init_state = 0, cohort) {
     # flagging errors
     if (init_age < 65 | init_age > 110) {
       stop('invalid age')
@@ -109,7 +109,7 @@ health3_create_life_table <- function(trans_probs, init_age, init_state = 0, coh
 #' @export simulate_life_table
 #'
 #' @examples example
-health3_simulate_life_table <- function(init_age, female, year, param_file, init_state, n_sim, mean) {
+health3_simulate_life_table <- function(init_age, female, year, param_file, init_state, n_sim, cohort, mean) {
   if (as.integer(n_sim) != n_sim) {
     stop('n_sim must be an integer')
   }
@@ -121,7 +121,7 @@ health3_simulate_life_table <- function(init_age, female, year, param_file, init
   life_tables <- list()
   for (i in 1:n_sim) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    LT <- health3_create_life_table(TP, init_age)
+    LT <- health3_create_life_table(TP, init_age, init_state, cohort)
     life_tables[[i]] <- LT
   }
 

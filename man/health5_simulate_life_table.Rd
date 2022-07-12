@@ -13,6 +13,7 @@ health5_simulate_life_table(
   init_age,
   init_state,
   n_sim,
+  cohort,
   mean
 )
 }
