@@ -139,10 +139,6 @@ health3_simulate_life_table <- function(init_age, female, year, param_file, init
     stop('cohort must be positive integer')
     }
 
-    if (length(trans_probs) != 111 - init_age) {
-    stop('initial age does not correspond to the number of transition probability matrices')
-    }
-
     life_tables <- list()
     for (i in 1:n_sim) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
