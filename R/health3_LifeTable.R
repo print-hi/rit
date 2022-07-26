@@ -110,26 +110,51 @@ health3_create_life_table <- function(trans_probs, init_age, init_state = 0, coh
 #'
 #' @examples example
 health3_simulate_life_table <- function(init_age, female, year, param_file, init_state, n_sim, cohort, mean) {
-  if (as.integer(n_sim) != n_sim) {
+    # flagging errors
+    if (as.integer(n_sim) != n_sim) {
     stop('n_sim must be an integer')
-  }
+    }
 
-  if (n_sim <= 0) {
+    if (n_sim <= 0) {
     stop('n_sim must be a positive integer')
-  }
+    }
 
-  life_tables <- list()
-  for (i in 1:n_sim) {
+    if (init_age < 65 | init_age > 110) {
+    stop('invalid age')
+    }
+
+    if (as.integer(init_age) != init_age) {
+    stop('initial age must be an integer')
+    }
+
+    if (init_state != 0 & init_state != 1) {
+    stop('invalid state, enter 0 for healthy, 1 for disabled')
+    }
+
+    if (cohort != floor(cohort)) {
+    stop('cohort must be integer value')
+    }
+
+    if (cohort <= 0) {
+    stop('cohort must be positive integer')
+    }
+
+    if (length(trans_probs) != 111 - init_age) {
+    stop('initial age does not correspond to the number of transition probability matrices')
+    }
+
+    life_tables <- list()
+    for (i in 1:n_sim) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
     LT <- health3_create_life_table(TP, init_age, init_state, cohort)
     life_tables[[i]] <- LT
-  }
+    }
 
-  if (mean == TRUE) {
+    if (mean == TRUE) {
     return(Reduce('+', life_tables)/n_sim)
-  } else {
+    } else {
     return(life_tables)
-  }
+    }
 
 }
 
