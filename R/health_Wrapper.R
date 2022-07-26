@@ -126,7 +126,7 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #'
 #' @examples example
 #'
-simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE) {
+simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=300,cohort=100000,mean=FALSE) {
 
   if (n_states == 3) {
     return(health3_simulate_life_table(init_age, female, year, param_file, init_state, n_sim, cohort, mean))
