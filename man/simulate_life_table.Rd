@@ -5,41 +5,44 @@
 \title{Simulate life table for frailty model}
 \usage{
 simulate_life_table(
+  n_states,
   model_type,
   param_file,
+  init_age,
   female,
   year = 2012,
+  init_state = 0,
   wave_index = 8,
   latent = 0,
-  init_age,
-  init_state = 0,
   n_sim = 100,
-  cohort = 1,
+  cohort = 1e+05,
   mean = FALSE
 )
 }
 \arguments{
+\item{n_states}{take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model}
+
 \item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
 
 \item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
+
+\item{init_age}{integer denoting current age}
 
 \item{female}{takes values 1 or 0, where 1 indicates policyholder is female}
 
 \item{year}{integer denoting current year}
 
+\item{init_state}{integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled}
+
 \item{wave_index}{the wave index}
 
-\item{latent}{initial value of latent factor, normally take the value 0
-#' @param init_age
-integer denoting current age}
-
-\item{init_state}{integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled}
+\item{latent}{initial value of latent factor, normally take the value 0}
 
 \item{n_sim}{number of simulations}
 
 \item{cohort}{number of people at the beginning of the life table}
 
-\item{mean}{TRUE tp return expected life table, FALSE to return all simulated life tables}
+\item{mean}{TRUE to return expected life table, FALSE to return all simulated life tables}
 }
 \value{
 list of life tables (default) or expected life table (mean == TRUE)

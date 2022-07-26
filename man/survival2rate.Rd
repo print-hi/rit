@@ -25,6 +25,3 @@ associated mortality rates in the same format as \code{surv}
 \description{
 Converts the survival function to the associated mortality rates.
 }
-\examples{
-
-}

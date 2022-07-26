@@ -3,7 +3,7 @@
 #' Creates a list of transition probability matrices starting from initial age to
 #' max age of 110 for 3 state model
 #'
-#'#' @param n_states
+#' @param n_states
 #' take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model
 #' @param model_type
 #' string that selects model type; S for Static, T for Trend and F for Frailty
@@ -93,28 +93,31 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #' Simulate life table for frailty model starting from initial age to
 #' max age of 110 for 3 state model
 #'
+#'
+#' @param n_states
+#' take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model
 #' @param model_type
 #' string that selects model type; S for Static, T for Trend and F for Frailty
 #' @param param_file
 #' string for file path of parameter file OR a tibble/dataframe of parameters
+#' @param init_age
+#' integer denoting current age
 #' @param female
 #' takes values 1 or 0, where 1 indicates policyholder is female
 #' @param year
 #' integer denoting current year
+#' @param init_state
+#' integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled
 #' @param wave_index
 #' the wave index
 #' @param latent
 #' initial value of latent factor, normally take the value 0
-#' #' @param init_age
-#' integer denoting current age
-#' @param init_state
-#' integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled
 #' @param n_sim
 #' number of simulations
 #' @param cohort
 #' number of people at the beginning of the life table
 #' @param mean
-#' TRUE tp return expected life table, FALSE to return all simulated life tables
+#' TRUE to return expected life table, FALSE to return all simulated life tables
 #'
 #' @return
 #' list of life tables (default) or expected life table (mean == TRUE)
@@ -123,7 +126,7 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #'
 #' @examples example
 #'
-simulate_life_table <- function(model_type, param_file, female,year = 2012,wave_index = 8,latent=0,init_age,init_state=0,n_sim=100,cohort=1,mean=FALSE) {
+simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE) {
 
   if (n_states == 3) {
     return(health3_simulate_life_table(init_age, female, year, param_file, init_state, n_sim, cohort, mean))

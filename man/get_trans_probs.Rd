@@ -16,6 +16,8 @@ get_trans_probs(
 )
 }
 \arguments{
+\item{n_states}{take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model}
+
 \item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
 
 \item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
@@ -36,10 +38,6 @@ list of transition probability matrices
 \description{
 Creates a list of transition probability matrices starting from initial age to
 max age of 110 for 3 state model
-}
-\details{
-#' @param n_states
-take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model
 }
 \examples{
 example

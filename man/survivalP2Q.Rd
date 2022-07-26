@@ -40,6 +40,3 @@ are as follows:
 The first seven principles are distortion risk measures and act on the survival function.
 The last two principles act on the probability density function.
 }
-\examples{
-
-}

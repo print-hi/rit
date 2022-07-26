@@ -32,6 +32,3 @@ at each age
 \description{
 Simulates the life path of an individual using 1-year death probabilities
 }
-\examples{
-
-}
