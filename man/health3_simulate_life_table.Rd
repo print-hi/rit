@@ -26,7 +26,11 @@ health3_simulate_life_table(
 
 \item{init_state}{0 for healthy, 1 for disabled}
 
-\item{n}{number of latent factor paths to simulate}
+\item{n_sim}{number of latent factor paths to simulate}
+
+\item{cohort}{cohort size of lifetable}
+
+\item{mean}{FALSE to return list of lifetables, TRUE to return expected lifetable}
 }
 \value{
 Dataframe containing life table

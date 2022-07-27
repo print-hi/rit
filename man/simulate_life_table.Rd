@@ -14,7 +14,7 @@ simulate_life_table(
   init_state = 0,
   wave_index = 8,
   latent = 0,
-  n_sim = 100,
+  n_sim = 300,
   cohort = 1e+05,
   mean = FALSE
 )
