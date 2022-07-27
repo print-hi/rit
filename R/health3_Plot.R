@@ -121,9 +121,9 @@ health3_prob_plots <- function(init_state, init_age, trans_probs) {
     disabled_probs <- c(1)
   }
   for (target in (init_age+1):110) {
-    alive_probs <- append(alive_probs, surv_prob(init_state, init_age, target, trans_probs))
-    healthy_probs <- append(healthy_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 0))
-    disabled_probs <- append(disabled_probs, surv_prob(init_state, init_age, target, trans_probs, end_state = 1))
+    alive_probs <- append(alive_probs, health3_surv_prob(init_state, init_age, target, trans_probs))
+    healthy_probs <- append(healthy_probs, health3_surv_prob(init_state, init_age, target, trans_probs, end_state = 0))
+    disabled_probs <- append(disabled_probs, health3_surv_prob(init_state, init_age, target, trans_probs, end_state = 1))
   }
 
   # create age axis
