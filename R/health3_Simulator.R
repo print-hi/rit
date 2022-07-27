@@ -5,7 +5,7 @@
 #' Simulates the path each life takes in an initial cohort using transition probabilities
 #'
 #' @param trans_probs
-#' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
+#' a list of transition probability matrices, preferably generated from \code{get_trans_probs}.
 #' @param init_age
 #' integer between 65 and 110 denoting current age. This has to the be same as the initial
 #' age used in the generation of transition probability matrices.
