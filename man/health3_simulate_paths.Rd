@@ -7,7 +7,7 @@
 health3_simulate_paths(trans_probs, init_age, init_state, cohort = 10000)
 }
 \arguments{
-\item{trans_probs}{a list of transition probability matrices, preferably generated from \code{get_trans_probs}.}
+\item{trans_probs}{a list of transition probability matrices, preferably generated from \code{health3_get_trans_probs}.}
 
 \item{init_age}{integer between 65 and 110 denoting current age. This has to the be same as the initial
 age used in the generation of transition probability matrices.}
