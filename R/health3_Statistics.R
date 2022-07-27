@@ -515,7 +515,7 @@ health3_time_to_disabled <- function(init_age, trans_probs = NULL, simulated_pat
     }
 
     # simulate path
-    SP <- health3_simulate_path(trans_probs, init_age, 0, 50000)
+    SP <- health3_simulate_paths(trans_probs, init_age, 0, 50000)
   }
 
   first_time <- rep(0, nrow(SP))
