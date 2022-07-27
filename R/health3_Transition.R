@@ -19,7 +19,6 @@
 #' @return
 #' list of transition probability matrices
 #'
-#' @export health3_get_trans_probs
 #' @import expm
 #' @examples example
 #'

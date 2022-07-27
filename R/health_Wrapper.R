@@ -23,10 +23,7 @@
 #' @return
 #' list of transition probability matrices
 #'
-#' @export get_trans_probs
-#'
-#'
-#' @export get_trans_probs
+#' @export
 #' @import expm
 #' @examples example
 #'
@@ -70,7 +67,7 @@ get_trans_probs <- function(n_states, model_type, param_file, init_age, female, 
 #' @return
 #' dataframe of lifetable generated
 #'
-#' @export create_life_table
+#' @export
 #'
 #' @examples example
 #'
@@ -122,7 +119,7 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #' @return
 #' list of life tables (default) or expected life table (mean == TRUE)
 #'
-#' @export simulate_life_table
+#' @export
 #'
 #' @examples example
 #'
@@ -160,7 +157,7 @@ simulate_life_table <- function(n_states, model_type, param_file, init_age, fema
 #'
 #' -1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 #'
-#' @export simulate_health_state_paths
+#' @export
 #'
 #' @examples example
 simulate_health_state_paths <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
