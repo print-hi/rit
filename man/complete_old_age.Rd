@@ -46,3 +46,6 @@ completed mortality rates for all ages and old ages in the same format as
 \description{
 Completes mortality rates at old ages.
 }
+\examples{
+
+}

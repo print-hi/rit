@@ -22,3 +22,6 @@ or as a matrix otherwise
 \description{
 Converts from period to cohort mortality rates
 }
+\examples{
+
+}

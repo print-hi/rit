@@ -28,7 +28,7 @@ get_trans_probs(
 
 \item{year}{integer denoting current year}
 
-\item{wave_index}{the wave index}
+\item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
 }

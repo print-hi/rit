@@ -32,3 +32,6 @@ Converts mortality rates to the associated survival function.
 \details{
 The survival function has survival time (starting from 0) on the rows.
 }
+\examples{
+
+}

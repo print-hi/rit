@@ -35,3 +35,6 @@ from a given cohort at each age
 \description{
 Simulate Cohort Life Path
 }
+\examples{
+
+}

@@ -19,3 +19,6 @@ calendar year or cohort (on the columns) and simulation number (3rd dimension)}
 \description{
 Combine Historical and Simulated Rates
 }
+\examples{
+
+}

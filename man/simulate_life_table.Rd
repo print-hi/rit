@@ -14,7 +14,7 @@ simulate_life_table(
   init_state = 0,
   wave_index = 8,
   latent = 0,
-  n_sim = 300,
+  n_sim = 100,
   cohort = 1e+05,
   mean = FALSE
 )
@@ -32,9 +32,11 @@ simulate_life_table(
 
 \item{year}{integer denoting current year}
 
-\item{init_state}{integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled}
+\item{init_state}{integer value
+for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 
-\item{wave_index}{the wave index}
+\item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
 

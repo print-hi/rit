@@ -17,14 +17,17 @@ simulate_health_state_paths(
 \item{init_age}{integer between 65 and 110 denoting current age. This has to the be same as the initial
 age used in the generation of transition probability matrices.}
 
-\item{init_state}{0 for healthy, 1 for disabled}
+\item{init_state}{integer value
+for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 
 \item{cohort}{integer (default 10000) denoting number of people in the simulation}
 }
 \value{
 a matrix where each row represents a new individual, and the columns represent
 the individual's movement through each state.
-
+for 3-state model: 0 for healthy state, 1 for disabled state, -1 for death state
+for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state, -1 for death state
 -1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 }
 \description{

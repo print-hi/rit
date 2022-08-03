@@ -23,3 +23,6 @@ of \code{surv_sim} will be preserved}
 \description{
 Plots simulated survival functions for a desired cohort.
 }
+\examples{
+
+}

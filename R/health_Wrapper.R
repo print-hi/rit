@@ -16,7 +16,7 @@
 #' @param year
 #' integer denoting current year
 #' @param wave_index
-#' the wave index
+#' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
 #'
@@ -60,7 +60,9 @@ get_trans_probs <- function(n_states, model_type, param_file, init_age, female, 
 #' @param init_age
 #' integer denoting current age
 #' @param init_state
-#' integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled
+#' integer value
+#' for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+#' for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state
 #' @param cohort
 #' initial cohort size for lifetable
 #'
@@ -104,9 +106,11 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #' @param year
 #' integer denoting current year
 #' @param init_state
-#' integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled
+#' integer value
+#' for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+#' for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state
 #' @param wave_index
-#' the wave index
+#' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
 #' @param n_sim
@@ -123,7 +127,7 @@ create_life_table <- function(model_type, trans_probs, init_age, init_state = 0,
 #'
 #' @examples example
 #'
-simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=300,cohort=100000,mean=FALSE) {
+simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE) {
 
   if (n_states == 3) {
     return(health3_simulate_life_table(init_age, female, year, param_file, init_state, n_sim, cohort, mean))
@@ -147,14 +151,17 @@ simulate_life_table <- function(n_states, model_type, param_file, init_age, fema
 #' integer between 65 and 110 denoting current age. This has to the be same as the initial
 #' age used in the generation of transition probability matrices.
 #' @param init_state
-#' 0 for healthy, 1 for disabled
+#' integer value
+#' for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+#' for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state
 #' @param cohort
 #' integer (default 10000) denoting number of people in the simulation
 #'
 #' @return
 #' a matrix where each row represents a new individual, and the columns represent
 #' the individual's movement through each state.
-#'
+#' for 3-state model: 0 for healthy state, 1 for disabled state, -1 for death state
+#' for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state, -1 for death state
 #' -1 (death) is absorbing, so if an individual enters that state, the rest of the row will be -1.
 #'
 #' @export

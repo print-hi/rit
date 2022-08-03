@@ -28,3 +28,6 @@ Returns a vector otherwise
 Produces expected curtate future lifetime for a 3D array of 1-year
 death probabilities.
 }
+\examples{
+
+}

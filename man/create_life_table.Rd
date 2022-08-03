@@ -17,7 +17,9 @@ create_life_table(
 
 \item{init_age}{integer denoting current age}
 
-\item{init_state}{integer value of 0 or 1, where 0 indicates healthy and 1 indicates disabled}
+\item{init_state}{integer value
+for 3-state model: integer value of 0 or 1, where 0 for healthy state, 1 for disabled state
+for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 
 \item{cohort}{initial cohort size for lifetable}
 }
