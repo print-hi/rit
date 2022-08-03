@@ -22,7 +22,7 @@ simulate_life_table(
 \arguments{
 \item{n_states}{take values 3 or 5, use 3 for 3-state model, and 5 for 5-state model}
 
-\item{model_type}{string that selects model type; S for Static, T for Trend and F for Frailty}
+\item{model_type}{select F for Frailty model}
 
 \item{param_file}{string for file path of parameter file OR a tibble/dataframe of parameters}
 

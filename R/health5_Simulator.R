@@ -119,9 +119,6 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
                 # then take the sum of all possible initial states of this year
             }
             state_status[age-init_age+2,1]=age+1
-            if (model_type=='F'){
-                latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
-            }
             expected_time_state=colSums(state_status) # the order is H M D MD Dead
         }
         # the size of the lists will be large

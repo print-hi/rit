@@ -13,7 +13,7 @@ n_states=5
 
 trans_probs_5state=get_trans_probs(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0)
 
-lifetable_created_5state=create_life_table(model_type, trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 1)
+lifetable_created_5state=create_life_table(trans_probs=trans_probs_5state, init_age, init_state = 0, cohort = 1)
 
 lifetable_simulated_5state=simulate_life_table(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=1,mean=FALSE)
 mean_lifetable_simulated_5state=simulate_life_table(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=1,mean=TRUE)

@@ -8,7 +8,7 @@ simulate_health_state_paths(
   trans_probs,
   init_age,
   init_state = 0,
-  cohort = 1e+05
+  cohort = 10000
 )
 }
 \arguments{
