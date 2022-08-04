@@ -1,87 +1,87 @@
 #' function to calculate transition rates at a certain age
 #'
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param age
 #' age of the individual
-#' @param gender
-#' gender 1 if female, 0 if male
-#' @param i
+#' @param female
+#' female 1 if female, 0 if male
+#' @param wave_index
 #' the wave index
 #' @param latent
 #' initial value of latent factor, normally take the value 0
-#' @param model
+#' @param model_type
 #' S for static model, T for trend model, F for frailty model
 #' @return
 #' 12 times 1 vector of transition rates for the 12 types of transitions
 #' @export health5_get_trans_rates
 #'
 #' @examples
-#' transition_rates=health5_get_trans_rates(model='F',params=params_5_frailty, age=65, gender=0, i=8, latent=0)
-health5_get_trans_rates=function(model,params,age,gender,i,latent){
+#' transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,latent){
     #
-    if (model == 'S') {
-        params <- params[1:3, 3:14]
-    } else if (model == 'T') {
-        params <- params[6:9, 3:14]
-    } else if (model == 'F') {
-        params <- params[11:15, 3:14]
+    if (model_type == 'S') {
+        param_file <- param_file[1:3, 3:14]
+    } else if (model_type == 'T') {
+        param_file <- param_file[6:9, 3:14]
+    } else if (model_type == 'F') {
+        param_file <- param_file[11:15, 3:14]
     }
     #
-    if (model== 'S'){
-        vari_x=matrix(c(1,age,gender),ncol=1) # construct a column vector of the variables
+    if (model_type== 'S'){
+        vari_x=matrix(c(1,age,female),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0))
     }
-    if (model== 'T'){
-        vari_x=matrix(c(1,age,gender,i),ncol=1) # construct a column vector of the variables
+    if (model_type== 'T'){
+        vari_x=matrix(c(1,age,female,wave_index),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0,0))
     }
-    if (model== 'F'){
-        vari_x=matrix(c(1,age,gender,i,latent),ncol=1) # construct a column vector of the variables
+    if (model_type== 'F'){
+        vari_x=matrix(c(1,age,female,wave_index,latent),ncol=1) # construct a column vector of the variables
         vari_x1=vari_x+cbind(c(0,1,0,0,0))
     }
-    ln_trans_rate_x=t(params)%*%vari_x # do matrix calculation to get a column vector of the ln transition rates
-    ln_trans_rate_x1=t(params)%*%vari_x1
+    ln_trans_rate_x=t(param_file)%*%vari_x # do matrix calculation to get a column vector of the ln transition rates
+    ln_trans_rate_x1=t(param_file)%*%vari_x1
 
-    integral_x=exp(ln_trans_rate_x)/params[2,] # use integration to approximate the midpoint rates
-    integral_x1=exp(ln_trans_rate_x1)/params[2,]
+    integral_x=exp(ln_trans_rate_x)/param_file[2,] # use integration to approximate the midpoint rates
+    integral_x1=exp(ln_trans_rate_x1)/param_file[2,]
 
-    trans_rate=t(exp(ln_trans_rate_x1)/params[2,]-exp(ln_trans_rate_x)/params[2,]) # column vector of transition rates
+    trans_rate=t(exp(ln_trans_rate_x1)/param_file[2,]-exp(ln_trans_rate_x)/param_file[2,]) # column vector of transition rates
     return(trans_rate)
 }
 
 #' function to get a matrix of transition probabilities at a certain age
 #'
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param age
 #' age of the individual
-#' @param gender
-#' gender 1 if female, 0 if male
-#' @param i
+#' @param female
+#' female 1 if female, 0 if male
+#' @param wave_index
 #' the wave index
 #' @param latent
 #' initial value of latent factor, normally take the value 0
-#' @param model
+#' @param model_type
 #' S for static model, T for trend model, F for frailty model
 #'
 #' @return
 #' 5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
-#' @export health5_get_trans_probs
+#' @export health5_get_trans_probs_at_age
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=health5_get_trans_probs(model='F', params=params_5_frailty, age=65, gender=0, i=8, latent=0)
-health5_get_trans_probs=function(model,params,age,gender,i,latent){
-    trans_rate=health5_get_trans_rates(model,params,age,gender,i,latent)
-    if (model == 'S') {
-        params <- params[1:3, 3:14]
-    } else if (model == 'T') {
-        params <- params[6:9, 3:14]
-    } else if (model == 'F') {
-        params <- params[11:15, 3:14]
+#' transition_probabilities=health5_get_trans_probs_at_age(model_type='F', param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_index,latent){
+    trans_rate=health5_get_trans_rates(model_type,param_file,age,female,wave_index,latent)
+    if (model_type == 'S') {
+        param_file <- param_file[1:3, 3:14]
+    } else if (model_type == 'T') {
+        param_file <- param_file[6:9, 3:14]
+    } else if (model_type == 'F') {
+        param_file <- param_file[11:15, 3:14]
     }
     trans_rate_matrix=rbind(c(-sum(trans_rate[1:4]),trans_rate[1],trans_rate[2],trans_rate[3],trans_rate[4]),
                             c(0,-sum(trans_rate[5:6]),0,trans_rate[5],trans_rate[6]),
@@ -95,26 +95,27 @@ health5_get_trans_probs=function(model,params,age,gender,i,latent){
 
 #' the function to get a full list of transition probability matrices from the initial age to age 110
 #'
-#' @param params
+#' @param param_file
 #' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
 #' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
 #' @param init_age
 #' the initial age of the transition probability matrices
-#' @param gender
-#' gender 1 if female, 0 if male
-#' @param i
+#' @param female
+#' female 1 if female, 0 if male
+#' @param wave_index
 #' the wave index
 #' @param model
 #' S for static model, T for trend model, F for frailty model
+#' @param latent
+#' initial value of latent factor, normally take the value 0
 #'
 #' @return a list of 5 times 5 transition probability matrices, from the initial age to age 110
 #' @import readxl expm
-#' @export health5_get_list_trans_prob_matrix
+#' @export health5_get_trans_probs
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=health5_get_list_trans_prob_matrix(model='F', params=params_5_frailty, init_age=65, gender=0, i=8)
-health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, i){
-    latent=0 # initial value of latent factor
+#' trans_prob_matrix_age65to110=health5_get_trans_probs(model_type='F', param_file=params_5_frailty, init_age=65, female=0, wave_index=8)
+health5_get_trans_probs=function(model_type, param_file, init_age, female, wave_index, latent=0){
     # list of 46 vectors of transition rates for this simulation
     trans_rate=list()
     # list of 46 matrices of transition probabilities for this simulation
@@ -127,8 +128,8 @@ health5_get_list_trans_prob_matrix=function(model, params, init_age, gender, i){
     #  }
 
     for (a in init_age:110){
-        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs(model, params,a,gender,i+(a-init_age)/2,latent) # calculate transition probability matrix for each age
-        if (model==3){
+        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model_type,param_file,a,female,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
+        if (model_type=='F'){
             latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }
         average_time_state=colSums(state_status) # the order is H M D MD Dead
