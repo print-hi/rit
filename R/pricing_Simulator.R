@@ -65,7 +65,7 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     if (is.null(econ_var)) {
-        econ_var <- get_var_simulations(ncol(state), n, frequency = 'year', return_sdf = TRUE)
+        econ_var <- esg_var_simulations(ncol(state), n, frequency = 'year', return_sdf = TRUE)
     }
 
     # Get matrix of economic variables for each path
@@ -197,13 +197,14 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 # ---- Health State Module
 
 get_health_state_3 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    trans_probs <- get_trans_probs('T', US_HRS, age, (sex == "F"), 2021)
-    return(simulate_path(age, 0, trans_probs, n))
+    trans_probs <-  get_trans_probs(3, 'T', US_HRS, age, (sex == "F"), year = 2022)
+    return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 
 # TODO
 get_health_state_5 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    return(simulate_individual_path_5(age, 0, params_5_frailty, (sex == "F"), 8, n, 3))
+    trans_probs <-  get_trans_probs(5, 'T', US_HRS, age, (sex == "F"), year = 2012, wave_index = 8, latent = 0)
+    return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 
 # ------------------------------------------------------------------------
