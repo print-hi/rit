@@ -10,7 +10,8 @@ sim_cohort_path_realised(
   death_probs = NULL,
   closure_age = 130,
   cohort = 1000,
-  n_sim = 10000
+  n_sim = 10000,
+  seed = NULL
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ death probabilities for a cohort starting at init_age in 2022}
 \item{cohort}{initial cohort size}
 
 \item{n_sim}{number of path simulations}
+
+\item{seed}{integer to be used as the seed for simulation}
 }
 \value{
 a matrix where each row represents the number of individuals still alive
