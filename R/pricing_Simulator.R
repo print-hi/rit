@@ -213,7 +213,7 @@ get_health_state_5 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
 # Temporary helper function, should link to mortality module
 get_aggregate_mortality <- function(age = 65, sex = "F", seed = 0, n = 1000) {
     capture.output(suppressWarnings(
-        mortality <- sim_indiv_path(age, sex, death_probs = NULL, closure_age = 130, n)
+        mortality <- mortality_sim_indiv_path(age, sex, death_probs = NULL, closure_age = 130, n)
     ))
     return(mortality)
 }
@@ -221,7 +221,7 @@ get_aggregate_mortality <- function(age = 65, sex = "F", seed = 0, n = 1000) {
 # Temporary helper function, should link to mortality module
 get_pool_realised <- function(age = 65, sex = "F", seed = 0, n = 1000, cohort = 1000) {
     capture.output(suppressWarnings(
-        pool <- sim_cohort_path_realised(age, sex, death_probs = NULL, closure_age = 130, cohort, n)
+        pool <- mortality_sim_cohort_path_realised(age, sex, death_probs = NULL, closure_age = 130, cohort, n)
     ))
     return(pool)
 }
@@ -229,7 +229,7 @@ get_pool_realised <- function(age = 65, sex = "F", seed = 0, n = 1000, cohort = 
 # Temporary helper function, should link to mortality module
 get_pool_expected <- function(age = 65, sex = "F", seed = 0, cohort = 1000) {
     capture.output(suppressWarnings(
-        pool <- sim_cohort_path_expected(age, sex, death_probs = NULL, closure_age = 130, cohort)
+        pool <- mortality_sim_cohort_path_expected(age, sex, death_probs = NULL, closure_age = 130, cohort)
     ))
     return(pool)
 }
