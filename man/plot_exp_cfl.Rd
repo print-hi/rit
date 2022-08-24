@@ -18,6 +18,3 @@ Should be generated from \code{\link{exp_cfl}}}
 \description{
 Plots simulated expected curtate future lifetime.
 }
-\examples{
-
-}

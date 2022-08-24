@@ -15,8 +15,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
 coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
@@ -187,8 +185,6 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #' `rates`
 #'
 #' @export
-#'
-#' @examples
 #'
 denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
 
@@ -379,8 +375,6 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #' `rates`
 #'
 #' @export
-#'
-#' @examples
 #'
 kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
 
@@ -590,8 +584,6 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 #' completed mortality rates for all ages and old ages in the same format as
 #' `rates`
 #' @export
-#'
-#' @examples
 #'
 complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
                              type = "prob", closure_age = 130, years = NULL, ...) {

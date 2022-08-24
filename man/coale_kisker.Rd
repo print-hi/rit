@@ -43,6 +43,3 @@ completed mortality rates for all ages and old ages in the same format as
 Implements the Coale and Kisker method of mortality rate completion for old
 ages.
 }
-\examples{
-
-}

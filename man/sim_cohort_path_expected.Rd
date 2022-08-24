@@ -31,6 +31,3 @@ vector of expected number of individuals still alive from a given cohort at each
 \description{
 Simulate Expected Cohort Life Path
 }
-\examples{
-
-}

@@ -30,8 +30,6 @@ arr_apply <- function(X, FUN) {
 #' 3D array of combined historical and simulated rates
 #' @export
 #'
-#' @examples
-#'
 combine_hist_sim <- function(rates_hist, rates_sim) {
 
 # Flagging errors ---------------------------------------------------------
@@ -86,8 +84,6 @@ combine_hist_sim <- function(rates_hist, rates_sim) {
 #' associated cohort mortality rates as a 3D array if `period_rates` is an array,
 #' or as a matrix otherwise
 #' @export
-#'
-#' @examples
 #'
 period2cohort <- function(period_rates, ages, init_age = NULL) {
 
@@ -184,8 +180,6 @@ period2cohort <- function(period_rates, ages, init_age = NULL) {
 #' associated period mortality rates as a 3D array if `cohort_rates` is an array,
 #' or as a matrix otherwise
 #' @export
-#'
-#' @examples
 #'
 cohort2period <- function(cohort_rates) {
 

@@ -21,8 +21,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
 sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000) {
 
 # Flagging errors ---------------------------------------------------------
@@ -120,8 +118,6 @@ sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age 
 #' a matrix where each row represents the number of individuals still alive
 #' from a given cohort at each age
 #' @export
-#'
-#' @examples
 #'
 sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
                                    closure_age = 130, cohort = 1000, n_sim = 10000) {
@@ -224,8 +220,6 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
 #' @return
 #' vector of expected number of individuals still alive from a given cohort at each age
 #' @export
-#'
-#' @examples
 #'
 sim_cohort_path_expected <- function(init_age, sex = "F", death_probs = NULL,
                                      closure_age = 130, cohort = 1000) {

@@ -17,6 +17,3 @@ or as a matrix otherwise
 \description{
 Converts from cohort to period mortality rates
 }
-\examples{
-
-}
