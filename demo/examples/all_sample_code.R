@@ -188,22 +188,24 @@ sim$stock_price$trajectory_83
 # ---- Policy Valuation
 
 # Creating Policy Object
-la <- create_policy_LA(60000, 5, 0.04, 0.05)
-
-
+ap <- create_policy_AP(1000000, 50000)
 # Simulating Cashflows
-cf <- simulate_cf(policy = ca, age = 65, sex = "M", n = 1000)
-
+cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
 # Pricing / Valuation
-v <- value_policy(ca, cf)
+v <- value_policy(ap, cf)
 
-# Other policies
-ap <- create_policy_AP(2000000, 50000)
-va <- create_policy_VA(100000, 40, 0.4, 0.02)
-pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
-ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
-rm <- create_policy_RM(600000, 0.4, 0.01, 0.04)
-
-
+#### Other policies
+# Account-Based Pension
+ap <- create_policy_AP(1000000, 50000)
+# Life Annuity
+la <- create_policy_LA(60000, 5, 0, 0.01)
+# Pooled Annuity
+pa <- create_policy_PA(60000, 10000, 0.05, 0.01)
+# Care Annuity
+ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(5, 0), c(0.04, 0.01))
+# Variable Annuity (GMWB)
+va <- create_policy_VA(1000000, 30, 0.1, 0.01)
+# Reverse Mortgage
+rm <- create_policy_RM(600000, 0.64, 0.01, 0.04)
 
 
