@@ -49,5 +49,6 @@ AUS_male_rates <- mortality_AUS_data$rate$male
 ages <- mortality_AUS_data$age # 0:110
 old_ages <- 91:130
 
-completed_rates <- mortality_coale_kisker(AUS_male_rates, ages, old_ages, type = "central")
+completed_rates <- mortality_coale_kisker(
+ AUS_male_rates, ages, old_ages, type = "central")
 }

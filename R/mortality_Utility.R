@@ -11,7 +11,7 @@
 #' @return
 #' 3D array of matrices obtained by applying a function
 #' @keywords internal
-arr_apply <- function(X, FUN) {
+mortality_arr_apply <- function(X, FUN) {
 
   X_list <- lapply(seq(dim(X)[3]), function(i) matrix(X[, , i], nrow = dim(X)[1], ncol = dim(X)[2]))
   sapply(X_list, FUN, simplify = "array")
@@ -30,9 +30,7 @@ arr_apply <- function(X, FUN) {
 #' 3D array of combined historical and simulated rates
 #' @export
 #'
-#' @examples
-#'
-combine_hist_sim <- function(rates_hist, rates_sim) {
+mortality_combine_hist_sim <- function(rates_hist, rates_sim) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -88,8 +86,12 @@ combine_hist_sim <- function(rates_hist, rates_sim) {
 #' @export
 #'
 #' @examples
-#'
-period2cohort <- function(period_rates, ages, init_age = NULL) {
+#' # consider the male mortality rates from the data file 'mortality_AUS_data'
+#' period_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' # convert to rates for cohort aged 55
+#' cohort_rates_55 <- mortality_period2cohort(period_rates, ages, init_age = 55)
+mortality_period2cohort <- function(period_rates, ages, init_age = NULL) {
 
 
 # Flagging errors ---------------------------------------------------------
@@ -162,7 +164,7 @@ period2cohort <- function(period_rates, ages, init_age = NULL) {
   if (is.matrix(period_rates)) {
     cohort_rates <- p2c_mat(period_rates)
   } else if (is.array(period_rates)) {
-    cohort_rates <- arr_apply(period_rates, p2c_mat)
+    cohort_rates <- mortality_arr_apply(period_rates, p2c_mat)
   }
 
   dimnames(cohort_rates) <- dimnames(period_rates)
@@ -186,8 +188,20 @@ period2cohort <- function(period_rates, ages, init_age = NULL) {
 #' @export
 #'
 #' @examples
-#'
-cohort2period <- function(cohort_rates) {
+#' # consider the Kannisto completion method on male mortality rates
+#' # from the data file 'mortality_AUS_data'
+#' AUS_male_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' old_ages <- 91:130
+#' fitted_ages <- 76:90
+#' completed_rates <- mortality_complete_old_age(
+#'  AUS_male_rates, ages, old_ages,
+#'  method = "kannisto", type = "central",
+#'  fitted_ages = fitted_ages)
+#' # suppose these are rates for cohort starting at age 60
+#' cohort_rates_60 <- completed_rates[as.character(60:130), ]
+#' period_rates <- mortality_cohort2period(cohort_rates_60)
+mortality_cohort2period <- function(cohort_rates) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -230,7 +244,7 @@ cohort2period <- function(cohort_rates) {
   if (is.vector(cohort_rates) | is.matrix(cohort_rates)) {
     period_rates <- c2p_mat(cohort_rates)
   } else if (is.array(cohort_rates)) {
-    period_rates <- arr_apply(cohort_rates, c2p_mat)
+    period_rates <- mortality_arr_apply(cohort_rates, c2p_mat)
   }
 
   dimnames(period_rates) <- dimnames(cohort_rates)
@@ -257,7 +271,7 @@ cohort2period <- function(cohort_rates) {
 #' initial and closure age
 #'
 #' @keywords internal
-generate_default_qx <- function(init_age, sex = "F", closure_age = 130) {
+mortality_generate_default_qx <- function(init_age, sex = "F", closure_age = 130) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -305,20 +319,20 @@ generate_default_qx <- function(init_age, sex = "F", closure_age = 130) {
     # Mortality Rate Completion with Kannisto Method
     old_ages <- 90:closure_age
     ages <- c(young_ages, old_ages)
-    kannisto_hist <- complete_old_age(rates = rates_hist, ages = young_ages,
-                                      old_ages = old_ages, fitted_ages = 80:89,
-                                      closure_age = closure_age,
-                                      method = "kannisto", type = "central")
-    kannisto_for <- complete_old_age(rates = M7_for$rates, ages = young_ages,
-                                     old_ages = old_ages, fitted_ages = 80:89,
-                                     closure_age = closure_age,
-                                     method = "kannisto", type = "central")
+    kannisto_hist <- mortality_complete_old_age(
+        rates = rates_hist, ages = young_ages,
+        old_ages = old_ages, fitted_ages = 80:89,
+        closure_age = closure_age, method = "kannisto", type = "central")
+    kannisto_for <- mortality_complete_old_age(
+        rates = M7_for$rates, ages = young_ages,
+        old_ages = old_ages, fitted_ages = 80:89,
+        closure_age = closure_age, method = "kannisto", type = "central")
 
     # Combine Historical and Forecasted Rates
     kannisto_55_period <- cbind(kannisto_hist, kannisto_for)
-    qx_period <- rate2rate(kannisto_55_period, from = "central", to = "prob")
+    qx_period <- mortality_rate2rate(kannisto_55_period, from = "central", to = "prob")
     # Take year 2022
-    death_probs <- period2cohort(qx_period, ages = ages, init_age = init_age)[, "2022"]
+    death_probs <- mortality_period2cohort(qx_period, ages = ages, init_age = init_age)[, "2022"]
 
     return(death_probs)
 }

@@ -51,7 +51,9 @@ ages <- mortality_AUS_data$age # 0:110
 old_ages <- 91:130
 # first convert mortality rates to death probabilties
 AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
-completed_qx <- mortality_denuit_goderniaux(AUS_male_qx, ages, old_ages, type = "prob")
+completed_qx <- mortality_denuit_goderniaux(
+ AUS_male_qx, ages, old_ages, type = "prob")
 # fit on ages 80:110 instead
-completed_qx_from_80 <- mortality_denuit_goderniaux(AUS_male_qx, ages, old_ages, type = "prob", start_fit_age = 80)
+completed_qx_from_80 <- mortality_denuit_goderniaux(
+ AUS_male_qx, ages, old_ages, type = "prob", start_fit_age = 80)
 }

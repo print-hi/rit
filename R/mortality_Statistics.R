@@ -17,7 +17,27 @@ NULL
 #' @rdname surv
 #'
 #' @export
-psurv <- function(surv_fun, surv_time) {
+#'
+#' @examples
+#' # create survival function for an individual aged 55
+#' AUS_male_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' old_ages <- 91:130
+#' fitted_ages <- 76:90
+#' completed_rates <- mortality_complete_old_age(
+#'  AUS_male_rates, ages, old_ages, method = "kannisto",
+#'  type = "central", fitted_ages = fitted_ages)
+#' all_ages <- 0:130
+#' surv_func <- mortality_rate2survival(
+#'  completed_rates, ages = all_ages,
+#'  from = 'central', init_age = 55)
+#' # take vector of survival function (consider year 2017)
+#' surv_func_2017 <- surv_func[, "2017"]
+#' # calculate probability of surviving 10 and 20 years
+#' mortality_psurv(surv_func_2017, c(10, 20))
+#' # calculating the 80% and 95% quantile survival time
+#' mortality_qsurv(surv_func_2017, c(0.8, 0.95))
+mortality_psurv <- function(surv_fun, surv_time) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -60,7 +80,7 @@ psurv <- function(surv_fun, surv_time) {
 #' @rdname surv
 #'
 #' @export
-qsurv <- function(surv_fun, surv_prob) {
+mortality_qsurv <- function(surv_fun, surv_prob) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -136,9 +156,7 @@ qsurv <- function(surv_fun, surv_prob) {
 #'
 #' @export
 #'
-#' @examples
-#'
-exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
+mortality_exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -216,7 +234,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
   } else if (is.matrix(px)) {
     kpx <- apply(px, 2, cumprod)
   } else if (is.array(px)) {
-    kpx <- arr_apply(px, function(x) apply(x, 2, cumprod))
+    kpx <- mortality_arr_apply(px, function(x) apply(x, 2, cumprod))
   }
 
   # Changing dim names
@@ -239,7 +257,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 
     return(result)
   } else {
-    result <- arr_apply(kpx, exp_cfl_mat)
+    result <- mortality_arr_apply(kpx, exp_cfl_mat)
     rownames(result) <- if (is.null(years)) colnames(qx) else as.character(years)
 
     return(t(result))
@@ -263,9 +281,7 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #'
 #' @export
 #'
-#' @examples
-#'
-plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
+mortality_plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 
 
 # Flagging Errors ---------------------------------------------------------
@@ -356,9 +372,7 @@ plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 #'
 #' @export
 #'
-#' @examples
-#'
-plot_surv_sim <- function(surv_sim, init_age, target_year, level = 95, years = NULL) {
+mortality_plot_surv_sim <- function(surv_sim, init_age, target_year, level = 95, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
 
