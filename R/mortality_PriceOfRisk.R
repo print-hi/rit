@@ -27,20 +27,8 @@
 #' @export
 #'
 #' @examples
-#' # consider the Kannisto completion method on male mortality rates
-#' # from the data file 'mortality_AUS_data'
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' fitted_ages <- 76:90
-#' completed_rates <- mortality_complete_old_age(
-#'  AUS_male_rates, ages, old_ages, method = "kannisto",
-#'  type = "central", fitted_ages = fitted_ages)
-#' # compute survival function of an individual aged 55
-#' all_ages <- 0:130
-#' surv_func <- mortality_rate2survival(
-#'  completed_rates, ages = all_ages, from = 'central', init_age = 55)
-mortality_rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = NULL) {
+#'
+rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = NULL) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -107,7 +95,7 @@ mortality_rate2survival <- function(rates, ages, from = "prob", init_age = NULL,
 # Implementation ----------------------------------------------------------
 
   # Converting to 1-year death probabilities
-  qx <- mortality_rate2rate(rates, from, "prob")
+  qx <- rate2rate(rates, from, "prob")
 
   # Converting to 1-year survival probabilities
 
@@ -132,7 +120,7 @@ mortality_rate2survival <- function(rates, ages, from = "prob", init_age = NULL,
   } else if (is.matrix(px)) {
     St <- rbind(1, apply(px, 2, cumprod))
   } else if (is.array(px)) {
-    St <- mortality_arr_apply(px, function(x) rbind(1, apply(x, 2, cumprod)))
+    St <- arr_apply(px, function(x) rbind(1, apply(x, 2, cumprod)))
   }
 
   rownames(St) <- as.character(0:(ages[length(ages)] - init_age + 1))
@@ -164,24 +152,8 @@ mortality_rate2survival <- function(rates, ages, from = "prob", init_age = NULL,
 #' @export
 #'
 #' @examples
-#' # create survival function for an individual aged 55
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' fitted_ages <- 76:90
-#' completed_rates <- mortality_complete_old_age(
-#'  AUS_male_rates, ages, old_ages, method = "kannisto",
-#'  type = "central", fitted_ages = fitted_ages)
-#' all_ages <- 0:130
-#' surv_func <- mortality_rate2survival(
-#'  completed_rates, ages = all_ages,
-#'  from = 'central', init_age = 55)
-#' # convert from P to Q measure survival function
-#' # see the section on risk neutral probability
-#' surv_func_Q <- mortality_survivalP2Q(surv_func, method = "wang", lambda = 1.5)
-#' # convert from survival function to mortality rates
-#' central_rates_Q <- mortality_survival2rate(surv_func_Q, 55:130, to = 'central')
-mortality_survival2rate <- function(surv, ages, to = "prob", years = NULL) {
+#'
+survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
   # surv
@@ -247,7 +219,7 @@ mortality_survival2rate <- function(surv, ages, to = "prob", years = NULL) {
   px <- ifelse(utils::head(surv, -1) == 0, 0, utils::tail(surv, -1) / utils::head(surv, -1))
   qx <- 1 - px
 
-  rates <- mortality_rate2rate(qx, from = "prob", to = to)
+  rates <- rate2rate(qx, from = "prob", to = to)
 
 
   if (!is.vector(rates)) {
@@ -294,21 +266,8 @@ mortality_survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #' @export
 #'
 #' @examples
-#' # create survival function for an individual aged 55
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' fitted_ages <- 76:90
-#' completed_rates <- mortality_complete_old_age(
-#'  AUS_male_rates, ages, old_ages, method = "kannisto",
-#'  type = "central", fitted_ages = fitted_ages)
-#' all_ages <- 0:130
-#' surv_func <- mortality_rate2survival(
-#'  completed_rates, ages = all_ages,
-#'  from = 'central', init_age = 55)
-#' # convert from P to Q measure survival function
-#' surv_func_Q <- mortality_survivalP2Q(surv_func, method = "wang", lambda = 1.5)
-mortality_survivalP2Q <- function(StP, method, lambda) {
+#'
+survivalP2Q <- function(StP, method, lambda) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -421,7 +380,7 @@ mortality_survivalP2Q <- function(StP, method, lambda) {
     } else if (is.matrix(StP)) {
       StQ <- pdfP2Q(StP)
     } else if (is.array(StP)) {
-      StQ <- mortality_arr_apply(StP, pdfP2Q)
+      StQ <- arr_apply(StP, pdfP2Q)
     }
 
     stopifnot(dim(StP) == dim(StQ))
