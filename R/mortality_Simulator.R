@@ -14,6 +14,8 @@
 #' maximum life span
 #' @param n_sim
 #' number of path simulations
+#' @param seed
+#' integer to be used as the seed for simulation
 #'
 #' @return
 #' a matrix where each row represents an individual's dead (-1) or alive (0) status
@@ -35,7 +37,7 @@
 #' # Consider males aged 55 in the year 2018
 #' qx_55_2018 <- kannisto_q[as.character(55:130), "2018"]
 #' mortality_sim_indiv_path(init_age = 55, sex = "M", death_probs = qx_55_2018)
-mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000) {
+mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000, seed = NULL) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -82,6 +84,10 @@ mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, cl
 
 # Implementation ----------------------------------------------------------
 
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
+
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
         death_probs <- mortality_generate_default_qx(init_age, sex, closure_age)
@@ -127,6 +133,8 @@ mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, cl
 #' initial cohort size
 #' @param n_sim
 #' number of path simulations
+#' @param seed
+#' integer to be used as the seed for simulation
 #'
 #' @return
 #' a matrix where each row represents the number of individuals still alive
@@ -149,7 +157,7 @@ mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, cl
 #' mortality_sim_cohort_path_realised(
 #'  init_age = 55, sex = "M", death_probs = qx_55_2018, cohort = 100)
 mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
-                                               closure_age = 130, cohort = 1000, n_sim = 10000) {
+                                               closure_age = 130, cohort = 1000, n_sim = 10000, seed = NULL) {
 # Flagging errors ---------------------------------------------------------
 
     # init_age
@@ -198,8 +206,11 @@ mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs 
         stop('number of simulations must be a positive integer')
     }
 
-
 # Implementation ----------------------------------------------------------
+
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
 
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {

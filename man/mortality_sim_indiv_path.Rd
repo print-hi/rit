@@ -9,7 +9,8 @@ mortality_sim_indiv_path(
   sex = "F",
   death_probs = NULL,
   closure_age = 130,
-  n_sim = 10000
+  n_sim = 10000,
+  seed = NULL
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ death probabilities for a cohort starting at init_age in 2022}
 \item{closure_age}{maximum life span}
 
 \item{n_sim}{number of path simulations}
+
+\item{seed}{integer to be used as the seed for simulation}
 }
 \value{
 a matrix where each row represents an individual's dead (-1) or alive (0) status
