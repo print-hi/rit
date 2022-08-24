@@ -41,14 +41,16 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
         # Get matrix of states for each path
         if (policy$name[1] == "CA") {
             if (nrow(policy) == 2) {
-                state <- get_health_state_3(age, sex, seed, n)
+                probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
             } else if (nrow(policy) == 4) {
-                state <- get_health_state_5(age, sex, seed, n)
+                probs <- get_trans_probs(5, 'S', US_HRS_5, age, sex == 'F')
             } else {
                 stop("Error: CA policy object needs to have 2 or 4 rows")
             }
+            state <- simulate_health_state_paths(probs, age, cohort = n)
         } else if (policy$name[1] == "RM") {
-            state <- get_health_state_3(age, sex, seed, n)
+            probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
+            state <- simulate_health_state_paths(probs, age, cohort = n)
         } else {
             state <- get_aggregate_mortality(age, sex, seed, n)
         }
@@ -76,6 +78,9 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
 
     # Generate cash flows for each state vector
     for (i in seq(1, n)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
+
+    # Round cashflows to cents
+    cf <- round(cf, 2)
 
     result <- list(cf = cf, sdf = t(unname(econ_var$discount_factors)))
 
@@ -238,8 +243,7 @@ get_pool_expected <- function(age = 65, sex = "F", seed = 0, cohort = 1000) {
 # ---- Economic Scenario Generator Module
 
 get_zcp3m_yield <- function(var_sim) {
-    zcp3m <- var_sim$zcp3m_yield
-    return(t(unname(zcp3m)))
+    return(t(unname(var_sim$zcp3m_yield)))
 }
 
 get_perc_change <- function(df) {
@@ -252,16 +256,16 @@ get_perc_change <- function(df) {
 }
 
 get_inflation_rate <- function(var_sim) {
-    infla <- get_perc_change(var_sim$CPI)
-    return(t(unname(infla)))
+    cpi <- t(unname(var_sim$CPI))
+    return(get_perc_change(cpi))
 }
 
 get_house_return <- function(var_sim) {
-    house <- get_perc_change(var_sim$home_index)
-    return(t(unname(house)))
+    home_index <- t(unname(var_sim$home_index))
+    return(get_perc_change(home_index))
 }
 
 get_stock_return <- function(var_sim) {
-    stock <- get_perc_change(var_sim$ASX200)
-    return(t(unname(stock)))
+    asx <- t(unname(var_sim$ASX200))
+    return(get_perc_change(asx))
 }
