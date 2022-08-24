@@ -3,7 +3,7 @@
 #' Implements the Coale and Kisker method of mortality rate completion for old
 #' ages.
 #'
-#' @inheritParams complete_old_age
+#' @inheritParams mortality_complete_old_age
 #' @param m_end
 #' constant or vector specifying the central death rates at the final age for
 #' each calendar year. If supplied as a vector, vector length and number of
@@ -16,8 +16,13 @@
 #' @export
 #'
 #' @examples
+#'# consider the male mortality rates from the data file 'mortality_AUS_data'
+#'AUS_male_rates <- mortality_AUS_data$rate$male
+#'ages <- mortality_AUS_data$age # 0:110
+#'old_ages <- 91:130
 #'
-coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
+#'completed_rates <- mortality_coale_kisker(AUS_male_rates, ages, old_ages, type = "central")
+mortality_coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 130, m_end = 1, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -117,7 +122,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 
 
   # Convert to central death rates
-  mxy_arr <- rate2rate(rates, from = type, to = "central")
+  mxy_arr <- mortality_rate2rate(rates, from = type, to = "central")
 
   # Obtaining relevant ages
   boundary_age <- old_ages[1] - 1
@@ -155,7 +160,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
     names(completed_mxy_vec) <- as.character(c(kept_ages, old_ages))
 
     # Convert to required mortality rate
-    return(rate2rate(completed_mxy_vec, from = "central", to = type))
+    return(mortality_rate2rate(completed_mxy_vec, from = "central", to = type))
 
   } else if (is.matrix(mxy_arr)) {
     completed_mxy_arr <- CK_mat(mxy_arr)
@@ -167,7 +172,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
   colnames(completed_mxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
-  return(rate2rate(completed_mxy_arr, from = "central", to = type))
+  return(mortality_rate2rate(completed_mxy_arr, from = "central", to = type))
 
 }
 
@@ -176,7 +181,7 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #' Implements the Denuit and Goderniaux method of mortality rate completion for
 #' old ages.
 #'
-#' @inheritParams complete_old_age
+#' @inheritParams mortality_complete_old_age
 #' @param start_fit_age
 #' model is fitted to ages starting from this age
 #' @param smoothing
@@ -189,9 +194,16 @@ coale_kisker <- function(rates, ages, old_ages, type = "central", closure_age = 
 #' @export
 #'
 #' @examples
-#'
-denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
-
+#' # consider the male mortality rates from the data file 'mortality_AUS_data'
+#' AUS_male_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' old_ages <- 91:130
+#' # first convert mortality rates to death probabilties
+#' AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
+#' completed_qx <- mortality_denuit_goderniaux(AUS_male_qx, ages, old_ages, type = "prob")
+#' # fit on ages 80:110 instead
+#' completed_qx_from_80 <- mortality_denuit_goderniaux(AUS_male_qx, ages, old_ages, type = "prob", start_fit_age = 80)
+mortality_denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age = 130, start_fit_age = 75, smoothing = FALSE, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
 
@@ -289,7 +301,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 # Implementation ----------------------------------------------------------
 
   # Convert to death probabilities
-  qxy_arr <- rate2rate(rates, from = type, to = "prob")
+  qxy_arr <- mortality_rate2rate(rates, from = type, to = "prob")
 
   # Obtaining relevant ages
   boundary_age <- old_ages[1] - 1
@@ -350,7 +362,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
     names(completed_qxy_vec) <- as.character(c(kept_ages, old_ages))
 
     # Convert to required mortality rate
-    return(rate2rate(completed_qxy_vec, from = "prob", to = type))
+    return(mortality_rate2rate(completed_qxy_vec, from = "prob", to = type))
 
   } else if (is.matrix(qxy_arr)) {
     completed_qxy_arr <- DG_mat(qxy_arr)
@@ -362,7 +374,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
   colnames(completed_qxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
-  return(rate2rate(completed_qxy_arr, from = "prob", to = type))
+  return(mortality_rate2rate(completed_qxy_arr, from = "prob", to = type))
 
 }
 
@@ -370,7 +382,7 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #'
 #' Implements the Kannisto method of age completion for old ages.
 #'
-#' @inheritParams complete_old_age
+#' @inheritParams mortality_complete_old_age
 #' @param fitted_ages
 #' vector of ages for which model is fitted on
 #'
@@ -381,8 +393,14 @@ denuit_goderniaux <- function(rates, ages, old_ages, type = "prob", closure_age 
 #' @export
 #'
 #' @examples
-#'
-kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
+#' # consider the male mortality rates from the data file 'mortality_AUS_data'
+#' AUS_male_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' old_ages <- 91:130
+#' # fit model on tail end of ages where mortality is still accurate
+#' fitted_ages <- 76:90
+#' completed_rates <- mortality_kannisto(AUS_male_rates, ages, old_ages, fitted_ages, type = "central")
+mortality_kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure_age = 130, years = NULL) {
 
 
 # Flagging Errors ---------------------------------------------------------
@@ -488,7 +506,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 # Implementation ----------------------------------------------------------
 
   # Convert to force of mortality
-  muxy_arr <- rate2rate(rates, from = type, to = "force")
+  muxy_arr <- mortality_rate2rate(rates, from = type, to = "force")
 
   # Obtaining relevant ages
   kept_ages <- ages[1]:(old_ages[1] - 1)
@@ -543,7 +561,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
     names(completed_muxy_vec) <- as.character(c(kept_ages, old_ages))
 
     # Convert to required mortality rate
-    return(rate2rate(completed_muxy_vec, from = "force", to = type))
+    return(mortality_rate2rate(completed_muxy_vec, from = "force", to = type))
   } else if (is.matrix(muxy_arr)) {
     completed_muxy_arr <- kannisto_mat(muxy_arr)
   } else if (is.array(muxy_arr)) {
@@ -554,7 +572,7 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
   colnames(completed_muxy_arr) <- if (is.null(years)) colnames(rates) else as.character(years)
 
   # Convert to required mortality rate
-  return(rate2rate(completed_muxy_arr, from = "force", to = type))
+  return(mortality_rate2rate(completed_muxy_arr, from = "force", to = type))
 
 }
 
@@ -584,7 +602,9 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 #' of `rates` will be preserved
 #' @param ...
 #' additional arguments for the chosen completion method. See
-#' \code{\link{coale_kisker}}, \code{\link{denuit_goderniaux}}, \code{\link{kannisto}}
+#' \code{\link{mortality_coale_kisker}},
+#' \code{\link{mortality_denuit_goderniaux}},
+#' \code{\link{mortality_kannisto}}
 #'
 #' @return
 #' completed mortality rates for all ages and old ages in the same format as
@@ -592,8 +612,17 @@ kannisto <- function(rates, ages, old_ages, fitted_ages, type = "force", closure
 #' @export
 #'
 #' @examples
-#'
-complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
+#' # consider the male mortality rates from the data file 'mortality_AUS_data'
+#' AUS_male_rates <- mortality_AUS_data$rate$male
+#' ages <- mortality_AUS_data$age # 0:110
+#' old_ages <- 91:130
+#' # first convert mortality rates to death probabilties
+#' AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
+#' # completing mortality rates for old ages
+#' DG_q <- mortality_complete_old_age(AUS_male_qx, ages, old_ages, method = "DG", type = "prob")
+#' CK_q <- mortality_complete_old_age(AUS_male_qx, ages, old_ages, method = "CK", type = "prob")
+#' kannisto_q <- mortality_complete_old_age(AUS_male_qx, ages, old_ages, method = "kannisto", type = "prob", fitted_ages = 80:90)
+mortality_complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
                              type = "prob", closure_age = 130, years = NULL, ...) {
 
   # error flagging already done in individual functions
@@ -602,13 +631,13 @@ complete_old_age <- function(rates, ages, old_ages, method = "kannisto",
   if (!is.element(method, valid_methods)) stop("invalid completion method")
 
   if (method == "CK") {
-    coale_kisker(rates = rates, ages = ages, old_ages = old_ages,
+    mortality_coale_kisker(rates = rates, ages = ages, old_ages = old_ages,
                  type = type, closure_age = closure_age, years = years, ...)
   } else if (method == "DG") {
-    denuit_goderniaux(rates = rates, ages = ages, old_ages = old_ages,
+    mortality_denuit_goderniaux(rates = rates, ages = ages, old_ages = old_ages,
                  type = type, closure_age = closure_age, years = years, ...)
   } else if (method == "kannisto") {
-    kannisto(rates = rates, ages = ages, old_ages = old_ages,
+    mortality_kannisto(rates = rates, ages = ages, old_ages = old_ages,
              type = type, closure_age = closure_age, years = years, ...)
   }
 }
