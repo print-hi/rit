@@ -14,11 +14,12 @@ freq = "year" # please change it to "year", "quarter", or "month"
 
 #### test discrete-time model ####
 
-discrete_sim = esg_var_simulations(num_years = num_years, 
+discrete_sim = esg_var_simulator(num_years = num_years, 
                                    num_paths = num_paths, 
                                    frequency = "month", 
                                    perc_change = F, 
                                    return_sdf = T)
+discrete_sim = lapply(discrete_sim,function(x) {x=t(x)})
 sum(is.na(discrete_sim)) # check if there're NA's 
 row.names(discrete_sim$zcp3m_yield)[1:10] # dates 
 discrete_sim$zcp3m_yield$trajectory_37[1:10]
@@ -57,11 +58,12 @@ matplot(as.Date(row.names(discrete_summ$zcp3m_yield)),discrete_summ$discount_fac
 # comments: interest rate at Q1 2020 was very low due to COVID, so the 
 # percentage change at the start could blow up. 
 
-discrete_sim = esg_var_simulations(num_years = num_years, 
+discrete_sim = esg_var_simulator(num_years = num_years, 
                                    num_paths = num_paths, 
                                    frequency = freq, 
                                    perc_change = T, 
                                    return_sdf = T)
+discrete_sim = lapply(discrete_sim,function(x) {x=t(x)})
 sum(is.na(discrete_sim)) # check if there're NA's 
 row.names(discrete_sim$zcp3m_yield)
 discrete_sim$zcp3m_yield$trajectory_37[1:9]
@@ -82,11 +84,12 @@ matplot(as.Date(row.names(discrete_sim$zcp3m_yield)[-1]),discrete_sim$discount_f
 
 #### test cont-time model: independent-factor interest rate term structure ####
 
-cts_sim = esg_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulator(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = "month", 
                               type = "independent", 
                               model = "interest_rate")
+cts_sim = lapply(cts_sim,function(x) {x=t(x)})
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs) # dates
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
@@ -101,11 +104,12 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)),cts_sim$maturity_40qtrs, type
 
 #### test cont-time model: correlated-factor interest rate term structure ####
 
-cts_sim = esg_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulator(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "correlated", 
                               model = "interest_rate")
+cts_sim = lapply(cts_sim,function(x) {x=t(x)})
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs) 
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
@@ -122,12 +126,13 @@ esg_summary(cts_sim$maturity_38qtrs, na.rm = T)
 
 #### test cont-time model: independent-factor term structure, house index, stock price ####
 
-cts_sim = esg_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulator(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "independent", 
                               model = "interest_house_stock",
                               perc_change = F)
+cts_sim = lapply(cts_sim,function(x) {x=t(x)})
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs)
 cts_sim$maturity_1qtrs$trajectory_46[1:10]
@@ -156,12 +161,13 @@ matplot(as.Date(row.names(cts_summ$maturity_1qtrs)),cts_summ$stock_price[,-ncol(
 
 #### test cont-time model: correlated-factor term structure, house index, stock price ####
 
-cts_sim = esg_afns_simulation(num_years = num_years, 
+cts_sim = esg_afns_simulator(num_years = num_years, 
                               num_paths = num_paths, 
                               frequency = freq, 
                               type = "correlated", 
                               model = "interest_house_stock",
                               perc_change = T)
+cts_sim = lapply(cts_sim,function(x) {x=t(x)})
 sum(is.na(cts_sim)) # check if there're NA's 
 row.names(cts_sim$maturity_1qtrs)
 cts_sim$maturity_1qtrs$trajectory_46[1:10]

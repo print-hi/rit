@@ -1,4 +1,4 @@
-#' esg_var_simulations
+#' esg_var_simulator
 #'
 #' Returns the simulated paths for various economic and financial variables:
 #' (1) Australia 3-month zero-coupon yields, (2) Australia 10-year zero-coupon
@@ -24,14 +24,14 @@
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for
 #' each economic variable, and a list of white noises in the VAR model.
-#' @export esg_var_simulations
+#' @export esg_var_simulator
 #'
-#' @examples sim = esg_var_simulations(num_years = 10, num_paths = 100,
+#' @examples sim = esg_var_simulator(num_years = 10, num_paths = 100,
 #' frequency = "year", return_sdf = T). To obtain all trajectories of Australia
 #' 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the
 #' first trajectory, type sim$noise$trajectory_1.
 #'
-esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
+esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
 
     ################
     # error messages 
@@ -95,7 +95,7 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     num_pred = 4 * num_years 
     time_index = seq(from = init_qtr, length.out = num_pred + 1, by = "quarter")
     path_index = paste("trajectory_", 1:num_paths, sep = "")
-    
+    progression = floor(num_paths / 5)
 
     ############################
     # step-by-step simulations # 
@@ -122,12 +122,14 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
         # simulate for num_pred steps 
         new_init = init_stat_2021q1 # z_{t-1}
         old_init = init_stat_2020q4 # z_{t-2}
+        
         for (i in 1:num_pred) {
             e = as.vector(noise[[noise_index]][,i])
             zt = intercept + coef1 %*% new_init + coef2 %*% old_init + as.matrix(chol(covres)) %*% e
             path[i,] = zt
             old_init = new_init # z_{t-2} <- z_{t-1}
             new_init = zt # z_{t-1} <- z_t
+            
         }
         return (path)
     }
@@ -136,6 +138,7 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     # simulation for the stationary series #
     ########################################
     
+    prog_ind = 1; cat("Progress: 0% \n")
     var_sim_stationary = function (num_pred, num_paths) {
         
         # loops thru the series (separate lists)
@@ -143,15 +146,22 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
                             expr = {data.frame(matrix(NA, nrow = num_pred, ncol = length(intercept)))},
                             simplify = F)
         v_path = lapply(1:num_paths, 
-                        function (x) {var_path(num_pred, x)})
+                        function (x) {
+                            if (x == progression * prog_ind && prog_ind < 5) {
+                                cat(paste(20*prog_ind, "%\n", sep = ""))
+                                prog_ind <<- prog_ind + 1
+                            }
+                            var_path(num_pred, x)
+                            
+                        })
         return (v_path)
     }
     stat = var_sim_stationary(num_pred, num_paths)
     stat = lapply(stat, function (x) {cbind(x[,1:2]/100, x[,3:8])})
     
-    ##################################################
-    # convert forecasted variables -> original units #
-    ##################################################
+    ################################################
+    # convert forecast variables -> original units #
+    ################################################
     
     index2grow_inv = function (x, init) {
         # reverse index to growth rate: home_value, gdp, cpi, asx200, aud
@@ -265,5 +275,6 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
         names(output) = names(sim)
     }
     
+    cat("100% \n")
     return (output)
 }
