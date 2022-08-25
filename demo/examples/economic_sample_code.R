@@ -182,8 +182,8 @@ matplot(as.Date(row.names(cts_sim$maturity_1qtrs)[-1]),cts_sim$stock_price[-1,],
 
 #### test esg_summary
 
-test_data = as.data.frame(matrix(1:100, nrow = 4, byrow = T))
-test_data2 = as.data.frame(matrix(1001:2000, nrow = 40, byrow = T))
+test_data = t(as.data.frame(matrix(1:100, nrow = 4, byrow = T)))
+test_data2 = t(as.data.frame(matrix(1001:2000, nrow = 40, byrow = T)))
 test_list = list(test_data, test_data2)
 esg_summary(test_list)
 

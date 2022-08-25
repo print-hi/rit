@@ -129,6 +129,7 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
         output[[41]] = exp(output[[41]])
         output[[42]] = exp(output[[42]])
     }
+    output = lapply(output, function (x) {x = t(x)})
     
     #############
     # Adj units # 

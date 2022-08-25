@@ -24,7 +24,7 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
         stop ("Probs must be between 0 and 1. ")
     }
     message("This function provides period-by-period summary statistics for time series data.")
-    message("Caution when using this function: the rows must represent the time spots, while the columns must be the trajectories. ")
+    message("Caution when using this function: the columns must represent the time spots, while the rows must be the trajectories. ")
 
     ###############
     # calculation #
@@ -34,23 +34,23 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
     
     if (is.list(paths) & !is.data.frame(paths)) {
         output = replicate(n = length(paths),
-                           expr = {data.frame(matrix(NA, nrow = nrow(paths[[1]]), ncol = length(stats)))},
+                           expr = {data.frame(matrix(NA, ncol = nrow(paths[[1]]), nrow = length(stats)))},
                            simplify = F)
         
         output = sapply(1:length(paths), function (x) {
-            output[[x]] = t(rbind(apply(paths[[x]], 1, quantile, probs = probs, na.rm = na.rm),
-                                  apply(paths[[x]], 1, mean, na.rm = na.rm),
-                                  apply(paths[[x]], 1, sd, na.rm = na.rm)))
+            output[[x]] = t(rbind(apply(paths[[x]], 2, quantile, probs = probs, na.rm = na.rm),
+                                  apply(paths[[x]], 2, mean, na.rm = na.rm),
+                                  apply(paths[[x]], 2, sd, na.rm = na.rm)))
             }, simplify = F)
-        output = lapply(output, function (x) {x = as.data.frame(x); colnames(x) = stats; return (x)})
+        output = lapply(output, function (x) {x = as.data.frame(t(x)); colnames(x) = stats; return (x)})
         names(output) = names(paths)
         
     } else {
-        output = data.frame(matrix(NA, nrow = nrow(paths), ncol = length(stats)))
-        output = t(rbind(apply(paths, 1, quantile, probs = probs, na.rm = na.rm),
-                         apply(paths, 1, mean, na.rm = na.rm),
-                         apply(paths, 1, sd, na.rm = na.rm)))
-        output = as.data.frame(output)
+        output = data.frame(matrix(NA, ncol = nrow(paths), nrow = length(stats)))
+        output = t(rbind(apply(paths, 2, quantile, probs = probs, na.rm = na.rm),
+                         apply(paths, 2, mean, na.rm = na.rm),
+                         apply(paths, 2, sd, na.rm = na.rm)))
+        output = t(as.data.frame(output))
         colnames(output) = stats
     }
     
