@@ -60,7 +60,8 @@ create_policy_CA <- function(benefit, increase, min, loading) {
     if (sum(loading < 0))   stop("Invalid loading: loading[i] > 0")
     if (sum(increase < 0))  stop("Invalid increase: increase[i] > 0")
 
-    if (length(benefit) != length(increase) & length(benefit) != length(min)) {
+    n_policies = length(benefit)
+    if (length(increase) != n_policies || length(min) != n_policies || length(loading) != n_policies) {
         stop("Invalid input: vectors must be of equal length")
     } else if (length(benefit) == 2) {
         state <- c("H", "S")
@@ -160,6 +161,9 @@ create_policy_PA <- function(benefit, size, interest, loading) {
     if (loading < 0)            stop("Invalid loading: loading > 0")
     if (interest < 0)           stop("Invalid interest: interest > 0")
 
+    if (!all.equal(size, as.integer(size)))
+        stop("Invalid size: size needs to be integer")
+
     pol <- data.frame(name = c("PA"),
                       benefit = c(benefit),
                       size = c(size),
@@ -200,8 +204,8 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
     if (value < 0)              stop("Invalid value: value > 0")
     if (margin < 0)             stop("Invalid margin: margin > 0")
     if (LVR < 0 | LVR > 1)      stop("Invalid LVR: 0 <= LVR <= 1")
-    if (trans_cost < 0)         stop("Invalid trans_cost: 0 < LVR < 1")
-    if (trans_cost > 1)         stop("Invalid trans_cost: 0 < LVR < 1")
+    if (trans_cost < 0)         stop("Invalid trans_cost: 0 < trans_cost < 1")
+    if (trans_cost > 1)         stop("Invalid trans_cost: 0 < trans_cost < 1")
 
     pol <- data.frame(name = c("RM"),
                       value = c(value),

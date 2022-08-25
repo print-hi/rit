@@ -16,28 +16,13 @@
 #' number of path simulations
 #' @param seed
 #' integer to be used as the seed for simulation
-#'
 #' @return
 #' a matrix where each row represents an individual's dead (-1) or alive (0) status
 #' at each age
 #'
 #' @export
 #'
-#' @examples
-#' # Simulate life paths for females starting at age 60
-#' mortality_sim_indiv_path(init_age = 60, sex = "F")
-#' # Suppose we want to use period 1-yr death probabilities instead
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
-#' kannisto_q <- mortality_complete_old_age(
-#'  AUS_male_qx, ages, old_ages, method = "kannisto",
-#'  type = "prob", fitted_ages = 80:90)
-#' # Consider males aged 55 in the year 2018
-#' qx_55_2018 <- kannisto_q[as.character(55:130), "2018"]
-#' mortality_sim_indiv_path(init_age = 55, sex = "M", death_probs = qx_55_2018)
-mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000, seed = NULL) {
+sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000, seed = NULL) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -90,7 +75,7 @@ mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, cl
 
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
-        death_probs <- mortality_generate_default_qx(init_age, sex, closure_age)
+        death_probs <- generate_default_qx(init_age, sex, closure_age)
     }
 
     # create empty matrix of simulated paths
@@ -141,23 +126,8 @@ mortality_sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, cl
 #' from a given cohort at each age
 #' @export
 #'
-#' @examples
-#' # Simulate life paths for cohort of 1000 females starting at age 60
-#' mortality_sim_cohort_path_realised(init_age = 60, sex = "F")
-#' # Suppose we want to use period 1-yr death probabilities instead
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
-#' kannisto_q <- mortality_complete_old_age(
-#'  AUS_male_qx, ages, old_ages, method = "kannisto",
-#'  type = "prob", fitted_ages = 80:90)
-#' # Consider 100 males aged 55 in the year 2018
-#' qx_55_2018 <- kannisto_q[as.character(55:130), "2018"]
-#' mortality_sim_cohort_path_realised(
-#'  init_age = 55, sex = "M", death_probs = qx_55_2018, cohort = 100)
-mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
-                                               closure_age = 130, cohort = 1000, n_sim = 10000, seed = NULL) {
+sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
+                                   closure_age = 130, cohort = 1000, n_sim = 10000, seed = NULL) {
 # Flagging errors ---------------------------------------------------------
 
     # init_age
@@ -206,6 +176,7 @@ mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs 
         stop('number of simulations must be a positive integer')
     }
 
+
 # Implementation ----------------------------------------------------------
 
     if (!is.null(seed)) {
@@ -214,7 +185,7 @@ mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs 
 
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
-        death_probs <- mortality_generate_default_qx(init_age, sex, closure_age)
+        death_probs <- generate_default_qx(init_age, sex, closure_age)
     }
 
     # empty matrix of simulated paths
@@ -261,24 +232,8 @@ mortality_sim_cohort_path_realised <- function(init_age, sex = "F", death_probs 
 #' vector of expected number of individuals still alive from a given cohort at each age
 #' @export
 #'
-#' @examples
-#' # Simulate expected life path for cohort of 1000 females starting at age 60
-#' mortality_sim_cohort_path_expected(init_age = 60, sex = "F")
-#' # Suppose we want to use period 1-yr death probabilities instead
-#' AUS_male_rates <- mortality_AUS_data$rate$male
-#' ages <- mortality_AUS_data$age # 0:110
-#' old_ages <- 91:130
-#' AUS_male_qx <- mortality_rate2rate(AUS_male_rates, from = "central", to = "prob")
-#' kannisto_q <- mortality_complete_old_age(
-#'  AUS_male_qx, ages, old_ages, method = "kannisto",
-#'  type = "prob", fitted_ages = 80:90)
-#' # Consider 100 males aged 55 in the year 2018
-#' qx_55_2018 <- kannisto_q[as.character(55:130), "2018"]
-#' mortality_sim_cohort_path_expected(
-#'  init_age = 55, sex = "M",
-#'  death_probs = qx_55_2018, cohort = 100)
-mortality_sim_cohort_path_expected <- function(init_age, sex = "F", death_probs = NULL,
-                                               closure_age = 130, cohort = 1000) {
+sim_cohort_path_expected <- function(init_age, sex = "F", death_probs = NULL,
+                                     closure_age = 130, cohort = 1000) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -329,7 +284,7 @@ mortality_sim_cohort_path_expected <- function(init_age, sex = "F", death_probs 
 
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
-        death_probs <- mortality_generate_default_qx(init_age, sex, closure_age)
+        death_probs <- generate_default_qx(init_age, sex, closure_age)
     }
 
     # cumulative survival probabilities
