@@ -18,7 +18,8 @@
 #' @export health5_get_trans_rates
 #'
 #' @examples
-#' transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+#' transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, 
+#' age=65, female=0, wave_index=8, latent=0)
 health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,latent){
     #
     if (model_type == 'S') {
@@ -30,24 +31,30 @@ health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,lat
     }
     #
     if (model_type== 'S'){
-        vari_x=matrix(c(1,age,female),ncol=1) # construct a column vector of the variables
+        # construct a column vector of the variables
+        vari_x=matrix(c(1,age,female),ncol=1) 
         vari_x1=vari_x+cbind(c(0,1,0))
     }
     if (model_type== 'T'){
-        vari_x=matrix(c(1,age,female,wave_index),ncol=1) # construct a column vector of the variables
+        # construct a column vector of the variables
+        vari_x=matrix(c(1,age,female,wave_index),ncol=1) 
         vari_x1=vari_x+cbind(c(0,1,0,0))
     }
     if (model_type== 'F'){
-        vari_x=matrix(c(1,age,female,wave_index,latent),ncol=1) # construct a column vector of the variables
+        # construct a column vector of the variables
+        vari_x=matrix(c(1,age,female,wave_index,latent),ncol=1) 
         vari_x1=vari_x+cbind(c(0,1,0,0,0))
     }
-    ln_trans_rate_x=t(param_file)%*%vari_x # do matrix calculation to get a column vector of the ln transition rates
+    # do matrix calculation to get a column vector of the ln transition rates
+    ln_trans_rate_x=t(param_file)%*%vari_x 
     ln_trans_rate_x1=t(param_file)%*%vari_x1
 
-    integral_x=exp(ln_trans_rate_x)/param_file[2,] # use integration to approximate the midpoint rates
+    # use integration to approximate the midpoint rates
+    integral_x=exp(ln_trans_rate_x)/param_file[2,] 
     integral_x1=exp(ln_trans_rate_x1)/param_file[2,]
 
-    trans_rate=t(exp(ln_trans_rate_x1)/param_file[2,]-exp(ln_trans_rate_x)/param_file[2,]) # column vector of transition rates
+    # column vector of transition rates
+    trans_rate=t(exp(ln_trans_rate_x1)/param_file[2,]-exp(ln_trans_rate_x)/param_file[2,]) 
     return(trans_rate)
 }
 
@@ -73,7 +80,8 @@ health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,lat
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=health5_get_trans_probs_at_age(model_type='F', param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+#' transition_probabilities=health5_get_trans_probs_at_age(model_type='F', param_file=params_5_frailty, 
+#' age=65, female=0, wave_index=8, latent=0)
 health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_index,latent){
     trans_rate=health5_get_trans_rates(model_type,param_file,age,female,wave_index,latent)
     if (model_type == 'S') {
@@ -114,7 +122,8 @@ health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_in
 #' @export health5_get_trans_probs
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=health5_get_trans_probs(model_type='F', param_file=params_5_frailty, init_age=65, female=0, wave_index=8)
+#' trans_prob_matrix_age65to110=health5_get_trans_probs(model_type='F', param_file=params_5_frailty, 
+#' init_age=65, female=0, wave_index=8)
 health5_get_trans_probs=function(model_type, param_file, init_age, female, wave_index, latent=0){
     # list of 46 vectors of transition rates for this simulation
     trans_rate=list()
@@ -128,7 +137,8 @@ health5_get_trans_probs=function(model_type, param_file, init_age, female, wave_
     #  }
 
     for (a in init_age:110){
-        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model_type,param_file,a,female,wave_index+(a-init_age)/2,latent) # calculate transition probability matrix for each age
+        # calculate transition probability matrix for each age
+        trans_prob_matrix[[a-init_age+1]]=health5_get_trans_probs_at_age(model_type,param_file,a,female,wave_index+(a-init_age)/2,latent) 
         if (model_type=='F'){
             latent=latent+rnorm(1,0,sqrt(0.5)) # simulate the latent factor
         }

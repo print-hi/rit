@@ -22,7 +22,8 @@
 #' @export health5_simulate_paths
 #'
 #' @examples
-#' simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
+#' simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, 
+#' init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
 health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohort = 10000) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
@@ -81,9 +82,12 @@ health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohor
 #' the initial age of the life table
 #' @return
 #' a list of n_sum number of life table matrices
-#' for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
-#' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
-#' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
+#' for each matrix, the row represents the age from the input initial age to 110, 
+#' and the columns are states H M D MD Dead
+#' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, 
+#' so we can get a distribution of the elements in the lifetable
+#' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise 
+#' it will produce the same lifetable n_sim times
 #' @export health5_create_life_table
 #'
 #' @examples
@@ -94,16 +98,20 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
         state_status=matrix(nrow = 110-init_age+2, ncol = 6)
         colnames(state_status) <- c("Age", "Healthy", "M", "D", "MD", "Dead")
         if (init_state==0){
-            state_status[1,]=c(init_age,1,0,0,0,0) # initial state status is 1 in the healthy state and 0 for the others
+            # initial state status is 1 in the healthy state and 0 for the others
+            state_status[1,]=c(init_age,1,0,0,0,0) 
         }
         if (init_state==1){
-            state_status[1,]=c(init_age,0,1,0,0,0) # initial state status is 1 in the M state and 0 for the others
+            # initial state status is 1 in the M state and 0 for the others
+            state_status[1,]=c(init_age,0,1,0,0,0) 
         }
         if (init_state==2){
-            state_status[1,]=c(init_age,0,0,1,0,0) # initial state status is 1 in the D state and 0 for the others
+            # initial state status is 1 in the D state and 0 for the others
+            state_status[1,]=c(init_age,0,0,1,0,0) 
         }
         if (init_state==3){
-            state_status[1,]=c(init_age,0,0,0,1,0) # initial state status is 1 in the MD state and 0 for the others
+            # initial state status is 1 in the MD state and 0 for the others
+            state_status[1,]=c(init_age,0,0,0,1,0) 
         }
 
         for (age in init_age:110){
@@ -115,7 +123,8 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
                     state_status[age-init_age+1,5]*list_trans_probs[[age-init_age+1]][4,j-1]+
                     state_status[age-init_age+1,6]*list_trans_probs[[age-init_age+1]][5,j-1]
                 # state_status is essentially the life table at each age
-                # firstly times the probability/or number(if assume 10000 individuals just simply times 10000) of the state at the beginning of this year with the probability of entering state j from this state
+                # firstly times the probability/or number(if assume 10000 individuals just simply times 10000) 
+                # of the state at the beginning of this year with the probability of entering state j from this state
                 # then take the sum of all possible initial states of this year
             }
             state_status[age-init_age+2,1]=age+1
@@ -147,13 +156,17 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
 #' the initial age of the life table
 #' @return
 #' a list of n_sum number of life table matrices
-#' for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
-#' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
-#' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
+#' for each matrix, the row represents the age from the input initial age to 110, 
+#' and the columns are states H M D MD Dead
+#' for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, 
+#' so we can get a distribution of the elements in the lifetable
+#' for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, 
+#' otherwise it will produce the same lifetable n_sim times
 #' @export health5_simulate_life_table
 #'
 #' @examples
-#' simulated_lifetable=health5_simulate_life_table(model_type='F', param_file, female, wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
+#' simulated_lifetable=health5_simulate_life_table(model_type='F', param_file, female, 
+#' wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
 health5_simulate_life_table=function(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, cohort, mean){
     if (model_type != 'F') {
         stop('use frailty model to simulate lifetables')
