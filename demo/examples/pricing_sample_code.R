@@ -1,6 +1,6 @@
 # Account-Based Pension
 ap <- create_policy_AP(1000000, 50000)
-cf_ap <- simulate_cf(ap)
+cf_ap <- simulate_cf(ap, 100)
 val_ap <- value_policy(ap, cf_ap)
 
 # Life Annuity
