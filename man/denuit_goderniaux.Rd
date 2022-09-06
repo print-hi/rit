@@ -44,6 +44,3 @@ completed mortality rates for all ages and old ages in the same format as
 Implements the Denuit and Goderniaux method of mortality rate completion for
 old ages.
 }
-\examples{
-
-}

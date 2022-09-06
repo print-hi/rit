@@ -30,6 +30,3 @@ resulting in the following conversions:
 \deqn{\mu_{x, y} = m_{x, y}}
 \deqn{m_{x, y}  = -log(1 - q_{x, y})}
 }
-\examples{
-
-}

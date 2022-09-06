@@ -40,6 +40,3 @@ completed mortality rates for all ages and old ages in the same format as
 \description{
 Implements the Kannisto method of age completion for old ages.
 }
-\examples{
-
-}

@@ -26,8 +26,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
 rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = NULL) {
 
 # Flagging errors ---------------------------------------------------------
@@ -151,8 +149,6 @@ rate2survival <- function(rates, ages, from = "prob", init_age = NULL, years = N
 #' associated mortality rates in the same format as `surv`
 #' @export
 #'
-#' @examples
-#'
 survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
@@ -264,8 +260,6 @@ survival2rate <- function(surv, ages, to = "prob", years = NULL) {
 #' @return
 #' the transformed survival function under the specified Q-measure
 #' @export
-#'
-#' @examples
 #'
 survivalP2Q <- function(StP, method, lambda) {
 

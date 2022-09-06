@@ -24,8 +24,6 @@
 #'
 #' @export
 #'
-#' @examples
-#'
 rate2rate <- function(rates, from, to) {
 
 # Flagging errors ---------------------------------------------------------

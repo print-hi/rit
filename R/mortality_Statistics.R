@@ -136,8 +136,6 @@ qsurv <- function(surv_fun, surv_prob) {
 #'
 #' @export
 #'
-#' @examples
-#'
 exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 
 # Flagging Errors ---------------------------------------------------------
@@ -263,8 +261,6 @@ exp_cfl <- function(qx, ages, init_age = NULL, years = NULL) {
 #'
 #' @export
 #'
-#' @examples
-#'
 plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 
 
@@ -355,8 +351,6 @@ plot_exp_cfl <- function(exp_cfl_rates, years, level = 95) {
 #' of `surv_sim` will be preserved
 #'
 #' @export
-#'
-#' @examples
 #'
 plot_surv_sim <- function(surv_sim, init_age, target_year, level = 95, years = NULL) {
 

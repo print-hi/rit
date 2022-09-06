@@ -16,6 +16,7 @@
 #' @param model Either "interest_rate" (default) or "interest_house_stock". 
 #' The latter model is based on an augmented Arbitrage-Free Nelson-Siegel model, 
 #' where both home value index and stock price are assumed to be dependent on interest rates. 
+#' @param seed Specify the seed for simulations. Default is NULL.  
 #'
 #' @return If model is `interest_rate`, the function returns a list containing 
 #' 40 data frames for the simulated trajectories for maturities from 1 quarter up to 10 years. 
@@ -28,7 +29,7 @@
 #' frequency = "year", type = "correlated", model = "interest_rate"). To obtain trajectories of 
 #' Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. To obtain trajectories of 
 #' S&P/ASX200 closing prices, type sim$stock_price. 
-esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate") {
+esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate", seed = NULL) {
     
     ##################
     # error messages #
@@ -48,7 +49,7 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
     } else if (!is.logical(perc_change)) {
         stop ("perc_change must be logical. ")
         
-    }
+    } 
     
     AFNS = afns_model(model, type, frequency)
     {
@@ -86,8 +87,9 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
                         expr = {data.frame(matrix(NA, nrow = num_xt, ncol = num_pred+1))},
                         simplify = F)
     Xt_sim = lapply(Xt_sim, function (x) {x[,1] = init_xt; return (x)})
+    set.seed(seed)
     noise = MASS::mvrnorm(num_paths*num_pred, mu = mu0, Sigma = Q_est)
-    noise_ind = 1
+    noise_ind = 1; 
     for (path in 1:num_paths) {
         for (i in 2:(num_pred+1)) {
             eta = as.matrix(noise[noise_ind,]) 

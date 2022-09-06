@@ -14,16 +14,15 @@
 #' maximum life span
 #' @param n_sim
 #' number of path simulations
-#'
+#' @param seed
+#' integer to be used as the seed for simulation
 #' @return
 #' a matrix where each row represents an individual's dead (-1) or alive (0) status
 #' at each age
 #'
 #' @export
 #'
-#' @examples
-#'
-sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000) {
+sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age = 130, n_sim = 10000, seed = NULL) {
 
 # Flagging errors ---------------------------------------------------------
 
@@ -70,6 +69,10 @@ sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age 
 
 # Implementation ----------------------------------------------------------
 
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
+
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
         death_probs <- generate_default_qx(init_age, sex, closure_age)
@@ -115,16 +118,16 @@ sim_indiv_path <- function(init_age, sex = "F", death_probs = NULL, closure_age 
 #' initial cohort size
 #' @param n_sim
 #' number of path simulations
+#' @param seed
+#' integer to be used as the seed for simulation
 #'
 #' @return
 #' a matrix where each row represents the number of individuals still alive
 #' from a given cohort at each age
 #' @export
 #'
-#' @examples
-#'
 sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
-                                   closure_age = 130, cohort = 1000, n_sim = 10000) {
+                                   closure_age = 130, cohort = 1000, n_sim = 10000, seed = NULL) {
 # Flagging errors ---------------------------------------------------------
 
     # init_age
@@ -176,6 +179,10 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
 
 # Implementation ----------------------------------------------------------
 
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
+
     # Generating default death probabilities for males and females if required
     if (is.null(death_probs)) {
         death_probs <- generate_default_qx(init_age, sex, closure_age)
@@ -224,8 +231,6 @@ sim_cohort_path_realised <- function(init_age, sex = "F", death_probs = NULL,
 #' @return
 #' vector of expected number of individuals still alive from a given cohort at each age
 #' @export
-#'
-#' @examples
 #'
 sim_cohort_path_expected <- function(init_age, sex = "F", death_probs = NULL,
                                      closure_age = 130, cohort = 1000) {

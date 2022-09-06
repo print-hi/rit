@@ -20,6 +20,7 @@
 #' change.Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
 #' @param return_sdf If the VAR-based stochastic discount factors are returned.
 #' Default is TRUE. 
+#' @param seed Specify the seed for simulations. Default is NULL. 
 #'
 #' @return A list containing 10 data frames for the simulated trajectories for
 #' each economic variable, and a list of white noises in the VAR model.
@@ -30,7 +31,7 @@
 #' 3-month zero-coupon yields, type sim$zcp3m_yield, to obtain the noises in the
 #' first trajectory, type sim$noise$trajectory_1.
 #'
-esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE) {
+esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
 
     ################
     # error messages 
@@ -101,6 +102,7 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
     ############################
     
     # white noise
+    set.seed(seed)
     noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1), 
                    nrow = length(intercept))
     noise = lapply(seq(from = 1, to = num_paths * num_pred, by = num_pred), 
@@ -207,7 +209,7 @@ esg_var_simulations = function (num_years = 5, num_paths = 10, frequency = "quar
                     simplify = T)
         st = rbind(init_st,st)
         
-        st = apply(st, 2, function (x) ifelse(x > 1.3,1.3,ifelse(x < 0.7, 0.7, x))) # trim the values
+        st[2,] = ifelse(st[2,] > 1.2,1.2,ifelse(st[2,] < 0.8, 0.8, st[2,])) # trim the irregular values: historical data: interest rate < 0
         row.names(st) = as.character(time_index)
         colnames(st) = path_index
         
