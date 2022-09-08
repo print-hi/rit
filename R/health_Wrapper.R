@@ -29,11 +29,13 @@
 #'
 get_trans_probs <- function(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0) {
 
-  if (year != 2012) {
-    wave_index = (year - 1998) / 2 + 1
-  }
-  else if (wave_index != 8) {
-    year = 2 * (wave_index - 1) + 1998
+  if (n_states == 5) {
+    if (year != 2012) {
+      wave_index = (year - 1998) / 2 + 1
+    }
+    else if (wave_index != 8) {
+      year = 2 * (wave_index - 1) + 1998
+    }
   }
 
   if (n_states == 3) {
