@@ -1,4 +1,4 @@
-#' esg_afns_simulation
+#' esg_afns_simulator
 #' 
 #' Returns the simulated paths of the zero-coupon interest rate term structure. 
 #' The model is based on an Arbitrage-Free Nelson-Siegel (AFNS) model. 
@@ -10,7 +10,7 @@
 #' @param num_paths Number of simulation paths. Default is 10 paths. 
 #' @param frequency One of "year", "quarter", and "month" (default).  
 #' @param perc_change If the outputs are expressed in terms of period-by-period percentage
-#' change.Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
+#' change. Default is FALSE. The reference level, i.e., the original values in the first output period, will be appended above the percentage changes for each variable and each trajectory. 
 #' @param type Either "independent" (default) or "correlated". Independent-factor 
 #' model assumes independence between the latent factors for interest rates. 
 #' @param model Either "interest_rate" (default) or "interest_house_stock". 
@@ -23,13 +23,13 @@
 #' If model is `interest_house_stock`,the function returns a list containing 42 data frames 
 #' for the simulated trajectories for maturities from 1 quarter up to 10 years, 
 #' as well as NSW house value indexes and S&P/ASX200 closing prices. 
-#' @export esg_afns_simulation
+#' @export esg_afns_simulator
 #'
-#' @examples sim = esg_afns_simulations(num_years = 10, num_paths = 100, 
+#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 100, 
 #' frequency = "year", type = "correlated", model = "interest_rate"). To obtain trajectories of 
 #' Australia 3-month zero-coupon yields, type sim$maturity_1qtrs. To obtain trajectories of 
 #' S&P/ASX200 closing prices, type sim$stock_price. 
-esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate", seed = NULL) {
+esg_afns_simulator = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate", seed = NULL) {
     
     ##################
     # error messages #
@@ -78,6 +78,7 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
     
     num_pred = num_years / h
     time_index = seq(from = init_qtr, length.out = num_pred+1, by = frequency)[-1]
+    progression = floor(num_paths*num_pred / 5)
     
     ###############
     # simulate Xt # 
@@ -89,13 +90,18 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
     Xt_sim = lapply(Xt_sim, function (x) {x[,1] = init_xt; return (x)})
     set.seed(seed)
     noise = MASS::mvrnorm(num_paths*num_pred, mu = mu0, Sigma = Q_est)
-    noise_ind = 1; 
+    noise_ind = 1; prog_ind = 1
+    cat("Progress: 0% \n")
     for (path in 1:num_paths) {
         for (i in 2:(num_pred+1)) {
             eta = as.matrix(noise[noise_ind,]) 
             Xt = as.matrix(Xt_sim[[path]][,i-1])
             Xt_sim[[path]][,i] = EK_est %*% theta_est + expm::expm(-h * KP_est) %*% Xt + eta
             noise_ind = noise_ind + 1
+            if (noise_ind == progression * prog_ind && prog_ind < 5) {
+                cat(paste(20*prog_ind, "%\n", sep = ""))
+                prog_ind = prog_ind + 1
+            }
         }
     }
     
@@ -129,6 +135,7 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
         output[[41]] = exp(output[[41]])
         output[[42]] = exp(output[[42]])
     }
+    output = lapply(output, function (x) {x = t(x)})
     
     #############
     # Adj units # 
@@ -141,6 +148,6 @@ esg_afns_simulation = function (num_years = 5, num_paths = 10, frequency = "mont
         names(output) = mat_qtrs
     }
     
-
+    cat("100% \n")
     return (output)
 } 
