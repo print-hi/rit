@@ -67,7 +67,7 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     if (is.null(econ_var)) {
-        econ_var <- esg_var_simulations(ncol(state), n, frequency = 'year', return_sdf = TRUE)
+        econ_var <- esg_var_simulator(ncol(state), n, frequency = 'year', return_sdf = TRUE)
     }
 
     # Get matrix of economic variables for each path
