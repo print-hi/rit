@@ -27,7 +27,7 @@
 #' @export esg_var_simulator
 #'
 #' @examples sim = esg_var_simulator(num_years = 10, num_paths = 100,
-#' frequency = "year", return_sdf = T)
+#' frequency = "year", return_sdf = TRUE)
 esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
 
     ################
@@ -100,7 +100,7 @@ esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarte
 
     # white noise
     set.seed(seed)
-    noise = matrix(data = rnorm(length(intercept) * num_pred * num_paths, 0, 1),
+    noise = matrix(data = compositions::rnorm(length(intercept) * num_pred * num_paths, 0, 1),
                    nrow = length(intercept))
     noise = lapply(seq(from = 1, to = num_paths * num_pred, by = num_pred),
                    function (x) {noise[, x:(x+num_pred-1)]})
@@ -239,7 +239,7 @@ esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarte
             qtr_data = zoo::zoo (x, time_index)
             month_data = zoo::zoo (NA, time_index_month)
             data = merge (qtr_data, month_data)
-            data$month_data = na.approx(data$qtr_data, rule=12)
+            data$month_data = zoo::na.approx(data$qtr_data, rule=12)
             return (as.vector(data$month_data))
         }
         output = lapply(sim,

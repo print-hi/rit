@@ -34,18 +34,18 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
                            simplify = F)
 
         output = sapply(1:length(paths), function (x) {
-            output[[x]] = rbind(apply(paths[[x]], 2, quantile, probs = probs, na.rm = na.rm),
+            output[[x]] = rbind(apply(paths[[x]], 2, stats::quantile, probs = probs, na.rm = na.rm),
                                   apply(paths[[x]], 2, mean, na.rm = na.rm),
-                                  apply(paths[[x]], 2, sd, na.rm = na.rm))
+                                  apply(paths[[x]], 2, stats::sd, na.rm = na.rm))
             }, simplify = F)
         output = lapply(output, function (x) {x = as.data.frame(x); row.names(x) = stats; return (x)})
         names(output) = names(paths)
 
     } else {
         output = data.frame(matrix(NA, ncol = nrow(paths), nrow = length(stats)))
-        output = rbind(apply(paths, 2, quantile, probs = probs, na.rm = na.rm),
+        output = rbind(apply(paths, 2, stats::quantile, probs = probs, na.rm = na.rm),
                          apply(paths, 2, mean, na.rm = na.rm),
-                         apply(paths, 2, sd, na.rm = na.rm))
+                         apply(paths, 2, stats::sd, na.rm = na.rm))
         output = as.data.frame(output)
         row.names(output) = stats
     }
