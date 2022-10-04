@@ -26,9 +26,12 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 }
 \value{
 a list of n_sum number of life table matrices
-for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
-for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
-for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
+for each matrix, the row represents the age from the input initial age to 110,
+and the columns are states H M D MD Dead
+for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables,
+so we can get a distribution of the elements in the lifetable
+for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise
+it will produce the same lifetable n_sim times
 }
 \description{
 the function to get n_sim number of lifetables

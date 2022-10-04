@@ -18,12 +18,12 @@ ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(5, 0), c(0.04, 0.01))
 cf_ca <- simulate_cf(ca)
 val_ca <- value_policy(ca, cf_ca)
 
-# Variable Annuity (GMWB)
-va <- create_policy_VA(1000000, 30, 0.1, 0.01)
-cf_va <- simulate_cf(va)
-val_va <- value_policy(va, cf_va)
-
 # Reverse Mortgage
 rm <- create_policy_RM(600000, 0.64, 0.01, 0.04)
 cf_rm <- simulate_cf(rm)
 val_rm <- value_policy(rm, cf_rm)
+
+# Variable Annuity (GMWB)
+va <- create_policy_VA(1000000, 30, 0.1, 0.01)
+cf_va <- simulate_cf(va)
+val_va <- value_policy(va, cf_va)

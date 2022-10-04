@@ -1,20 +1,16 @@
 #' esg_summary
-#' 
-#' Provides period-by-period summary statistics including quantiles, mean, and standard deviation for time series data. 
+#'
+#' Provides period-by-period summary statistics including quantiles, mean, and standard deviation for time series data.
 #'
 #'
-#' @param paths List or dataframe containing time series data. 
-#' @param probs Numeric vector of probabilities with values in [0,1]. Default is 0%, 25%, 50%, 75%, 100%-tiles. 
-#' @param na.rm logical, if true, any NA and NaN's are removed from data before computing the statistics. Default TRUE. 
+#' @param paths List or dataframe containing time series data.
+#' @param probs Numeric vector of probabilities with values in [0,1]. Default is 0%, 25%, 50%, 75%, 100%-tiles.
+#' @param na.rm logical, if true, any NA and NaN's are removed from data before computing the statistics. Default TRUE.
 #'
-#' @return List of dataframe containing summary statistics for each period across trajectories. 
+#' @return List of dataframe containing summary statistics for each period across trajectories.
 #' @export
-#'
-#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 100, frequency = "year", type = "correlated", model = "interest_rate"). 
-#' This contains simulated paths from the continuous-time simulator. 
-#' series_summ = esg_summary (paths = sim, probs = seq(0,1,0.2), na.rm = T)
 esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
-    
+
     ##################
     # error messages #
     ##################
@@ -29,14 +25,14 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
     ###############
     # calculation #
     ###############
-    
+
     stats = c(paste(probs*100, "%-tile", sep = ""), "Mean", "StdDev")
-    
+
     if (is.list(paths) & !is.data.frame(paths)) {
         output = replicate(n = length(paths),
                            expr = {data.frame(matrix(NA, ncol = nrow(paths[[1]]), nrow = length(stats)))},
                            simplify = F)
-        
+
         output = sapply(1:length(paths), function (x) {
             output[[x]] = rbind(apply(paths[[x]], 2, quantile, probs = probs, na.rm = na.rm),
                                   apply(paths[[x]], 2, mean, na.rm = na.rm),
@@ -44,7 +40,7 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
             }, simplify = F)
         output = lapply(output, function (x) {x = as.data.frame(x); row.names(x) = stats; return (x)})
         names(output) = names(paths)
-        
+
     } else {
         output = data.frame(matrix(NA, ncol = nrow(paths), nrow = length(stats)))
         output = rbind(apply(paths, 2, quantile, probs = probs, na.rm = na.rm),
@@ -53,7 +49,7 @@ esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
         output = as.data.frame(output)
         row.names(output) = stats
     }
-    
-    
+
+
     return (output)
 }

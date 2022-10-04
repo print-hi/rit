@@ -30,5 +30,6 @@ for each row it starts from the initial age as an input, and end at age 110
 function to get the path of 10000 individuals
 }
 \examples{
-simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
+simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, 
+init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
 }

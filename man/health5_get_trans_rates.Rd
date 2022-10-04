@@ -34,5 +34,6 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, 
+age=65, female=0, wave_index=8, latent=0)
 }

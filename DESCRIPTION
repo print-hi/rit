@@ -11,7 +11,7 @@ Description: Toolkit of R modules for researchers to use in modelling
              based on means-testing, pricing and quantifying risk for a 
              range of finance and insurance products to finance retirement 
              and aged care risks.
-Depends: dplyr, ggplot2, tidyr, expm, moments, matrixStats, StMoMo, R (>= 2.10)
+Imports: dplyr, ggplot2, tidyr, expm, moments, matrixStats, StMoMo, readxl
 License: `use_mit_license()`, `use_gpl3_license()` or pick a license
 Encoding: UTF-8
 LazyData: true
