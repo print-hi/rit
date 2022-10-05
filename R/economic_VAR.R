@@ -26,7 +26,7 @@
 #' each economic variable, and a list of white noises in the VAR model.
 #' @export esg_var_simulator
 #'
-#' @examples sim = esg_var_simulator(num_years = 10, num_paths = 100,
+#' @examples sim = esg_var_simulator(num_years = 10, num_paths = 10,
 #' frequency = "year", perc_change = FALSE, return_sdf = TRUE, seed = 2022)
 esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
 

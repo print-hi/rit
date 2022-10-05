@@ -25,7 +25,7 @@
 #' as well as NSW house value indexes and S&P/ASX200 closing prices. 
 #' @export esg_afns_simulator
 #'
-#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 100,
+#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 10,
 #' frequency = "year", perc_change = FALSE, type = "correlated", model = "interest_rate", seed = 2022)
 esg_afns_simulator = function (num_years = 5, num_paths = 10, frequency = "month", perc_change = FALSE, type = "independent", model = "interest_rate", seed = NULL) {
 
