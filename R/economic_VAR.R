@@ -162,7 +162,7 @@ esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarte
 
     index2grow_inv = function (x, init) {
         # reverse index to growth rate: home_value, gdp, cpi, asx200, aud
-        Reduce (function (init, x) {init * exp(x)}, c(init, x), accumulate = T)
+        Reduce (function (init, x) {init * exp(x)}, c(init, x), accumulate = TRUE)
     }
 
 
@@ -212,8 +212,8 @@ esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarte
         }
         st = sapply(1:num_paths,
                     function (x) {sapply(1:num_pred,
-                    function (y) {st[y,x] = st_expn(y,x)}, simplify = T)},
-                    simplify = T)
+                    function (y) {st[y,x] = st_expn(y,x)}, simplify = TRUE)},
+                    simplify = TRUE)
         st = rbind(init_st,st)
 
         st[2,] = ifelse(st[2,] > 1.2,1.2,ifelse(st[2,] < 0.8, 0.8, st[2,])) # trim the irregular values: historical data: interest rate < 0
