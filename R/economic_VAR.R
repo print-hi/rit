@@ -7,7 +7,7 @@
 #' price, (8) Australian dollar trade-weighted index, (9) Australia mortgage
 #' rate, (10) New South Wales unemployment rate.
 #' Simulations are based on a Vector Autoregression model. This function uses
-#' the package `zoo` to convert the frequnency units.
+#' the package `zoo` to convert the frequnency units. Period-by-period summary statistics can be obtained from \code{esg_summary}.
 #'
 #' @param num_years Number of years to forecast, counting from 2021-01-01.
 #' Default is 5 years, recommended period is less than 10 years.
@@ -27,7 +27,7 @@
 #' @export esg_var_simulator
 #'
 #' @examples sim = esg_var_simulator(num_years = 10, num_paths = 100,
-#' frequency = "year", return_sdf = TRUE)
+#' frequency = "year", perc_change = FALSE, return_sdf = TRUE, seed = 2022)
 esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarter", perc_change = FALSE, return_sdf = TRUE, seed = NULL) {
 
     ################
@@ -100,7 +100,7 @@ esg_var_simulator = function (num_years = 5, num_paths = 10, frequency = "quarte
 
     # white noise
     set.seed(seed)
-    noise = matrix(data = compositions::rnorm(length(intercept) * num_pred * num_paths, 0, 1),
+    noise = matrix(data = stats::rnorm(length(intercept) * num_pred * num_paths, 0, 1),
                    nrow = length(intercept))
     noise = lapply(seq(from = 1, to = num_paths * num_pred, by = num_pred),
                    function (x) {noise[, x:(x+num_pred-1)]})
