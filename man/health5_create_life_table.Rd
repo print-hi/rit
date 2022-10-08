@@ -2,37 +2,26 @@
 % Please edit documentation in R/health5_Simulator.R
 \name{health5_create_life_table}
 \alias{health5_create_life_table}
-\title{the function to get n_sim number of lifetables}
+\title{the function to create lifetable for Static or Trend models}
 \usage{
 health5_create_life_table(list_trans_probs, init_age, init_state, cohort)
 }
 \arguments{
-\item{init_age}{the initial age of the life table}
+\item{list_trans_probs}{a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
 
-\item{init_state}{0 for H state, 1 for M state, 2 for D state, 3 for MD state}
+\item{init_age}{the initial age of the path}
 
-\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
+\item{init_state}{the initial state of all individuals}
 
-\item{female}{female 1 if female, 0 if male}
-
-\item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
-
-\item{latent}{initial value of latent factor, normally take the value 0}
-
-\item{n_sim}{the number of simulations}
-
-\item{model_type}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
+\item{cohort}{the number of simulated cohorts}
 }
 \value{
-a list of n_sum number of life table matrices
-for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
-for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
-for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
+a life table matrix
+the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
 }
 \description{
-the function to get n_sim number of lifetables
+the function to create lifetable for Static or Trend models
 }
 \examples{
-created_lifetable=health5_create_life_table(trans_probs_5,init_age=65,init_state=0)
+created_lifetable=health5_create_life_table(list_trans_probs=trans_probs,init_age=65,init_state=0,cohort=10000)
 }

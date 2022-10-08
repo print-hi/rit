@@ -2,7 +2,7 @@
 % Please edit documentation in R/health5_Simulator.R
 \name{health5_simulate_life_table}
 \alias{health5_simulate_life_table}
-\title{the function to get n_sim number of lifetables}
+\title{the function to get n_sim number of simulated lifetables for Frailty model}
 \usage{
 health5_simulate_life_table(
   model_type,
@@ -18,10 +18,7 @@ health5_simulate_life_table(
 )
 }
 \arguments{
-\item{model_type}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
-
-\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
 
 \item{female}{female 1 if female, 0 if male}
 
@@ -34,16 +31,20 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 \item{init_state}{0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 
 \item{n_sim}{the number of simulations}
+
+\item{cohort}{number of people at the beginning of the life table}
+
+\item{mean}{TRUE to return expected life table, FALSE to return all simulated life tables}
 }
 \value{
-a list of n_sum number of life table matrices
+a list of n_sim number of life table matrices when mean=FALSE
 for each matrix, the row represents the age from the input initial age to 110, and the columns are states H M D MD Dead
-for model 3 the frailty model, it simulates the latent factor to get n_sim number of lifetables, so we can get a distribution of the elements in the lifetable
-for model 1 and 2, n_sim is suggest to set to be 1 to get one lifetable, otherwise it will produce the same lifetable n_sim times
+or the mean life table when mean=TRUE
 }
 \description{
-the function to get n_sim number of lifetables
+#' @param model_type
+choose F for Frailty model
 }
 \examples{
-simulated_lifetable=health5_simulate_life_table(model_type='F', param_file, female, wave_index,latent=0,init_age=65,init_state=0,n_sim=100,return_expected=0)
+simulated_lifetable=health5_simulate_life_table(model_type='F', param_file=US_HRS_5, female=0, wave_index=8,latent=0,init_age=65,init_state=0,n_sim=100,cohort=10000,mean=FALSE)
 }

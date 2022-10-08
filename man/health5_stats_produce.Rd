@@ -10,11 +10,11 @@ health5_stats_produce(input)
 \item{input}{the list of values to be studied}
 }
 \value{
-mean and variance of the
+mean and variance of the list of values
 }
 \description{
 function to produce the mean and variance of a list of values
 }
 \examples{
-stats_first_time_leave_H=health5_stats_produce(first_time_stats(simulated_path,0))
+stats_first_time_leave_H=health5_stats_produce(health5_first_time_stats(simulated_individual_path, 0))
 }

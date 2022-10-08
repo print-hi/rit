@@ -2,33 +2,26 @@
 % Please edit documentation in R/health5_Simulator.R
 \name{health5_simulate_paths}
 \alias{health5_simulate_paths}
-\title{function to get the path of 10000 individuals}
+\title{function to get the path of set number of individuals}
 \usage{
-health5_simulate_paths(list_trans_probs, init_age, init_state, cohort = 10000)
+health5_simulate_paths(list_trans_probs, init_age, init_state, cohort)
 }
 \arguments{
+\item{list_trans_probs}{a list of transition probability matrices, preferably generated from \code{get_trans_probs}.}
+
 \item{init_age}{the initial age of the path}
 
 \item{init_state}{the initial state of all individuals}
 
-\item{cohort}{the number of simulations, set to be 10000}
-
-\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
-
-\item{female}{female 1 if female, 0 if male}
-
-\item{wave_index}{the wave index}
-
-\item{model_type}{1 for no-frailty model, 2 for no-frailty model with a trend, 3 for frailty model}
+\item{cohort}{the number of simulated cohorts}
 }
 \value{
-10000 rows of individual paths in the states, 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
+rows of individual paths in the states, 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 for each row it starts from the initial age as an input, and end at age 110
 }
 \description{
-function to get the path of 10000 individuals
+function to get the path of set number of individuals
 }
 \examples{
-simulated_individual_path=health5_simulate_paths(model_type='F', init_age=65, init_state=0, param_file=params_5_frailty, female=0, wave_index=8, cohort = 10000)
+simulated_individual_path=health5_simulate_paths(trans_probs, init_age=65, init_state=0, cohort=10000)
 }

@@ -25,6 +25,6 @@ Creates life table from a list of transition probability matrices at some initia
 and specified cohort size.
 }
 \examples{
-example
+lifetable <- create_life_table(trans_probs, init_age=65, init_state = 0, cohort = 100000)
 
 }

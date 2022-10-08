@@ -4,7 +4,7 @@
 \alias{health3_simulate_paths}
 \title{Simulate cohort life path}
 \usage{
-health3_simulate_paths(trans_probs, init_age, init_state, cohort = 10000)
+health3_simulate_paths(trans_probs, init_age, init_state, cohort)
 }
 \arguments{
 \item{trans_probs}{a list of transition probability matrices, preferably generated from \code{health3_get_trans_probs}.}

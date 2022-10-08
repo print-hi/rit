@@ -22,7 +22,7 @@
 #'
 #'
 #' @examples example
-health3_simulate_paths <- function(trans_probs, init_age, init_state, cohort = 10000) {
+health3_simulate_paths <- function(trans_probs, init_age, init_state, cohort) {
   # screening for errors
   if (init_state != 0 & init_state != 1) {
     stop('invalid state, 0 for healthy and 1 for disabled')

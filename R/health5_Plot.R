@@ -1,6 +1,4 @@
-# Functions to create different plots
-
-#' Create Survival Probability Plots
+#' Functions to create different plots
 #'
 #' Create a plot of survival probabilities to H, M, D, MD and Dead states.
 #'
@@ -19,7 +17,7 @@
 #'
 #' @import tidyr dplyr ggplot2
 #'
-#' @examples example
+#' @examples health5_prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 health5_prob_plots <- function(init_state, init_age, trans_probs) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {

@@ -7,7 +7,7 @@
 health5_total_time_stats(simulated_path, state)
 }
 \arguments{
-\item{simulated_path}{the simulated path of individuals from the function simulate_individual_path}
+\item{simulated_path}{the simulated path of individuals from the function \code{simulate_health_state_paths}}
 
 \item{state}{0 for total time in H state
 1 for total time in M state

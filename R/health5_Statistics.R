@@ -1,6 +1,6 @@
 #' function to get the first time leaving or entering different states for a number of individuals
 #' @param simulated_path
-#' the simulated path of individuals from the function simulate_individual_path
+#' the simulated path of individuals from the function \code{simulate_health_state_paths}
 #' @param state
 #' 0 for first time leaving H state, only useful when initial state is 0
 #' 1 for first time entering M state
@@ -47,7 +47,7 @@ health5_first_time_stats=function(simulated_path, state){
 
 #' function to get the total time in different states for a number of individuals
 #' @param simulated_path
-#' the simulated path of individuals from the function simulate_individual_path
+#' the simulated path of individuals from the function \code{simulate_health_state_paths}
 #' @param state
 #' 0 for total time in H state
 #' 1 for total time in M state
@@ -60,8 +60,7 @@ health5_first_time_stats=function(simulated_path, state){
 #' a column that consists the total time in different states for a number of individuals
 #' @export health5_total_time_stats
 #'
-#' @examples
-#' total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
+#' @examples total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
 health5_total_time_stats=function(simulated_path, state){
     total_time=matrix(nrow=nrow(simulated_path),ncol=1)
     if (state==0){
@@ -128,11 +127,10 @@ health5_total_time_stats=function(simulated_path, state){
 #' @param input
 #' the list of values to be studied
 #' @return
-#' mean and variance of the
+#' mean and variance of the list of values
 #' @export health5_stats_produce
 #'
-#' @examples
-#' stats_first_time_leave_H=health5_stats_produce(first_time_stats(simulated_path,0))
+#' @examples stats_first_time_leave_H=health5_stats_produce(health5_first_time_stats(simulated_individual_path, 0))
 health5_stats_produce=function(input){
     output=matrix(nrow=1, ncol = 2)
     colnames(output) <- c('expected_value', 'st_dev')

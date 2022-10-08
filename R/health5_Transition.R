@@ -1,24 +1,23 @@
 #' function to calculate transition rates at a certain age
 #'
+#' @param model_type
+#' S for static model, T for trend model, F for frailty model
 #' @param param_file
-#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
+#' matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.
 #' @param age
 #' age of the individual
 #' @param female
 #' female 1 if female, 0 if male
 #' @param wave_index
-#' the wave index
+#' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
-#' @param model_type
-#' S for static model, T for trend model, F for frailty model
 #' @return
 #' 12 times 1 vector of transition rates for the 12 types of transitions
 #' @export health5_get_trans_rates
 #'
 #' @examples
-#' transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+#' transition_rates=health5_get_trans_rates(model_type='F',param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
 health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,latent){
     #
     if (model_type == 'S') {
@@ -53,19 +52,18 @@ health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,lat
 
 #' function to get a matrix of transition probabilities at a certain age
 #'
+#' @param model_type
+#' S for static model, T for trend model, F for frailty model
 #' @param param_file
-#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
+#' matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.
 #' @param age
 #' age of the individual
 #' @param female
 #' female 1 if female, 0 if male
 #' @param wave_index
-#' the wave index
+#' the wave index = (interview year - 1998)/2 + 1
 #' @param latent
 #' initial value of latent factor, normally take the value 0
-#' @param model_type
-#' S for static model, T for trend model, F for frailty model
 #'
 #' @return
 #' 5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
@@ -73,7 +71,7 @@ health5_get_trans_rates=function(model_type,param_file,age,female,wave_index,lat
 #' @import expm
 #'
 #' @examples
-#' transition_probabilities=health5_get_trans_probs_at_age(model_type='F', param_file=params_5_frailty, age=65, female=0, wave_index=8, latent=0)
+#' transition_probs_65=health5_get_trans_probs_at_age(model_type='F', param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
 health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_index,latent){
     trans_rate=health5_get_trans_rates(model_type,param_file,age,female,wave_index,latent)
     if (model_type == 'S') {
@@ -95,17 +93,16 @@ health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_in
 
 #' the function to get a full list of transition probability matrices from the initial age to age 110
 #'
+#' @param model_type
+#' S for static model, T for trend model, F for frailty model
 #' @param param_file
-#' matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-#' gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.
+#' matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.
 #' @param init_age
 #' the initial age of the transition probability matrices
 #' @param female
 #' female 1 if female, 0 if male
 #' @param wave_index
 #' the wave index
-#' @param model
-#' S for static model, T for trend model, F for frailty model
 #' @param latent
 #' initial value of latent factor, normally take the value 0
 #'
@@ -114,8 +111,8 @@ health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_in
 #' @export health5_get_trans_probs
 #'
 #' @examples
-#' trans_prob_matrix_age65to110=health5_get_trans_probs(model_type='F', param_file=params_5_frailty, init_age=65, female=0, wave_index=8)
-health5_get_trans_probs=function(model_type, param_file, init_age, female, wave_index, latent=0){
+#' trans_probs=health5_get_trans_probs(model_type='F', param_file=US_HRS_5, init_age=65, female=0, wave_index=8, latent=0)
+health5_get_trans_probs=function(model_type, param_file, init_age, female, wave_index, latent){
     # list of 46 vectors of transition rates for this simulation
     trans_rate=list()
     # list of 46 matrices of transition probabilities for this simulation

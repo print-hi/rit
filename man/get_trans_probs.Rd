@@ -37,9 +37,9 @@ list of transition probability matrices
 }
 \description{
 Creates a list of transition probability matrices starting from initial age to
-max age of 110 for 3 state model
+max age of 110 for 3 state model or 5 state model
 }
 \examples{
-example
+trans_probs=get_trans_probs(n_states=5, model_type='F', param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, latent = 0)
 
 }
