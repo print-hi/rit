@@ -20,7 +20,6 @@ List of dataframe containing summary statistics for each period across trajector
 Provides period-by-period summary statistics including quantiles, mean, and standard deviation for time series data.
 }
 \examples{
-sim = esg_afns_simulator(num_years = 10, num_paths = 10, frequency = "year", type = "correlated", model = "interest_rate"). 
-This contains simulated paths from the continuous-time simulator \code{esg_afns_simulator}. 
+sim = esg_afns_simulator(num_years = 10, num_paths = 10, frequency = "year", type = "correlated", model = "interest_rate")
 series_summ = esg_summary (paths = sim, probs = seq(0,1,0.2), na.rm = TRUE)
 }
