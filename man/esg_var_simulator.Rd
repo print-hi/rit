@@ -44,9 +44,9 @@ rental yields, (5) Australian GDP, (6) Australian CPI, (7) S&P/ASX200 closing
 price, (8) Australian dollar trade-weighted index, (9) Australia mortgage
 rate, (10) New South Wales unemployment rate.
 Simulations are based on a Vector Autoregression model. This function uses
-the package \code{zoo} to convert the frequnency units.
+the package \code{zoo} to convert the frequnency units. Period-by-period summary statistics can be obtained from \code{esg_summary}.
 }
 \examples{
-sim = esg_var_simulator(num_years = 10, num_paths = 100,
-frequency = "year", return_sdf = T)
+sim = esg_var_simulator(num_years = 10, num_paths = 10,
+frequency = "year", perc_change = FALSE, return_sdf = TRUE, seed = 2022)
 }
