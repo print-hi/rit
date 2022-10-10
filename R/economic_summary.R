@@ -1,16 +1,20 @@
 #' esg_summary
 #'
-#' Provides period-by-period summary statistics including quantiles, mean, and standard deviation for time series data.
+#' Provides period-by-period summary statistics including quantiles, mean, and 
+#' standard deviation for time series data.
 #'
 #'
 #' @param paths List or dataframe containing time series data.
-#' @param probs Numeric vector of probabilities with values in [0,1]. Default is 0%, 25%, 50%, 75%, 100%-tiles.
-#' @param na.rm logical, if true, any NA and NaN's are removed from data before computing the statistics. Default TRUE.
+#' @param probs Numeric vector of probabilities with values in [0,1]. Default 
+#' is 0%, 25%, 50%, 75%, 100%-tiles.
+#' @param na.rm logical, if true, any NA and NaN's are removed from data 
+#' before computing the statistics. Default TRUE.
 #'
 #' @return List of dataframe containing summary statistics for each period across trajectories. 
 #' @export
 #' 
-#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 10, frequency = "year", type = "correlated", model = "interest_rate")
+#' @examples sim = esg_afns_simulator(num_years = 10, num_paths = 10, 
+#' frequency = "year", type = "correlated", model = "interest_rate")
 #' series_summ = esg_summary (paths = sim, probs = seq(0,1,0.2), na.rm = TRUE)
 esg_summary = function (paths, probs = seq(0, 1, 0.25), na.rm = TRUE) {
 
