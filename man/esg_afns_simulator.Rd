@@ -44,9 +44,9 @@ as well as NSW house value indexes and S&P/ASX200 closing prices.
 Returns the simulated paths of the zero-coupon interest rate term structure.
 The model is based on an Arbitrage-Free Nelson-Siegel (AFNS) model.
 This function uses the package \code{MASS} for random number generation and \code{expm}
-for matrix exponential.
+for matrix exponential. Period-by-period summary statistics can be obtained from \code{esg_summary}.
 }
 \examples{
-sim = esg_afns_simulator(num_years = 10, num_paths = 100,
-frequency = "year", type = "correlated", model = "interest_rate")
+sim = esg_afns_simulator(num_years = 10, num_paths = 10,
+frequency = "year", perc_change = FALSE, type = "correlated", model = "interest_rate", seed = 2022)
 }
