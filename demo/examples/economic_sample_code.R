@@ -99,6 +99,17 @@ matplot(as.Date(colnames(cts_sim$maturity_1qtrs)),t(cts_sim$maturity_4qtrs), typ
 matplot(as.Date(colnames(cts_sim$maturity_1qtrs)),t(cts_sim$maturity_20qtrs), type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
 matplot(as.Date(colnames(cts_sim$maturity_1qtrs)),t(cts_sim$maturity_40qtrs), type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
 
+cts_summ = esg_summary(cts_sim$maturity_1qtrs, na.rm = T)
+cts_summ = t(cts_summ[-nrow(cts_summ),]) # removes standard deviation 
+plot(as.Date(row.names(cts_summ)),cts_summ[,1], col = "black", "l", lty = 3, xlab = "date", ylab = "(%)", ylim = c(min(cts_summ[,1]), max(cts_summ[,5])))
+lines(as.Date(row.names(cts_summ)), cts_summ[,5], lty = 3, col = "black")
+lines(as.Date(row.names(cts_summ)), cts_summ[,2], lty = 2, col = "black")
+lines(as.Date(row.names(cts_summ)), cts_summ[,4], lty = 2, col = "black")
+lines(as.Date(row.names(cts_summ)), cts_summ[,3], lty = 1, col = "black")
+lines(as.Date(row.names(cts_summ)), cts_summ[,6], lty = 1, col = "blue")
+legend("topleft", legend=c("min/max", "25%/75%-tile", "median", "mean"), col=c("black", "black","black","blue"), lty = c(3,2,1,1), bty = "n")
+title("Simulated 3-Month Zero-Coupon Yields")
+
 #### test cont-time model: correlated-factor interest rate term structure ####
 
 cts_sim = esg_afns_simulator(num_years = num_years, 
@@ -118,9 +129,6 @@ matplot(as.Date(colnames(cts_sim$maturity_1qtrs)[-1]),t(cts_sim$maturity_2qtrs[,
 matplot(as.Date(colnames(cts_sim$maturity_1qtrs)[-1]),t(cts_sim$maturity_4qtrs[,-1]), type = "l", ylab = "", main = "1-year zero-coupon yields", xlab = "")
 matplot(as.Date(colnames(cts_sim$maturity_1qtrs)[-1]),t(cts_sim$maturity_20qtrs[,-1]), type = "l", ylab = "", main = "5-year zero-coupon yields", xlab = "")
 matplot(as.Date(colnames(cts_sim$maturity_1qtrs)[-1]),t(cts_sim$maturity_40qtrs[,-1]), type = "l", ylab = "", main = "10-year zero-coupon yields", xlab = "")
-
-cts_summ = esg_summary(cts_sim$maturity_38qtrs, na.rm = T)
-matplot(t(cts_summ))
 
 #### test cont-time model: independent-factor term structure, house index, stock price ####
 
