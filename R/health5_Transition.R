@@ -86,7 +86,7 @@ health5_get_trans_probs_at_age=function(model_type,param_file,age,female,wave_in
                             c(trans_rate[7],trans_rate[8],-sum(trans_rate[c(7,8,9,10)]),trans_rate[9],trans_rate[10]),
                             c(0,trans_rate[11],0,-sum(trans_rate[11:12]),trans_rate[12]),
                             c(0,0,0,0,0))
-    trans_prob_matrix=expm(trans_rate_matrix)
+    trans_prob_matrix=expm::expm(trans_rate_matrix)
     return(trans_prob_matrix)
 }
 

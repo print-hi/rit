@@ -56,7 +56,7 @@ health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohor
 #' the function to create lifetable for Static or Trend models
 #'
 #' @param list_trans_probs
-#' a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.
+#' a list of transition probability matrices, preferably generated from \code{{get_trans_probs}}.
 #' @param init_age
 #' the initial age of the path
 #' @param init_state

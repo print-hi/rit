@@ -7,7 +7,7 @@
 health5_create_life_table(list_trans_probs, init_age, init_state, cohort)
 }
 \arguments{
-\item{list_trans_probs}{a list of transition probability matrices, preferably generated from \code{\link[tshm]{get_trans_probs}}.}
+\item{list_trans_probs}{a list of transition probability matrices, preferably generated from \code{{get_trans_probs}}.}
 
 \item{init_age}{the initial age of the path}
 
