@@ -1,6 +1,5 @@
 ---
 title: "Retirement Income Toolkit - Economic Scenario - VAR"
-author: "Queenie Huang"
 output:
  bookdown::html_document2:
     toc: yes

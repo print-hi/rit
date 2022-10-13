@@ -78,16 +78,20 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
         state_status=matrix(nrow = 110-init_age+2, ncol = 6)
         colnames(state_status) <- c("Age", "Healthy", "M", "D", "MD", "Dead")
         if (init_state==0){
-            state_status[1,]=c(init_age,1,0,0,0,0) # initial state status is 1 in the healthy state and 0 for the others
+            # initial state status is 1 in the healthy state and 0 for the others
+            state_status[1,]=c(init_age,1,0,0,0,0) 
         }
         if (init_state==1){
-            state_status[1,]=c(init_age,0,1,0,0,0) # initial state status is 1 in the M state and 0 for the others
+            # initial state status is 1 in the M state and 0 for the others
+            state_status[1,]=c(init_age,0,1,0,0,0) 
         }
         if (init_state==2){
-            state_status[1,]=c(init_age,0,0,1,0,0) # initial state status is 1 in the D state and 0 for the others
+            # initial state status is 1 in the D state and 0 for the others
+            state_status[1,]=c(init_age,0,0,1,0,0) 
         }
         if (init_state==3){
-            state_status[1,]=c(init_age,0,0,0,1,0) # initial state status is 1 in the MD state and 0 for the others
+            # initial state status is 1 in the MD state and 0 for the others
+            state_status[1,]=c(init_age,0,0,0,1,0) 
         }
 
         for (age in init_age:110){
@@ -99,7 +103,8 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
                     state_status[age-init_age+1,5]*list_trans_probs[[age-init_age+1]][4,j-1]+
                     state_status[age-init_age+1,6]*list_trans_probs[[age-init_age+1]][5,j-1]
                 # state_status is essentially the life table at each age
-                # firstly times the probability/or number(if assume 10000 individuals just simply times 10000) of the state at the beginning of this year with the probability of entering state j from this state
+                # firstly times the probability/or number(if assume 10000 individuals just simply times 10000) 
+                # of the state at the beginning of this year with the probability of entering state j from this state
                 # then take the sum of all possible initial states of this year
             }
             state_status[age-init_age+2,1]=age+1

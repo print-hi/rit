@@ -41,14 +41,16 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
         # Get matrix of states for each path
         if (policy$name[1] == "CA") {
             if (nrow(policy) == 2) {
-                state <- get_health_state_3(age, sex, seed, n)
+                probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
             } else if (nrow(policy) == 4) {
-                state <- get_health_state_5(age, sex, seed, n)
+                probs <- get_trans_probs(5, 'S', US_HRS_5, age, sex == 'F')
             } else {
                 stop("Error: CA policy object needs to have 2 or 4 rows")
             }
+            state <- simulate_health_state_paths(probs, age, cohort = n)
         } else if (policy$name[1] == "RM") {
-            state <- get_health_state_3(age, sex, seed, n)
+            probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
+            state <- simulate_health_state_paths(probs, age, cohort = n)
         } else {
             state <- get_aggregate_mortality(age, sex, seed, n)
         }
@@ -65,7 +67,7 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     if (is.null(econ_var)) {
-        econ_var <- get_var_simulations(ncol(state), n, frequency = 'year', return_sdf = TRUE)
+        econ_var <- esg_var_simulator(ncol(state), n, frequency = 'year', return_sdf = TRUE)
     }
 
     # Get matrix of economic variables for each path
@@ -77,7 +79,10 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     # Generate cash flows for each state vector
     for (i in seq(1, n)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
 
-    result <- list(cf = cf, sdf = t(unname(econ_var$discount_factors)))
+    # Round cashflows to cents
+    cf <- round(cf, 2)
+
+    result <- list(cf = cf, sdf = unname(econ_var$discount_factors))
 
     return(result)
 }
@@ -197,13 +202,14 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 # ---- Health State Module
 
 get_health_state_3 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    trans_probs <- get_trans_probs('T', US_HRS, age, (sex == "F"), 2021)
-    return(simulate_path(age, 0, trans_probs, n))
+    trans_probs <-  get_trans_probs(3, 'T', US_HRS, age, (sex == "F"), year = 2022)
+    return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 
 # TODO
 get_health_state_5 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    return(simulate_individual_path_5(age, 0, params_5_frailty, (sex == "F"), 8, n, 3))
+    trans_probs <-  get_trans_probs(5, 'T', US_HRS, age, (sex == "F"), year = 2012, wave_index = 8, latent = 0)
+    return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 
 # ------------------------------------------------------------------------
@@ -236,11 +242,6 @@ get_pool_expected <- function(age = 65, sex = "F", seed = 0, cohort = 1000) {
 # ------------------------------------------------------------------------
 # ---- Economic Scenario Generator Module
 
-get_zcp3m_yield <- function(var_sim) {
-    zcp3m <- var_sim$zcp3m_yield
-    return(t(unname(zcp3m)))
-}
-
 get_perc_change <- function(df) {
     result <- df
     for (i in seq(1, ncol(df) - 1)) {
@@ -250,17 +251,21 @@ get_perc_change <- function(df) {
     return(result)
 }
 
+get_zcp3m_yield <- function(var_sim) {
+    return((unname(var_sim$zcp3m_yield)))
+}
+
 get_inflation_rate <- function(var_sim) {
-    infla <- get_perc_change(var_sim$CPI)
-    return(t(unname(infla)))
+    cpi <- (unname(var_sim$CPI))
+    return(get_perc_change(cpi))
 }
 
 get_house_return <- function(var_sim) {
-    house <- get_perc_change(var_sim$home_index)
-    return(t(unname(house)))
+    home_index <- (unname(var_sim$home_index))
+    return(get_perc_change(home_index))
 }
 
 get_stock_return <- function(var_sim) {
-    stock <- get_perc_change(var_sim$ASX200)
-    return(t(unname(stock)))
+    asx <- (unname(var_sim$ASX200))
+    return(get_perc_change(asx))
 }

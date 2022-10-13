@@ -1,0 +1,12 @@
+Economic Variables ,Description ,Unit,Frequency,Start,End ,Source,Link
+3-month Zero-coupon rate,Analytic series,Yield ,Daily  ,1/07/1992,29/10/2021,RBA,https://www.rba.gov.au/statistics/historical-data.html 
+10-year Zero-coupon rate,Analytic series,Yield ,Daily  ,1/07/1992,29/10/2021,RBA,https://www.rba.gov.au/statistics/historical-data.html 
+Mortgage rate,Lending rates; Housing loans; Banks; Variable; Standard; Owner-occupier,Yield ,Monthly,1/02/1976,30/11/2021,RBA,https://www.rba.gov.au/statistics/tables/ 
+Home value index,,Index,Monthly ,1/01/1980,1/05/2021,coreLogic,
+Hedonic rental yields ,,Yield ,Monthly ,1/01/1980,1/05/2021,coreLogic,
+GDP per capita,Chain volume measures; seasonally adjusted,$million,Quarterly ,1/09/1959,1/06/2021,ABS,https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-national-income-expenditure-and-product/latest-release#data-download 
+CPI,Sydney; seasonally adjusted,Index,Quarterly ,1/09/1948,1/09/2021,ABS,https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release#data-download 
+Corporate bond yields ,Non-financial corporate BBB-rated bonds – Yield – 10 year target tenor,Yield ,Monthly ,1/01/2005,1/09/2021,RBA,https://www.rba.gov.au/statistics/tables/ 
+S&P/ASX 200,Daily closing price,$,Daily  ,1/01/1993,20/11/2021,Refinitiv Eikon  ,
+Unemployment rate ,NSW; seasonally adjusted, Rate ,Monthly  ,1/02/1978,1/09/2021,ABS,https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release#data-downloads 
+Forex ,Australian Dollar Trade-weighted Index,Index,Daily  ,1/12/1983,1/11/2021,RBA,https://www.rba.gov.au/statistics/historical-data.html 

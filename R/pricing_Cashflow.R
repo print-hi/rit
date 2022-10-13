@@ -223,7 +223,7 @@ cf_pooled_annuity <- function(policy, state, data) {
     }
 
     # Deduct initial costs from cashflow
-    cf[1] <- cf[1] - policy$benefit * sum(ax)
+    # cf[1] <- cf[1] - policy$benefit * sum(ax)
 
     return(cf)
 }

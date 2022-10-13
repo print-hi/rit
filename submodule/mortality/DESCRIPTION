@@ -1,0 +1,19 @@
+Package: rit-mortality
+Title: Retirement Income Toolkit: Mortality only
+Version: 0.1
+Authors@R: person(given = "School of Risk & Actuarial", family = "UNSW",
+           role = c("aut", "cre"), email = "void@unsw.edu.au",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Toolkit of R modules for researchers to use in modelling 
+             retirement and age care risks, simulating cash flows for a 
+             range of retirement and long-term care products including 
+             Australian government support for Age Pensions and Aged-Care 
+             based on means-testing, pricing and quantifying risk for a 
+             range of finance and insurance products to finance retirement 
+             and aged care risks.
+Depends: dplyr, ggplot2, tidyr, expm, moments, readxl, matrixStats, StMoMo, R (>= 2.10)
+License: `use_mit_license()`, `use_gpl3_license()` or pick a license
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
