@@ -21,7 +21,7 @@
 #'
 #' @examples example
 #'
-health3_create_life_table <- function(trans_probs, init_age, init_state = 0, cohort) {
+health3_create_life_table <- function(trans_probs, init_age, init_state, cohort) {
     # flagging errors
     if (init_age < 65 | init_age > 110) {
       stop('invalid age')

@@ -139,7 +139,7 @@ health3_aflF <- function(init_age, init_state, female, year, param_file, n = 100
   for (x in 1:n) {
     # simulate new frailty path for each iteration
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    SP <- health3_simulate_paths(TP, init_age, init_state)
+    SP <- health3_simulate_paths(TP, init_age, init_state, cohort=10000)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i, ]
       future_lifetimes[(x-1)*10000+i] <- which(row_val == -1)[1]-1-0.5
@@ -287,7 +287,7 @@ health3_hflF <- function(init_age, init_state, female, year, param_file, n = 100
   healthy_lifetimes <- rep(0, n*10000)
   for (x in 1:n) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    SP <- health3_simulate_paths(TP, init_age, init_state)
+    SP <- health3_simulate_paths(TP, init_age, init_state, cohort=10000)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
       if (init_state == 0) {
@@ -441,7 +441,7 @@ health3_dflF <- function(init_age, init_state, female, year, param_file, n = 100
   # simulate n unique latent factors
   for (x in 1:n) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    SP <- health3_simulate_paths(TP, init_age, init_state)
+    SP <- health3_simulate_paths(TP, init_age, init_state, cohort=10000)
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]
       if (init_state == 1) {
@@ -584,7 +584,7 @@ health3_time_to_disabledF <- function(init_age, female, year, param_file, n = 10
   first_time <- rep(0, n*10000)
   for (x in 1:n) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    SP <- health3_simulate_paths(TP, init_age, 0)
+    SP <- health3_simulate_paths(TP, init_age, 0, cohort=10000)
     for (i in nrow(SP)) {
       row_val <- SP[i,]
       if (1 %in% row_val) {
@@ -763,7 +763,7 @@ health3_survival_statsF <- function(init_age, init_state, female, year, param_fi
 
   for (x in 1:n) {
     TP <- health3_get_trans_probs('F', param_file, init_age, female, year)
-    SP <- health3_simulate_paths(TP, init_age, init_state)
+    SP <- health3_simulate_paths(TP, init_age, init_state, cohort=10000)
 
     for (i in 1:nrow(SP)) {
       row_val <- SP[i,]

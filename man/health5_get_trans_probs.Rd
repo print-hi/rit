@@ -10,12 +10,13 @@ health5_get_trans_probs(
   init_age,
   female,
   wave_index,
-  latent = 0
+  latent
 )
 }
 \arguments{
-\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
+\item{model_type}{S for static model, T for trend model, F for frailty model}
+
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
 
 \item{init_age}{the initial age of the transition probability matrices}
 
@@ -24,8 +25,6 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 \item{wave_index}{the wave index}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
-
-\item{model}{S for static model, T for trend model, F for frailty model}
 }
 \value{
 a list of 5 times 5 transition probability matrices, from the initial age to age 110
@@ -34,6 +33,5 @@ a list of 5 times 5 transition probability matrices, from the initial age to age
 the function to get a full list of transition probability matrices from the initial age to age 110
 }
 \examples{
-trans_prob_matrix_age65to110=health5_get_trans_probs(model_type='F', param_file=params_5_frailty, 
-init_age=65, female=0, wave_index=8)
+trans_probs=health5_get_trans_probs(model_type='F', param_file=US_HRS_5, init_age=65, female=0, wave_index=8, latent=0)
 }

@@ -23,5 +23,5 @@ line plot denoting Probability of surviving to each different state
 Create a plot of survival probabilities to different states.
 }
 \examples{
-example
+prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 }

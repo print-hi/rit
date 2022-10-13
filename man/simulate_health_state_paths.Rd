@@ -34,5 +34,5 @@ for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state, 
 Simulates the path each life takes in an initial cohort using transition probabilities
 }
 \examples{
-example
+simulated_path <- simulate_health_state_paths(trans_probs, init_age=65, init_state = 0, cohort = 10000)
 }

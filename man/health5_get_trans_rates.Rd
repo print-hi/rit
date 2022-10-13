@@ -16,14 +16,13 @@ health5_get_trans_rates(
 \arguments{
 \item{model_type}{S for static model, T for trend model, F for frailty model}
 
-\item{param_file}{matrix of estimated parameters to construct the five state model. The rows are beta, gamma_age,
-gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns are 1-12 transition types.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
 
 \item{age}{age of the individual}
 
 \item{female}{female 1 if female, 0 if male}
 
-\item{wave_index}{the wave index}
+\item{wave_index}{the wave index = (interview year - 1998)/2 + 1}
 
 \item{latent}{initial value of latent factor, normally take the value 0}
 }
@@ -34,6 +33,5 @@ gamma_f, phi (if trend or frailty model), alpha (if frailty model). The columns 
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=health5_get_trans_rates(model_type='F',param_file=params_5_frailty, 
-age=65, female=0, wave_index=8, latent=0)
+transition_rates=health5_get_trans_rates(model_type='F',param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
 }

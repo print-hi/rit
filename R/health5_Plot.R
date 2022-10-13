@@ -1,6 +1,4 @@
-# Functions to create different plots
-
-#' Create Survival Probability Plots
+#' Functions to create different plots
 #'
 #' Create a plot of survival probabilities to H, M, D, MD and Dead states.
 #'
@@ -19,7 +17,7 @@
 #'
 #' @import tidyr dplyr ggplot2
 #'
-#' @examples example
+#' @examples health5_prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 health5_prob_plots <- function(init_state, init_age, trans_probs) {
   # flagging errors
   if (init_age < 65 | init_age > 110) {
@@ -48,14 +46,14 @@ lifetable=create_life_table(trans_probs, init_age, init_state, cohort = 1)
                               'Dead'= lifetable[,6])
 
   updated_df <- survival_df %>%
-    select(age, H, M, D, MD, Dead) %>%
+    dplyr::select(age, H, M, D, MD, Dead) %>%
     tidyr::gather(key = 'Type', value = 'value', -age)
 
-  surv_plot <- ggplot(updated_df, aes(x = age, y = value)) +
-    geom_line(aes(color = Type)) +
-    scale_color_manual(labels = c('D', 'Dead', 'H', 'M', 'MD'),
+  surv_plot <- ggplot2::ggplot(updated_df, aes(x = age, y = value)) +
+      ggplot2::geom_line(aes(color = Type)) +
+      ggplot2::scale_color_manual(labels = c('D', 'Dead', 'H', 'M', 'MD'),
                        values = c('darkolivegreen2', 'Red', 'skyblue1','blue','yellow')) +
-    ggtitle('Probability of Surviving to each Different State')
+      ggplot2::ggtitle('Probability of Surviving to each Different State')
   return(surv_plot)
 }
 

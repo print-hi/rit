@@ -136,14 +136,14 @@ health3_prob_plots <- function(init_state, init_age, trans_probs) {
                               'disabled' = disabled_probs)
 
   updated_df <- survival_df %>%
-    select(age, alive, healthy, disabled) %>%
+    dplyr::select(age, alive, healthy, disabled) %>%
     tidyr::gather(key = 'Type', value = 'value', -age)
 
-  surv_plot <- ggplot(updated_df, aes(x = age, y = value)) +
-    geom_line(aes(color = Type)) +
-    scale_color_manual(labels = c('Alive', 'Disabled', 'Healthy'),
+  surv_plot <- ggplot2::ggplot(updated_df, aes(x = age, y = value)) +
+     ggplot2::geom_line(aes(color = Type)) +
+     ggplot2::scale_color_manual(labels = c('Alive', 'Disabled', 'Healthy'),
                        values = c('darkolivegreen2', 'lightcoral', 'skyblue1')) +
-    ggtitle('Probability of Surviving to each Different State')
+     ggplot2::ggtitle('Probability of Surviving to each Different State')
 
   return(surv_plot)
 }

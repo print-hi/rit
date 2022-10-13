@@ -2,7 +2,7 @@
 % Please edit documentation in R/health5_Plot.R
 \name{health5_prob_plots}
 \alias{health5_prob_plots}
-\title{Create Survival Probability Plots}
+\title{Functions to create different plots}
 \usage{
 health5_prob_plots(init_state, init_age, trans_probs)
 }
@@ -21,5 +21,5 @@ line plot with 5 lines, each denoting probabilities of being in the states H, M,
 Create a plot of survival probabilities to H, M, D, MD and Dead states.
 }
 \examples{
-example
+health5_prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 }

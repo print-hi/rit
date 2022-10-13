@@ -7,7 +7,7 @@
 health5_first_time_stats(simulated_path, state)
 }
 \arguments{
-\item{simulated_path}{the simulated path of individuals from the function simulate_individual_path}
+\item{simulated_path}{the simulated path of individuals from the function \code{simulate_health_state_paths}}
 
 \item{state}{0 for first time leaving H state, only useful when initial state is 0
 1 for first time entering M state

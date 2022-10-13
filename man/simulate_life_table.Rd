@@ -50,10 +50,10 @@ for 5-state model: 0 for H state, 1 for M state, 2 for D state, 3 for MD state}
 list of life tables (default) or expected life table (mean == TRUE)
 }
 \description{
-Simulate life table for frailty model starting from initial age to
-max age of 110 for 3 state model
+Simulate life table for for 3 state or 5 state frailty model starting from initial age to
+max age of 110
 }
 \examples{
-example
+lifetable_simulated <- simulate_life_table(n_states=5, model_type='F', param_file=US_HRS_5, init_age=65, female=0, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE)
 
 }
