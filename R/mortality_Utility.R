@@ -281,20 +281,20 @@ generate_default_qx <- function(init_age, sex = "F", closure_age = 130) {
     young_ages <- 55:89
 
     if (sex == "F") {
-        AUS_StMoMo <- StMoMoData(mortality_AUS_data, series = "female")
-        rates_hist <- mortality_AUS_data$rate$female[as.character(young_ages), ]
+        AUS_StMoMo <- StMoMo::StMoMoData(rit::mortality_AUS_data, series = "female")
+        rates_hist <- rit::mortality_AUS_data$rate$female[as.character(young_ages), ]
     } else {
-        AUS_StMoMo <- StMoMoData(mortality_AUS_data, series = "male")
-        rates_hist <- mortality_AUS_data$rate$male[as.character(young_ages), ]
+        AUS_StMoMo <- StMoMo::StMoMoData(rit::mortality_AUS_data, series = "male")
+        rates_hist <- rit::mortality_AUS_data$rate$male[as.character(young_ages), ]
     }
 
     # Using M7 model to Forecast Rates
-    M7 <- m7()
-    AUS_Ini_Data <- central2initial(AUS_StMoMo)
+    M7 <- StMoMo::m7()
+    AUS_Ini_Data <- StMoMo::central2initial(AUS_StMoMo)
     ages_fit <- young_ages
-    wxy <- genWeightMat(ages = ages_fit, years = AUS_Ini_Data$years, clip = 3)
-    M7_fit <- fit(M7, data = AUS_Ini_Data, ages.fit = ages_fit, wxt = wxy)
-    M7_for <- forecast(M7_fit, h = 100)
+    wxy <- StMoMo::genWeightMat(ages = ages_fit, years = AUS_Ini_Data$years, clip = 3)
+    M7_fit <- StMoMo::fit(M7, data = AUS_Ini_Data, ages.fit = ages_fit, wxt = wxy)
+    M7_for <- forecast::forecast(M7_fit, h = 100)
 
     # Mortality Rate Completion with Kannisto Method
     old_ages <- 90:closure_age
