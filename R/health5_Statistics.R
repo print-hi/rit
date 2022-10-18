@@ -13,6 +13,10 @@
 #' @export health5_first_time_stats
 #'
 #' @examples
+#' trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
+#' param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
+#' simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
+#' init_age=87, init_state = 0, cohort = 100)
 #' first_time_H=health5_first_time_stats(simulated_individual_path, 0)
 health5_first_time_stats=function(simulated_path, state){
     first_time=matrix(nrow=nrow(simulated_path),ncol=1)
@@ -60,7 +64,11 @@ health5_first_time_stats=function(simulated_path, state){
 #' a column that consists the total time in different states for a number of individuals
 #' @export health5_total_time_stats
 #'
-#' @examples total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
+#' @examples trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
+#' param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
+#' simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
+#' init_age=87, init_state = 0, cohort = 100)
+#' total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
 health5_total_time_stats=function(simulated_path, state){
     total_time=matrix(nrow=nrow(simulated_path),ncol=1)
     if (state==0){
@@ -130,7 +138,11 @@ health5_total_time_stats=function(simulated_path, state){
 #' mean and variance of the list of values
 #' @export health5_stats_produce
 #'
-#' @examples stats_first_time_leave_H=health5_stats_produce(health5_first_time_stats(simulated_individual_path, 0))
+#' @examples trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
+#' param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
+#' simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
+#' init_age=87, init_state = 0, cohort = 100)
+#' stats_first_time_leave_H=health5_stats_produce(health5_first_time_stats(simulated_individual_path, 0))
 health5_stats_produce=function(input){
     output=matrix(nrow=1, ncol = 2)
     colnames(output) <- c('expected_value', 'st_dev')

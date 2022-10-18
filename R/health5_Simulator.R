@@ -14,8 +14,10 @@
 #' for each row it starts from the initial age as an input, and end at age 110
 #' @export health5_simulate_paths
 #'
-#' @examples
-#' simulated_individual_path=health5_simulate_paths(trans_probs, init_age=65, init_state=0, cohort=10000)
+#' @examples trans_probs <- get_trans_probs(n_states=5, model_type='T', 
+#' param_file=US_HRS_5, init_age=65, female=0, wave_index=13, latent = 0)
+#' simulated_individual_path=health5_simulate_paths(trans_probs, init_age=65, 
+#' init_state=0, cohort=10000)
 health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohort) {
     # init_state 0 for H, 1 for M, 2 for D, 3 for MD, -1 for Dead
 
@@ -70,8 +72,10 @@ health5_simulate_paths <- function(list_trans_probs, init_age, init_state, cohor
 #'
 #' @export health5_create_life_table
 #'
-#' @examples
-#' created_lifetable=health5_create_life_table(list_trans_probs=trans_probs,init_age=65,init_state=0,cohort=10000)
+#' @examples trans_probs <- get_trans_probs(n_states=5, model_type='T', 
+#' param_file=US_HRS_5, init_age=65, female=0, wave_index=13, latent = 0)
+#' created_lifetable=health5_create_life_table(list_trans_probs=trans_probs,
+#' init_age=65,init_state=0,cohort=10000)
 health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
         # list of 46 matrices of transition probabilities for this simulation
         #list of lifetables
@@ -120,7 +124,8 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
 #'#' @param model_type
 #' choose F for Frailty model
 #' @param param_file
-#' matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.
+#' matrix of estimated parameters to construct the five state model. Generally, 
+#' use US_HRS_5 for 5 state model.
 #' @param female
 #' female 1 if female, 0 if male
 #' @param wave_index
@@ -146,7 +151,9 @@ health5_create_life_table=function(list_trans_probs,init_age,init_state,cohort){
 #' @export health5_simulate_life_table
 #'
 #' @examples
-#' simulated_lifetable=health5_simulate_life_table(model_type='F', param_file=US_HRS_5, female=0, wave_index=8,latent=0,init_age=65,init_state=0,n_sim=100,cohort=10000,mean=FALSE)
+#' simulated_lifetable=health5_simulate_life_table(model_type='F', 
+#' param_file=US_HRS_5, female=0, wave_index=8,latent=0,init_age=65,init_state=0,
+#' n_sim=100,cohort=10000,mean=FALSE)
 health5_simulate_life_table=function(model_type, param_file, female, wave_index,latent,init_age,init_state,n_sim, cohort, mean){
     if (model_type != 'F') {
         stop('use frailty model to simulate lifetables')

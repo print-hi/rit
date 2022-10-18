@@ -143,7 +143,7 @@ get_path_prices <- function(cashflows) {
     }
 
     # Calculate cumulative product of factors
-    cmsdf <- rowCumprods((1/sdf))
+    cmsdf <- matrixStats::rowCumprods((1/sdf))
 
     # Calculate discounted value of cashflows for each path
     value <- rowSums(cashflows$cf * cmsdf)
@@ -169,14 +169,14 @@ get_price_stats <- function(prices) {
     # Calculate and organise summary statistics into list
     stats <- list(size = length(prices),
                   mean = mean(prices),
-                  var = var(prices),
-                  sd = sqrt(var(prices)),
+                  var = stats::var(prices),
+                  sd = sqrt(stats::var(prices)),
                   min = min(prices),
                   max = max(prices),
-                  skew = skewness(prices),
-                  kurtosis = kurtosis(prices),
-                  median = median(prices),
-                  quantile = quantile(prices, probs = probs))
+                  skew = e1071::skewness(prices),
+                  kurtosis = e1071::kurtosis(prices),
+                  median = stats::median(prices),
+                  quantile = stats::quantile(prices, probs = probs))
 
     # Otherwise, return expected value
     return(stats)

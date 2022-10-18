@@ -23,5 +23,8 @@ line plot denoting Probability of surviving to each different state
 Create a plot of survival probabilities to different states.
 }
 \examples{
+trans_probs=get_trans_probs(n_states=5, model_type='F', 
+param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, 
+latent = 0)
 prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 }

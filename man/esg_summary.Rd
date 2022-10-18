@@ -9,13 +9,22 @@ esg_summary(paths, probs = seq(0, 1, 0.25), na.rm = TRUE)
 \arguments{
 \item{paths}{List or dataframe containing time series data.}
 
-\item{probs}{Numeric vector of probabilities with values in \link{0,1}. Default is 0\%, 25\%, 50\%, 75\%, 100\%-tiles.}
+\item{probs}{Numeric vector of probabilities with values in \link{0,1}.
+Default is 0\%, 25\%, 50\%, 75\%, 100\%-tiles.}
 
-\item{na.rm}{logical, if true, any NA and NaN's are removed from data before computing the statistics. Default TRUE.}
+\item{na.rm}{logical, if true, any NA and NaN's are removed from data before
+computing the statistics. Default TRUE.}
 }
 \value{
-List of dataframe containing summary statistics for each period across trajectories.
+List of dataframe containing summary statistics for each period
+across trajectories.
 }
 \description{
-Provides period-by-period summary statistics including quantiles, mean, and standard deviation for time series data.
+Provides period-by-period summary statistics including quantiles, mean,
+and standard deviation for time series data.
+}
+\examples{
+sim = esg_afns_simulator(num_years = 10, num_paths = 10, 
+frequency = "year", type = "correlated", model = "interest_rate") 
+series_summ = esg_summary (paths = sim, probs = seq(0,1,0.2), na.rm = TRUE)
 }

@@ -2,7 +2,8 @@
 % Please edit documentation in R/health5_Transition.R
 \name{health5_get_trans_probs}
 \alias{health5_get_trans_probs}
-\title{the function to get a full list of transition probability matrices from the initial age to age 110}
+\title{the function to get a full list of transition probability matrices from the
+initial age to age 110}
 \usage{
 health5_get_trans_probs(
   model_type,
@@ -16,7 +17,8 @@ health5_get_trans_probs(
 \arguments{
 \item{model_type}{S for static model, T for trend model, F for frailty model}
 
-\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally,
+use US_HRS_5 for 5 state model.}
 
 \item{init_age}{the initial age of the transition probability matrices}
 
@@ -27,10 +29,12 @@ health5_get_trans_probs(
 \item{latent}{initial value of latent factor, normally take the value 0}
 }
 \value{
-a list of 5 times 5 transition probability matrices, from the initial age to age 110
+a list of 5 times 5 transition probability matrices, from the
+initial age to age 110
 }
 \description{
-the function to get a full list of transition probability matrices from the initial age to age 110
+the function to get a full list of transition probability matrices from the
+initial age to age 110
 }
 \examples{
 trans_probs=health5_get_trans_probs(model_type='F', param_file=US_HRS_5, init_age=65, female=0, wave_index=8, latent=0)

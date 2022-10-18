@@ -25,7 +25,9 @@
 #'
 #' @export
 #' @import expm
-#' @examples trans_probs=get_trans_probs(n_states=5, model_type='F', param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, latent = 0)
+#' @examples trans_probs=get_trans_probs(n_states=5, model_type='F', 
+#' param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, 
+#' latent = 0)
 #'
 get_trans_probs <- function(n_states, model_type, param_file, init_age, female, year = 2012, wave_index = 8, latent = 0) {
 
@@ -71,7 +73,10 @@ get_trans_probs <- function(n_states, model_type, param_file, init_age, female, 
 #'
 #' @export
 #'
-#' @examples lifetable <- create_life_table(trans_probs, init_age=65, init_state = 0, cohort = 100000)
+#' @examples trans_probs=get_trans_probs(n_states=5, model_type='F', 
+#' param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, 
+#' latent = 0)
+#' lifetable <- create_life_table(trans_probs, init_age=65, init_state = 0, cohort = 100000)
 #'
 create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 100000) {
 
@@ -124,7 +129,9 @@ create_life_table <- function(trans_probs, init_age, init_state = 0, cohort = 10
 #'
 #' @export
 #'
-#' @examples lifetable_simulated <- simulate_life_table(n_states=5, model_type='F', param_file=US_HRS_5, init_age=65, female=0, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE)
+#' @examples lifetable_simulated <- simulate_life_table(n_states=5, model_type='F', 
+#' param_file=US_HRS_5, init_age=65, female=0, year = 2012, init_state = 0, 
+#' wave_index = 8,latent=0,n_sim=100,cohort=100,mean=FALSE)
 #'
 simulate_life_table <- function(n_states, model_type, param_file, init_age, female, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE) {
 
@@ -165,7 +172,11 @@ simulate_life_table <- function(n_states, model_type, param_file, init_age, fema
 #'
 #' @export
 #'
-#' @examples simulated_path <- simulate_health_state_paths(trans_probs, init_age=65, init_state = 0, cohort = 10000)
+#' @examples trans_probs=get_trans_probs(n_states=5, model_type='F', 
+#' param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, 
+#' latent = 0)
+#' simulated_path <- simulate_health_state_paths(trans_probs, init_age=65, 
+#' init_state = 0, cohort = 10000)
 simulate_health_state_paths <- function(trans_probs, init_age, init_state = 0, cohort = 10000) {
 
   if (length(trans_probs[[1]][1,]) == 3) {
@@ -200,7 +211,10 @@ simulate_health_state_paths <- function(trans_probs, init_age, init_state = 0, c
 #'
 #' @import tidyr dplyr ggplot2
 #'
-#' @examples prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
+#' @examples trans_probs=get_trans_probs(n_states=5, model_type='F', 
+#' param_file=US_HRS_5, init_age=65, female=0, year = 2012, wave_index = 8, 
+#' latent = 0)
+#' prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
 
 prob_plots <- function (init_state, init_age, trans_probs) {
 

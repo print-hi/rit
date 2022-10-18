@@ -18,7 +18,8 @@ health5_simulate_life_table(
 )
 }
 \arguments{
-\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally,
+use US_HRS_5 for 5 state model.}
 
 \item{female}{female 1 if female, 0 if male}
 
@@ -46,5 +47,7 @@ or the mean life table when mean=TRUE
 choose F for Frailty model
 }
 \examples{
-simulated_lifetable=health5_simulate_life_table(model_type='F', param_file=US_HRS_5, female=0, wave_index=8,latent=0,init_age=65,init_state=0,n_sim=100,cohort=10000,mean=FALSE)
+simulated_lifetable=health5_simulate_life_table(model_type='F', 
+param_file=US_HRS_5, female=0, wave_index=8,latent=0,init_age=65,init_state=0,
+n_sim=100,cohort=10000,mean=FALSE)
 }

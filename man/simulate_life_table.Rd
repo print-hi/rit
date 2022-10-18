@@ -54,6 +54,8 @@ Simulate life table for for 3 state or 5 state frailty model starting from initi
 max age of 110
 }
 \examples{
-lifetable_simulated <- simulate_life_table(n_states=5, model_type='F', param_file=US_HRS_5, init_age=65, female=0, year = 2012, init_state = 0, wave_index = 8,latent=0,n_sim=100,cohort=100000,mean=FALSE)
+lifetable_simulated <- simulate_life_table(n_states=5, model_type='F', 
+param_file=US_HRS_5, init_age=65, female=0, year = 2012, init_state = 0, 
+wave_index = 8,latent=0,n_sim=100,cohort=100,mean=FALSE)
 
 }

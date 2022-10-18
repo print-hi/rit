@@ -23,5 +23,8 @@ for each row it starts from the initial age as an input, and end at age 110
 function to get the path of set number of individuals
 }
 \examples{
-simulated_individual_path=health5_simulate_paths(trans_probs, init_age=65, init_state=0, cohort=10000)
+trans_probs <- get_trans_probs(n_states=5, model_type='T', 
+param_file=US_HRS_5, init_age=65, female=0, wave_index=13, latent = 0)
+simulated_individual_path=health5_simulate_paths(trans_probs, init_age=65, 
+init_state=0, cohort=10000)
 }

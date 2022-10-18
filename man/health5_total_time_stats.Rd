@@ -23,5 +23,9 @@ a column that consists the total time in different states for a number of indivi
 function to get the total time in different states for a number of individuals
 }
 \examples{
+trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
+param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
+simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
+init_age=87, init_state = 0, cohort = 100)
 total_time_alive=health5_total_time_stats(simulated_individual_path, 4)
 }

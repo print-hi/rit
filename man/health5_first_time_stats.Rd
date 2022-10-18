@@ -22,5 +22,9 @@ a column that consists the first time leaving or entering the state for a number
 function to get the first time leaving or entering different states for a number of individuals
 }
 \examples{
+trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
+param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
+simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
+init_age=87, init_state = 0, cohort = 100)
 first_time_H=health5_first_time_stats(simulated_individual_path, 0)
 }

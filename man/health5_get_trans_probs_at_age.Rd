@@ -16,7 +16,8 @@ health5_get_trans_probs_at_age(
 \arguments{
 \item{model_type}{S for static model, T for trend model, F for frailty model}
 
-\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally,
+use US_HRS_5 for 5 state model.}
 
 \item{age}{age of the individual}
 
@@ -27,11 +28,13 @@ health5_get_trans_probs_at_age(
 \item{latent}{initial value of latent factor, normally take the value 0}
 }
 \value{
-5 times 5 matrix of transitions probabilities, the states are H M D MD Dead on the rows and columns
+5 times 5 matrix of transitions probabilities, the states are H M D MD Dead
+on the rows and columns
 }
 \description{
 function to get a matrix of transition probabilities at a certain age
 }
 \examples{
-transition_probs_65=health5_get_trans_probs_at_age(model_type='F', param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
+transition_probs_65=health5_get_trans_probs_at_age(model_type='F', 
+param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
 }

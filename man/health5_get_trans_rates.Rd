@@ -16,7 +16,8 @@ health5_get_trans_rates(
 \arguments{
 \item{model_type}{S for static model, T for trend model, F for frailty model}
 
-\item{param_file}{matrix of estimated parameters to construct the five state model. Generally, use US_HRS_5 for 5 state model.}
+\item{param_file}{matrix of estimated parameters to construct the five state model. Generally,
+use US_HRS_5 for 5 state model.}
 
 \item{age}{age of the individual}
 
@@ -33,5 +34,6 @@ health5_get_trans_rates(
 function to calculate transition rates at a certain age
 }
 \examples{
-transition_rates=health5_get_trans_rates(model_type='F',param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
+transition_rates=health5_get_trans_rates(model_type='F',param_file=US_HRS_5, 
+age=65, female=0, wave_index=8, latent=0)
 }

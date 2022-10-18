@@ -23,5 +23,8 @@ the row represents the age from the input initial age to 110, and the columns ar
 the function to create lifetable for Static or Trend models
 }
 \examples{
-created_lifetable=health5_create_life_table(list_trans_probs=trans_probs,init_age=65,init_state=0,cohort=10000)
+trans_probs <- get_trans_probs(n_states=5, model_type='T', 
+param_file=US_HRS_5, init_age=65, female=0, wave_index=13, latent = 0)
+created_lifetable=health5_create_life_table(list_trans_probs=trans_probs,
+init_age=65,init_state=0,cohort=10000)
 }
