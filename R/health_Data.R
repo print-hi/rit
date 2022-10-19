@@ -3,10 +3,10 @@
 #' A dataset containing the parameters of the 5-state static, trend and frailty cox regression
 #' models estimated with the 1998-2014 US Health and Retirement Study data.
 #'
-#' @format A data frame with 12 rows and 14 variables:
+#' @format A data frame with 15 rows and 14 variables:
 #' \describe{
-#'   \item{Model}{static, trend or frailty}
-#'   \item{Coef}{the covariate that the coefficient is corresponding to}
+#'    \item{Model}{static, trend or frailty}
+#'    \item{Coef}{the covariate that the coefficient is corresponding to}
 #'    \item{trans1}{parameter estimate for H to M transition}
 #'    \item{trans2}{parameter estimate for H to D transition}
 #'    \item{trans3}{parameter estimate for H to MD transition}
@@ -31,8 +31,6 @@
 #'
 #' @format A data frame with 3 rows and 12 variables:
 #' \describe{
-#'   \item{Model}{static, trend or frailty}
-#'   \item{Coef}{the covariate that the coefficient is corresponding to}
 #'    \item{trans1}{parameter estimate for H to M transition}
 #'    \item{trans2}{parameter estimate for H to D transition}
 #'    \item{trans3}{parameter estimate for H to MD transition}
@@ -57,8 +55,6 @@
 #'
 #' @format A data frame with 4 rows and 12 variables:
 #' \describe{
-#'   \item{Model}{static, trend or frailty}
-#'   \item{Coef}{the covariate that the coefficient is corresponding to}
 #'    \item{trans1}{parameter estimate for H to M transition}
 #'    \item{trans2}{parameter estimate for H to D transition}
 #'    \item{trans3}{parameter estimate for H to MD transition}
@@ -83,8 +79,6 @@
 #'
 #' @format A data frame with 5 rows and 12 variables:
 #' \describe{
-#'   \item{Model}{static, trend or frailty}
-#'   \item{Coef}{the covariate that the coefficient is corresponding to}
 #'    \item{trans1}{parameter estimate for H to M transition}
 #'    \item{trans2}{parameter estimate for H to D transition}
 #'    \item{trans3}{parameter estimate for H to MD transition}
@@ -100,3 +94,45 @@
 #' }
 #' @source \url{https://www.cepar.edu.au/publications/working-papers/multi-state-model-functional-disability-and-health-status-presence-systematic-trend-and-uncertainty}
 "params_5_frailty"
+
+#' Parameters of 3-state Cox Regression Model estimated from US HRS
+#'
+#' A dataset containing the parameters of the 3-state static, trend and frailty cox regression
+#' models estimated with the 1998-2014 US Health and Retirement Study data.
+#'
+#' @format A data frame with 15 rows and 6 variables:
+#' \describe{
+#'    \item{Model}{static, trend or frailty}
+#'    \item{Coef}{the covariate that the coefficient is corresponding to}
+#'    \item{trans1}{parameter estimate for H to M transition}
+#'    \item{trans2}{parameter estimate for H to D transition}
+#'    \item{trans3}{parameter estimate for H to MD transition}
+#'    \item{trans4}{parameter estimate for H to Dead transition}
+#' }
+#' @source \url{https://cepar.edu.au/publications/working-papers/functional-disability-systematic-trends-and-uncertainty-comparison-between-china-and-us}
+"US_HRS"
+
+#' Parameters of 3-state Cox Regression Model estimated from CLHLS
+#'
+#' A dataset containing the parameters of the 3-state static, trend and frailty cox regression
+#' models estimated with the 1998-2014 CLHLS data.
+#'
+#' @format A data frame with 15 rows and 6 variables:
+#' \describe{
+#'    \item{Model}{static, trend or frailty}
+#'    \item{Coef}{the covariate that the coefficient is corresponding to}
+#'    \item{trans1}{parameter estimate for H to M transition}
+#'    \item{trans2}{parameter estimate for H to D transition}
+#'    \item{trans3}{parameter estimate for H to MD transition}
+#'    \item{trans4}{parameter estimate for H to Dead transition}
+#' }
+#' @source \url{https://cepar.edu.au/publications/working-papers/functional-disability-systematic-trends-and-uncertainty-comparison-between-china-and-us}
+"china_CLHLS"
+
+#' 10000 simulated paths for males aged 65 in 2012 initially healthy under the 5-state trend model
+#'
+#' A matrix containing 10000 simulated paths for males aged 65 in 2012 initially healthy under the 5-state trend model with parameters estimated with US HRS data
+#' Each row of the matrix represent the path of one individual from age 65 to 110
+#' Used as an inbuilt variable to illustrate the statistics functions for the 5-state health model
+#'
+"health5_simulated_path_example"

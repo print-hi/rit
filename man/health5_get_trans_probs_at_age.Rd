@@ -35,6 +35,5 @@ on the rows and columns
 function to get a matrix of transition probabilities at a certain age
 }
 \examples{
-transition_probs_65=health5_get_trans_probs_at_age(model_type='F', 
-param_file=US_HRS_5, age=65, female=0, wave_index=8, latent=0)
+example
 }

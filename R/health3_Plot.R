@@ -92,6 +92,7 @@ health3_surv_prob <- function(init_state, init_age, target_age, trans_probs, end
 #'
 #' @examples example
 health3_prob_plots <- function(init_state, init_age, trans_probs) {
+    age <- alive <- healthy <- disabled <- value <- Type <- NULL
   # flagging errors
   if (init_age < 65 | init_age > 110) {
     stop('invalid age')

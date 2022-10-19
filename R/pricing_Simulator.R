@@ -41,15 +41,15 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
         # Get matrix of states for each path
         if (policy$name[1] == "CA") {
             if (nrow(policy) == 2) {
-                probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
+                probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
             } else if (nrow(policy) == 4) {
-                probs <- get_trans_probs(5, 'S', US_HRS_5, age, sex == 'F')
+                probs <- get_trans_probs(5, 'S', rit::US_HRS_5, age, sex == 'F')
             } else {
                 stop("Error: CA policy object needs to have 2 or 4 rows")
             }
             state <- simulate_health_state_paths(probs, age, cohort = n)
         } else if (policy$name[1] == "RM") {
-            probs <- get_trans_probs(3, 'S', US_HRS, age, sex == 'F')
+            probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
             state <- simulate_health_state_paths(probs, age, cohort = n)
         } else {
             state <- get_aggregate_mortality(age, sex, seed, n)
@@ -202,13 +202,13 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 # ---- Health State Module
 
 get_health_state_3 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    trans_probs <-  get_trans_probs(3, 'T', US_HRS, age, (sex == "F"), year = 2022)
+    trans_probs <-  get_trans_probs(3, 'T', rit::US_HRS, age, (sex == "F"), year = 2022)
     return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 
 # TODO
 get_health_state_5 <- function(age = 65, sex = "F", seed = 0, n = 1000) {
-    trans_probs <-  get_trans_probs(5, 'T', US_HRS, age, (sex == "F"), year = 2012, wave_index = 8, latent = 0)
+    trans_probs <-  get_trans_probs(5, 'T', rit::US_HRS_5, age, (sex == "F"), year = 2012, wave_index = 8, latent = 0)
     return(simulate_health_state_paths(trans_probs, age, 0, n))
 }
 

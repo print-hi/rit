@@ -37,5 +37,5 @@ the function to get a full list of transition probability matrices from the
 initial age to age 110
 }
 \examples{
-trans_probs=health5_get_trans_probs(model_type='F', param_file=US_HRS_5, init_age=65, female=0, wave_index=8, latent=0)
+example
 }

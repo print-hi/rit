@@ -23,6 +23,10 @@
 #' @examples example
 #'
 health3_get_trans_probs <- function(model_type, param_file, init_age, female, year) {
+    b1 <- gamma_age1 <- gamma_gender1 <- gamma_time1 <- a1 <- NULL
+    b2 <- gamma_age2 <- gamma_gender2 <- gamma_time2 <- a2 <- NULL
+    b3 <- gamma_age3 <- gamma_gender3 <- gamma_time3 <- a3 <- NULL
+    b4 <- gamma_age4 <- gamma_gender4 <- gamma_time4 <- a4 <- NULL
     # flagging errors
     if (init_age < 65 | init_age >= 110) {
       stop('invalid age')

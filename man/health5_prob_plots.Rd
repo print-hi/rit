@@ -22,7 +22,5 @@ states H, M, D, MD, Dead respectively.
 Create a plot of survival probabilities to H, M, D, MD and Dead states.
 }
 \examples{
-trans_probs <- get_trans_probs(n_states=5, model_type='T', 
-param_file=US_HRS_5, init_age=65, female=0, wave_index=13, latent = 0)
-health5_prob_plots(init_state=0, init_age=65, trans_probs=trans_probs)
+example
 }

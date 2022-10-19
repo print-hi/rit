@@ -16,9 +16,5 @@ mean and variance of the list of values
 function to produce the mean and variance of a list of values
 }
 \examples{
-trans_probs_5 <- get_trans_probs(n_states=5, model_type='T', 
-param_file=US_HRS_5, init_age=87, female=0, wave_index=13, latent = 0)
-simulated_individual_path <- simulate_health_state_paths(trans_probs_5, 
-init_age=87, init_state = 0, cohort = 100)
-stats_first_time_leave_H=health5_stats_produce(health5_first_time_stats(simulated_individual_path, 0))
+stats=health5_stats_produce(health5_first_time_stats(health5_simulated_path_example, 0))
 }
