@@ -26,7 +26,7 @@
 #' @export simulate_cf
 #' @examples
 #' ap <- create_policy_AP(400000, 60000)
-#' cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
+#' cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
 simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = NULL, econ_var = NULL) {
 
     # Set cash flow function based on input policy
@@ -105,6 +105,8 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
 #' Seed for random generator
 #' @param n
 #' Number of paths to simulate (Monte-Carlo method)
+#' @param period
+#' Number of periods to simulate
 #' @param econ_var
 #' Simulated economic variables via Economic Scenario Generator
 #' @return

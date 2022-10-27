@@ -22,5 +22,5 @@ Policy object
 Generates policy object for Reverse Mortgage policies
 }
 \examples{
-rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)
+rm <- create_policy_RM(600000, 0.64, 0.01, 0.04)
 }

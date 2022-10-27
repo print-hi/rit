@@ -7,9 +7,9 @@
 plot_convergence(prices, seed = 9999)
 }
 \arguments{
-\item{seed}{Seed choice for random sampling}
+\item{prices}{Matrix of simulated cashflow paths}
 
-\item{cashflows}{Matrix of simulated cashflow paths}
+\item{seed}{Seed choice for random sampling}
 }
 \value{
 Convergence Plot

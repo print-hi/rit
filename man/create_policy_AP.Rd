@@ -18,5 +18,5 @@ Policy object
 Generates policy object for Account Based Pension policies
 }
 \examples{
-ap <- create_policy_AP(400000, 60000)
+ap <- create_policy_AP(1000000, 50000)
 }

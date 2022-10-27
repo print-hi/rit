@@ -19,7 +19,9 @@
 #' convergence + distribution plots
 #' @export value_policy
 #' @examples
-#' value <- value_policy(policy_object)
+#' la <- create_policy_LA(60000, 5, 0, 0.01)
+#' cf_la <- simulate_cf(la)
+#' val_la <- value_policy(la, cf_la)
 value_policy <- function(policy, cashflows, seed = 0) {
 
     if (nrow(cashflows$cf) > nrow(cashflows$sdf) || ncol(cashflows$cf) > ncol(cashflows$sdf))
@@ -112,7 +114,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
 ###### Economic Scenario Generator Module
 
 get_sdf <- function(n = 100, period = 100) {
-    var_sim <- get_var_simulations(period, n, frequency = 'year', return_sdf = TRUE)
+    var_sim <- esg_var_simulator(period, n, frequency = 'year', return_sdf = TRUE)
     sdf <- var_sim$discount_factors
     return(t(unname(sdf)))
 }
@@ -157,7 +159,7 @@ get_path_prices <- function(cashflows) {
 #' Calculates general statistics for a provided set of cashflows
 #'
 #' @name get_price_stats
-#' @param cashflows
+#' @param prices
 #' Matrix of simulated cashflow paths
 #' @return
 #' List of statistics
@@ -173,8 +175,8 @@ get_price_stats <- function(prices) {
                   sd = sqrt(stats::var(prices)),
                   min = min(prices),
                   max = max(prices),
-                  skew = e1071::skewness(prices),
-                  kurtosis = e1071::kurtosis(prices),
+                  skew = moments::skewness(prices),
+                  kurtosis = moments::kurtosis(prices),
                   median = stats::median(prices),
                   quantile = stats::quantile(prices, probs = probs))
 
@@ -188,7 +190,7 @@ get_price_stats <- function(prices) {
 #' Plots a convergence value for a provided set of cashflows
 #'
 #' @name plot_convergence
-#' @param cashflows
+#' @param prices
 #' Matrix of simulated cashflow paths
 #' @param seed
 #' Seed choice for random sampling
@@ -216,8 +218,8 @@ plot_convergence <- function(prices, seed = 9999) {
                    " paths)", sep = "")
     plot(x = breaks, y = expected, ylab = "Value", xlab = "Number of Paths",
          main = title)
-    abline(h = expected[length(expected)], lty=2)
-    p <- recordPlot()
+    graphics::abline(h = expected[length(expected)], lty=2)
+    p <- grDevices::recordPlot()
 
     return(p)
 
@@ -228,10 +230,8 @@ plot_convergence <- function(prices, seed = 9999) {
 #' Plots a histogram for a provided set of cashflows
 #'
 #' @name plot_distribution
-#' @param cashflows
+#' @param prices
 #' Matrix of simulated cashflow paths
-#' @param convergence
-#' If convergence = TRUE, plots convergence of price
 #' @return
 #' Distribution Plot
 plot_distribution <- function(prices) {
@@ -239,10 +239,10 @@ plot_distribution <- function(prices) {
     # Format histogram plot
     title <- paste("Distribution of Policy Valuation (", length(prices),
                    " paths)", sep = "")
-    hist(x = prices, breaks = 20, ylab = "Frequency", xlab = "Value",
+    graphics::hist(x = prices, breaks = 20, ylab = "Frequency", xlab = "Value",
          main = title, labels = TRUE)
 
-    p <- recordPlot()
+    p <- grDevices::recordPlot()
 
     return(p)
 

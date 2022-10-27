@@ -22,5 +22,5 @@ Policy object
 Generates policy object for Life Annuity  policies
 }
 \examples{
-la <- create_policy_LA(60000, 5, 0.04, 0.05)
+la <- create_policy_LA(60000, 5, 0, 0.01)
 }

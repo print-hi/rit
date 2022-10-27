@@ -7,7 +7,7 @@
 get_price_stats(prices)
 }
 \arguments{
-\item{cashflows}{Matrix of simulated cashflow paths}
+\item{prices}{Matrix of simulated cashflow paths}
 }
 \value{
 List of statistics

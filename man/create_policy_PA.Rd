@@ -22,5 +22,5 @@ Policy object
 Generates policy object for Pooled Annuity policies
 }
 \examples{
-pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
+pa <- create_policy_PA(60000, 10000, 0.05, 0.01)
 }

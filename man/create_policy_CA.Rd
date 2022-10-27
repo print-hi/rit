@@ -22,5 +22,5 @@ Policy object
 Generates policy object for Care Annuity policies
 }
 \examples{
-la <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
+ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(5, 0), c(0.04, 0.01))
 }

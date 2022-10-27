@@ -23,5 +23,7 @@ Conducts valuation of a given policy, providing summary statistics and
 convergence / distribution plots
 }
 \examples{
-value <- value_policy(policy_object)
+la <- create_policy_LA(60000, 5, 0, 0.01)
+cf_la <- simulate_cf(la)
+val_la <- value_policy(la, cf_la)
 }

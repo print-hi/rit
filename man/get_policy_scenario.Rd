@@ -17,6 +17,8 @@ get_policy_scenario(policy, age, sex, seed, n, period, econ_var)
 
 \item{n}{Number of paths to simulate (Monte-Carlo method)}
 
+\item{period}{Number of periods to simulate}
+
 \item{econ_var}{Simulated economic variables via Economic Scenario Generator}
 }
 \value{

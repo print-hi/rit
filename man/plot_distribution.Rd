@@ -7,9 +7,7 @@
 plot_distribution(prices)
 }
 \arguments{
-\item{cashflows}{Matrix of simulated cashflow paths}
-
-\item{convergence}{If convergence = TRUE, plots convergence of price}
+\item{prices}{Matrix of simulated cashflow paths}
 }
 \value{
 Distribution Plot

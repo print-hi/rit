@@ -38,5 +38,5 @@ Simulate cash flows using Monte-Carlo methods for various policies
 }
 \examples{
 ap <- create_policy_AP(400000, 60000)
-cf <- cashflow(policy = ap, age = 65, sex = "M", n = 1000)
+cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
 }

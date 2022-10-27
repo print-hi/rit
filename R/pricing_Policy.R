@@ -14,7 +14,7 @@
 #' Policy object
 #' @export create_policy_AP
 #' @examples
-#' ap <- create_policy_AP(400000, 60000)
+#' ap <- create_policy_AP(1000000, 50000)
 create_policy_AP <- function(balance, expenses) {
 
     if (length(balance) > 1)    stop("Invalid balance: length(balance) = 1")
@@ -30,7 +30,6 @@ create_policy_AP <- function(balance, expenses) {
 
     return(pol)
 }
-# ap <- create_policy_AP(balance = 500000, expenses = 25500)
 
 # ---------------------------------------------------------------------------- #
 # ------------------------------- Care Annuity ------------------------------- #
@@ -52,7 +51,7 @@ create_policy_AP <- function(balance, expenses) {
 #' Policy object
 #' @export create_policy_CA
 #' @examples
-#' la <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(8, 0), c(0.04, 0.05))
+#' ca <- create_policy_CA(c(60000, 1200), c(0, 0.04), c(5, 0), c(0.04, 0.01))
 create_policy_CA <- function(benefit, increase, min, loading) {
 
     if (sum(min < 0))       stop("Invalid min: min[i] > 0")
@@ -80,10 +79,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 
     return(pol)
 }
-# benefit <- c(12000, 24000, 24000, 18000)
-# increase <- c(0, 0.03, 0.03, 0.03)
-# min <- c(10, 0 , 0, 0)
-# ca <- create_policy_CA(benefit, increase, min, 0.01)
+
 
 # ---------------------------------------------------------------------------- #
 # ------------------------------- Life Annuity ------------------------------- #
@@ -105,7 +101,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 #' Policy object
 #' @export create_policy_LA
 #' @examples
-#' la <- create_policy_LA(60000, 5, 0.04, 0.05)
+#' la <- create_policy_LA(60000, 5, 0, 0.01)
 create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 
     if (length(defer) > 1)      stop("Invalid defer: length(defer) = 1")
@@ -126,7 +122,6 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 
     return(pol)
 }
-# la <- create_policy_LA(120000, 5, 0.04, 0.01)
 
 # ---------------------------------------------------------------------------- #
 # ------------------------------ Pooled Annuity ------------------------------ #
@@ -148,7 +143,7 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 #' Policy object
 #' @export create_policy_PA
 #' @examples
-#' pa <- create_policy_PA(60000, 1000, 0.04, 0.05)
+#' pa <- create_policy_PA(60000, 10000, 0.05, 0.01)
 create_policy_PA <- function(benefit, size, interest, loading) {
 
     if (length(size) > 1)       stop("Invalid size: length(size) = 1")
@@ -193,7 +188,7 @@ create_policy_PA <- function(benefit, size, interest, loading) {
 #' Policy object
 #' @export create_policy_RM
 #' @examples
-#' rm <- create_policy_RM(100000, 0.4, 0.01, 0.05)
+#' rm <- create_policy_RM(600000, 0.64, 0.01, 0.04)
 create_policy_RM <- function(value, LVR, trans_cost, margin) {
 
     if (length(LVR) > 1)        stop("Invalid LVR: length(LVR) = 1")
@@ -238,7 +233,7 @@ create_policy_RM <- function(value, LVR, trans_cost, margin) {
 #' Policy object
 #' @export create_policy_VA
 #' @examples
-#' va <- create_policy_VA(100000, 40, 0.4, 0.02)
+#' va <- create_policy_VA(1000000, 30, 0.1, 0.01)
 create_policy_VA <- function(value, length, prop, g_fee) {
 
     if (length(prop) > 1)       stop("Invalid prop: length(prop) = 1")
