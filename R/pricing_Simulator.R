@@ -62,7 +62,9 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     cf <- matrix(nrow = n, ncol = ncol(state))
 
     # Generate cash flows for each state vector
-    for (i in seq(1, n)) cf[i,] <- cf_func(policy, state[i,], data[[i]])
+    for (i in seq(1, n)) {
+        cf[i,] <- cf_func(policy, state[i,], data[[i]])
+    }
 
     # Round cashflows to cents
     cf <- round(cf, 2)
