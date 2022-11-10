@@ -15,8 +15,3 @@ devtools::install_github("https://github.com/print-hi/rit")
 ## Documentation
 
 The documentation is available [here](https://print-hi.github.io/toolkit-live/).
-
-## ToDo
-
-- All: Implement seed parameter to allow for better control over simulations
-- Pricing: Provide algorithm/details for each product in documentation
