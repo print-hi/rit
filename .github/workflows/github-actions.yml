@@ -1,5 +1,5 @@
 # from https://github.com/r-lib/actions/blob/v2/examples/check-release.yaml
-name: RIT Testing Pipeline
+name: R-CMD-check
 run-name: ${{ github.actor }} has pushed code!
 on: [push, pull_request]
 jobs:
