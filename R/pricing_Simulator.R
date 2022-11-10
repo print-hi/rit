@@ -36,24 +36,9 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
                                       "PA" = cf_pooled_annuity,
                                       "CA" = cf_care_annuity,
                                       "LA" = cf_life_annuity)
-
+    # Get matrix of states for each path
     if (is.null(state)) {
-        # Get matrix of states for each path
-        if (policy$name[1] == "CA") {
-            if (nrow(policy) == 2) {
-                probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
-            } else if (nrow(policy) == 4) {
-                probs <- get_trans_probs(5, 'S', rit::US_HRS_5, age, sex == 'F')
-            } else {
-                stop("Error: CA policy object needs to have 2 or 4 rows")
-            }
-            state <- simulate_health_state_paths(probs, age, cohort = n)
-        } else if (policy$name[1] == "RM") {
-            probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
-            state <- simulate_health_state_paths(probs, age, cohort = n)
-        } else {
-            state <- get_aggregate_mortality(age, sex, seed, n)
-        }
+        state <- get_state_simulation(policy, age, sex, seed, n)
     }
 
     if (nrow(state) != n) {
@@ -194,6 +179,24 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 
     return(data)
 
+}
+
+get_state_simulation <- function(policy, age, sex, seed, n) {
+    if (policy$name[1] == "CA") {
+        if (nrow(policy) == 2) {
+            probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
+        } else if (nrow(policy) == 4) {
+            probs <- get_trans_probs(5, 'S', rit::US_HRS_5, age, sex == 'F')
+        } else {
+            stop("Error: CA policy object needs to have 2 or 4 rows")
+        }
+        return(simulate_health_state_paths(probs, age, cohort = n))
+    } else if (policy$name[1] == "RM") {
+        probs <- get_trans_probs(3, 'S', rit::US_HRS, age, sex == 'F')
+        return(simulate_health_state_paths(probs, age, cohort = n))
+    } else {
+        return(get_aggregate_mortality(age, sex, seed, n))
+    }
 }
 
 
