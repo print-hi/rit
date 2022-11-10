@@ -8,6 +8,7 @@ Toolkit of R modules for researchers to use in modelling retirement and age care
 2. In RStudio Console:
 ```
 install.packages("devtools")
+library(devtools)
 devtools::install_github("https://github.com/print-hi/rit")
 ```
 
