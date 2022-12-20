@@ -28,12 +28,14 @@ value_policy <- function(policy, cashflows, seed = 0) {
         stop("Invalid Cashflow Object: Inconsistent dimensions")
 
     # Calculate price of policy for each path
-    paths <- get_path_prices(cashflows)
+    cf_data <- get_path_prices(cashflows)
+    dcf <- cf_data$dcf
+    values <- cf_data$values
 
     # Produce statistics and plots for policy price
-    stat <- get_price_stats(paths)
-    dist <- plot_distribution(paths)
-    conv <- plot_convergence(paths, seed)
+    stat <- get_price_stats(values)
+    dist <- plot_distribution(values)
+    conv <- plot_convergence(values, seed)
 
     # Maps 'colname' attribute to formatted title for output text
     attr_mapping <- list(
@@ -104,7 +106,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
     writeLines(msg)
 
     # Create policy class object
-    x <- list(paths = paths, stats = stat, conv = conv, dist = dist)
+    x <- list(dcf = dcf, values = values, stats = stat, conv = conv, dist = dist)
     ret <- structure(x, class = "PolStats")
 
     return(ret)
@@ -147,10 +149,14 @@ get_path_prices <- function(cashflows) {
     # Calculate cumulative product of factors
     cmsdf <- matrixStats::rowCumprods((1/sdf))
 
-    # Calculate discounted value of cashflows for each path
-    value <- rowSums(cashflows$cf * cmsdf)
+    # Discount cashflows
+    dcf <- cashflows$cf * cmsdf
 
-    return(value)
+    # Calculate discounted value of cashflows for each path
+    values <- rowSums(dcf)
+
+
+    return(list(dcf = dcf, values = values))
 
 }
 

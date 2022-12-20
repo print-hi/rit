@@ -90,15 +90,15 @@ cf_care_annuity <- function(policy, state, data) {
     i <- 1
     while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
+        # For flat-rate increases of benefits
+        benefit <- benefit * (1 + increase)
+
         # Base + additional benefits from LTC: state[i] = 1 (M), 2 (D), 3(MD)
         if (!state[i]) {
             cf[i] <- benefit[1]
         } else {
             cf[i] <- benefit[1] + benefit[state[i] + 1]
         }
-
-        # For flat-rate increases of benefits
-        benefit <- benefit * (1 + increase)
 
         i <- i + 1
     }
@@ -151,11 +151,11 @@ cf_life_annuity <- function(policy, state, data) {
     i <- 1
     while (state[i] != -1 & i < length(state)) {     # while PH is not dead
 
-        # Get benefit if alive after deferment period
-        cf[i] <- ifelse (i <= d, 0, benefit)
-
         # For flat-rate increase
         benefit <- benefit * (1 + increase)
+
+        # Get benefit if alive after deferment period
+        cf[i] <- ifelse (i <= d, 0, benefit)
 
         i <- i + 1
     }

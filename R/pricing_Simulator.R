@@ -9,10 +9,6 @@
 #' @param policy
 #' Policy type to simulate:
 #' `policy object created using a create_policy function
-#' @param age
-#' Initial age of policyholder in years
-#' @param sex
-#' sex of policyholder, `sex = "F"` (female), `"M"` (male)
 #' @param seed
 #' Seed for random generator
 #' @param n
@@ -26,8 +22,8 @@
 #' @export simulate_cf
 #' @examples
 #' ap <- create_policy_AP(400000, 60000)
-#' cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
-simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = NULL, econ_var = NULL) {
+#' cf <- simulate_cf(policy = ap, n = 1000)
+simulate_cf <- function(policy, seed = 0, n = 100, state = NULL, econ_var = NULL) {
 
     # Set cash flow function based on input policy
     cf_func <- switch(policy$name[1], "AP" = cf_account_based_pension,
@@ -38,12 +34,12 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
                                       "LA" = cf_life_annuity)
     # Get matrix of states for each path
     if (is.null(state)) {
-        state <- get_state_simulation(policy, age, sex, seed, n)
+        state <- get_state_simulation(policy, age = 65, sex = "F", seed, n)
     }
 
     if (nrow(state) != n) {
         stop("Error: State matrix does not fit number of paths requested")
-    } else if (!is.null(econ_var) && ncol(state) > ncol(econ_var)) {
+    } else if (!is.null(econ_var) && ncol(state) > ncol(econ_var$discount_factors)) {
         stop("Error: Duration of economic simulation is too short")
     }
 
@@ -52,11 +48,11 @@ simulate_cf <- function(policy, age = 65, sex = "F", seed = 0, n = 100, state = 
     #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
 
     if (is.null(econ_var)) {
-        econ_var <- esg_var_simulator(ncol(state), n, frequency = 'year', return_sdf = TRUE)
+        econ_var <- get_econ_simulation(state, n, seed)
     }
 
     # Get matrix of economic variables for each path
-    data <- get_policy_scenario(policy, age, sex, seed, n, period, econ_var)
+    data <- get_policy_scenario(policy, age = 65, sex = "F", seed, n, period, econ_var)
 
     # Initialize output matrix
     cf <- matrix(nrow = n, ncol = ncol(state))
@@ -122,12 +118,13 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
     } else if (policy$name[1] == "CA" | policy$name[1] == "LA") {
 
         # Get all relevant economic variables
-        infla <- get_inflation_rate(var_sim)
+        #infla <- get_inflation_rate(var_sim)
 
         # Organise economic inputs into a data.frame for each path
         data <- list()
         for (i in seq(1, n)) {
-            temp <- data.frame(infla = infla[i, ])
+            #temp <- data.frame(infla = infla[i, ])
+            temp <- data.frame()
             data <- append(data, list(temp))
         }
 
@@ -183,6 +180,17 @@ get_policy_scenario <- function(policy, age, sex, seed, n, period, econ_var) {
 
 }
 
+get_econ_simulation <- function(state, n, seed) {
+    esg_names <- c("ASX200", "CPI", "home_index", "zcp3m_yield", "discount_factors")
+    # Generalize naming to match generic pricing module inputs
+    gen_names <- c("market_index", "inflation_index", "home_index", "zcp3m_yield", "discount_factors")
+
+    simulated_vars <- esg_var_simulator(ncol(state), n, frequency = 'year', return_sdf = TRUE, seed = seed)
+    filtered_vars <- simulated_vars[esg_names]
+    names(filtered_vars) <- gen_names
+    return(filtered_vars)
+}
+
 get_state_simulation <- function(policy, age, sex, seed, n) {
     if (policy$name[1] == "CA") {
         if (nrow(policy) == 2) {
@@ -200,7 +208,6 @@ get_state_simulation <- function(policy, age, sex, seed, n) {
         return(get_aggregate_mortality(age, sex, seed, n))
     }
 }
-
 
 ###############################################################################
 ###### PLACEHOLDER FUNCTIONS
@@ -263,7 +270,7 @@ get_zcp3m_yield <- function(var_sim) {
 }
 
 get_inflation_rate <- function(var_sim) {
-    cpi <- (unname(var_sim$CPI))
+    cpi <- (unname(var_sim$inflation_index))
     return(get_perc_change(cpi))
 }
 
@@ -273,6 +280,6 @@ get_house_return <- function(var_sim) {
 }
 
 get_stock_return <- function(var_sim) {
-    asx <- (unname(var_sim$ASX200))
+    asx <- (unname(var_sim$market_index))
     return(get_perc_change(asx))
 }
