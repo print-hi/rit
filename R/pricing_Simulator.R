@@ -32,23 +32,30 @@ simulate_cf <- function(policy, seed = 0, n = 100, state = NULL, econ_var = NULL
                                       "PA" = cf_pooled_annuity,
                                       "CA" = cf_care_annuity,
                                       "LA" = cf_life_annuity)
-    # Get matrix of states for each path
+
+    # If not provided, get states for each path (matrix)
     if (is.null(state)) {
         state <- get_state_simulation(policy, age = 65, sex = "F", seed, n)
     }
 
+    # Validate formatting of mortality state data
     if (nrow(state) != n) {
         stop("Error: State matrix does not fit number of paths requested")
-    } else if (!is.null(econ_var) && ncol(state) > ncol(econ_var$discount_factors)) {
-        stop("Error: Duration of economic simulation is too short")
     }
 
-    # Ensures that state <-> data has 1:1 match for each path at each time
-    # DISABLED WHILE USING TEMP DATA, needs MAX_AGE defined !!!
-    #if (ncol(state) != nrow(data))  stop("Error fetching policy data")
-
+    # If not provided, get economic data for each path (list of matrices)
     if (is.null(econ_var)) {
         econ_var <- get_econ_simulation(state, n, seed)
+    }
+
+    # Validate formatting of economic data
+    for (i in names(econ_var)) {
+        if (ncol(econ_var[[i]]) < ncol(state)) {
+            stop(paste("Error: Reduced dimension size in economic simulation -> $", i,
+                       " (expected ", nrow(state), "x", ncol(state),
+                       ", got ", nrow(econ_var[[i]]), "x", ncol(econ_var[[i]]), ")",
+                       sep=""))
+        }
     }
 
     # Get matrix of economic variables for each path

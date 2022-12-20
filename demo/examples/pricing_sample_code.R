@@ -73,3 +73,13 @@ state <- construct_state_matrix(seq(1, N_PATHS), max_years = MAX_YEARS)
 
 cf_la <- simulate_cf(la, n = 100, state = state, econ_var = econ_var)
 val_la <- value_policy(la, cf_la)
+
+
+# ERROR CASE
+state <- construct_state_matrix(rep(6, N_PATHS), max_years = MAX_YEARS)
+sdf <- rep(1.06, N_PATHS*(MAX_YEARS-1))
+econ_var <- construct_econ_var(sdf, max_years = MAX_YEARS-1)
+
+la <- create_policy_LA(60000, defer = 5, increase = 0.06, loading = 0.06)
+cf_la <- simulate_cf(la, n = 100, state = state, econ_var = econ_var)
+val_la <- value_policy(la, cf_la)
