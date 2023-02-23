@@ -6,21 +6,16 @@
 \usage{
 simulate_cf(
   policy,
-  age = 65,
-  sex = "F",
   seed = 0,
   n = 100,
   state = NULL,
-  econ_var = NULL
+  econ_var = NULL,
+  cohort_death_probs = NULL
 )
 }
 \arguments{
 \item{policy}{Policy type to simulate:
 `policy object created using a create_policy function}
-
-\item{age}{Initial age of policyholder in years}
-
-\item{sex}{sex of policyholder, \code{sex = "F"} (female), \code{"M"} (male)}
 
 \item{seed}{Seed for random generator}
 
@@ -28,7 +23,7 @@ simulate_cf(
 
 \item{state}{Simulated state matrix via Health-State / Aggregate Mortality}
 
-\item{econ_var}{Simulated economic variables via Economic Scenario Generator}
+\item{econ_var}{Simulated death probabilities for cohort (for Pooled Annuity)}
 }
 \value{
 Matrix of cash flow vectors for each simulated path
@@ -38,5 +33,5 @@ Simulate cash flows using Monte-Carlo methods for various policies
 }
 \examples{
 ap <- create_policy_AP(400000, 60000)
-cf <- simulate_cf(policy = ap, age = 65, sex = "M", n = 1000)
+cf <- simulate_cf(policy = ap, n = 1000)
 }

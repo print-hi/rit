@@ -12,8 +12,6 @@ create_policy_LA(benefit, defer = 0, increase = 0, loading)
 \item{defer}{(Optional) Deferment period of policy}
 
 \item{increase}{(Optional) Annual rate of increase for policy}
-
-\item{loading}{(Optional) Loading factor for contract}
 }
 \value{
 Policy object

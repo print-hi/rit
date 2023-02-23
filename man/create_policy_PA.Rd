@@ -12,8 +12,6 @@ create_policy_PA(benefit, size, interest, loading)
 \item{size}{Size of pool}
 
 \item{interest}{Assumed investment earnings rate (flat)}
-
-\item{loading}{(Optional) Loading factor for contract}
 }
 \value{
 Policy object

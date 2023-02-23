@@ -36,6 +36,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
     stat <- get_price_stats(values)
     dist <- plot_distribution(values)
     conv <- plot_convergence(values, seed)
+    scat <- plot_scatter(values)
 
     # Maps 'colname' attribute to formatted title for output text
     attr_mapping <- list(
@@ -106,7 +107,7 @@ value_policy <- function(policy, cashflows, seed = 0) {
     writeLines(msg)
 
     # Create policy class object
-    x <- list(dcf = dcf, values = values, stats = stat, conv = conv, dist = dist)
+    x <- list(dcf = dcf, values = values, stats = stat, conv = conv, dist = dist, scat = scat)
     ret <- structure(x, class = "PolStats")
 
     return(ret)
@@ -247,6 +248,28 @@ plot_distribution <- function(prices) {
                    " paths)", sep = "")
     graphics::hist(x = prices, breaks = 20, ylab = "Frequency", xlab = "Value",
          main = title, labels = TRUE)
+
+    p <- grDevices::recordPlot()
+
+    return(p)
+
+}
+
+#' Plot Distribution of Cashflows
+#'
+#' Plots a scatter plot for a provided set of cashflows
+#'
+#' @name plot_scatter
+#' @param prices
+#' Matrix of simulated cashflow paths
+#' @return
+#' Distribution Plot
+plot_scatter <- function(prices) {
+
+    # Format histogram plot
+    title <- paste("Scatterplot of Policy Valuation (", length(prices),
+                   " paths)", sep = "")
+    graphics::plot(x = prices, ylab = "Frequency", xlab = "Value", main = title)
 
     p <- grDevices::recordPlot()
 

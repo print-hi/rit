@@ -45,6 +45,11 @@ cf_account_based_pension <- function(policy, state, data) {
         i <- i + 1
     }
 
+    # Withdraw balance after death (payout to family)
+    if (i < length(state) & balance > 0) {
+        cf[i] <- balance
+    }
+
     return(cf)
 }
 
@@ -207,20 +212,23 @@ cf_pooled_annuity <- function(policy, state, data) {
 
         if (suv_r == 0) break
 
-        # Increase benefit by ratio of rates
-        benefit <- benefit * suv_e / suv_r
+        # Mortality experience adjustment factor
+        mea <- suv_e / suv_r
 
-        # Compound realized + discount expected rates
-        benefit <- benefit * (1 + data$stock[i]) / (1 + interest)
+        # Interest rate adjustment factor
+        ira <- (1 + data$stock[i]) / (1 + interest)
+
+        # Scale benefit from period t to t + 1
+        benefit <- benefit * mea * ira
 
         i <- i + 1
     }
 
     # Calculate value of unit annuity for entire pool
-    ax <- rep(0, length(data$pool_e))
-    for (i in seq(1, length(data$pool_e))) {
-        ax[i] <- (data$pool_e[i]/data$pool_e[1]) * (1 + interest)^(-i)
-    }
+    #ax <- rep(0, length(data$pool_e))
+    #for (i in seq(1, length(data$pool_e))) {
+        #ax[i] <- (data$pool_e[i]/data$pool_e[1]) * (1 + interest)^(-i)
+    #}
 
     # Deduct initial costs from cashflow
     # cf[1] <- cf[1] - policy$benefit * sum(ax)
@@ -277,7 +285,7 @@ cf_reverse_mortgage <- function(policy, state, data) {
 
     # Get loan amount for policyholder
     loan <- LVR * value
-    #cf[1] <- loan
+    #cf[1] <- loan      # only value NNEG!
 
     i <- 1
     while (state[i] == 0 & i < length(state)) {     # while PH is healthy

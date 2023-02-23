@@ -12,8 +12,6 @@ create_policy_CA(benefit, increase, min, loading)
 \item{increase}{Annual rate of increase for each policy (vector)}
 
 \item{min}{Minimum guaranteed period for each policy (vector)}
-
-\item{loading}{(Optional) Loading factor for contract}
 }
 \value{
 Policy object

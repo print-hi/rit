@@ -18,4 +18,4 @@ License: `use_mit_license()`, `use_gpl3_license()` or pick a license
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
