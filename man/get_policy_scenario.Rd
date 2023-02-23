@@ -4,7 +4,7 @@
 \alias{get_policy_scenario}
 \title{Scenario Generator}
 \usage{
-get_policy_scenario(policy, age, sex, seed, n, period, econ_var)
+get_policy_scenario(policy, age, sex, seed, n, period, econ_var, death_probs)
 }
 \arguments{
 \item{policy}{Policy object containing necessary parameters (see create_policy_ )}

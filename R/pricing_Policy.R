@@ -45,8 +45,6 @@ create_policy_AP <- function(balance, expenses) {
 #' Annual rate of increase for each policy (vector)
 #' @param min
 #' Minimum guaranteed period for each policy (vector)
-#' @param loading
-#' (Optional) Loading factor for contract
 #' @return
 #' Policy object
 #' @export create_policy_CA
@@ -56,7 +54,6 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 
     if (sum(min < 0))       stop("Invalid min: min[i] > 0")
     if (sum(benefit < 0))   stop("Invalid benefit: benefit[i] > 0")
-    if (sum(loading < 0))   stop("Invalid loading: loading[i] > 0")
     if (sum(increase < 0))  stop("Invalid increase: increase[i] > 0")
 
     n_policies = length(benefit)
@@ -74,8 +71,7 @@ create_policy_CA <- function(benefit, increase, min, loading) {
                       state = c(state),
                       increase = c(increase),
                       benefit = c(benefit),
-                      min = c(min),
-                      loading = c(loading))
+                      min = c(min))
 
     return(pol)
 }
@@ -95,8 +91,6 @@ create_policy_CA <- function(benefit, increase, min, loading) {
 #' (Optional) Deferment period of policy
 #' @param increase
 #' (Optional) Annual rate of increase for policy
-#' @param loading
-#' (Optional) Loading factor for contract
 #' @return
 #' Policy object
 #' @export create_policy_LA
@@ -106,19 +100,16 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 
     if (length(defer) > 1)      stop("Invalid defer: length(defer) = 1")
     if (length(benefit) > 1)    stop("Invalid benefit: length(benefit) = 1")
-    if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
     if (length(increase) > 1)   stop("Invalid increase: length(increase) = 1")
 
     if (defer < 0)              stop("Invalid defer: defer > 0")
     if (benefit < 0)            stop("Invalid benefit: benefit > 0")
-    if (loading < 0)            stop("Invalid loading: loading > 0")
     if (increase < 0)           stop("Invalid increase: increase > 0")
 
     pol <- data.frame(name = c("LA"),
                       benefit = c(benefit),
                       defer = c(defer),
-                      increase = c(increase),
-                      loading = c(loading))
+                      increase = c(increase))
 
     return(pol)
 }
@@ -137,8 +128,6 @@ create_policy_LA <- function(benefit, defer = 0, increase = 0, loading) {
 #' Size of pool
 #' @param interest
 #' Assumed investment earnings rate (flat)
-#' @param loading
-#' (Optional) Loading factor for contract
 #' @return
 #' Policy object
 #' @export create_policy_PA
@@ -148,12 +137,10 @@ create_policy_PA <- function(benefit, size, interest, loading) {
 
     if (length(size) > 1)       stop("Invalid size: length(size) = 1")
     if (length(benefit) > 1)    stop("Invalid benefit: length(benefit) = 1")
-    if (length(loading) > 1)    stop("Invalid loading: length(loading) = 1")
     if (length(interest) > 1)   stop("Invalid interest: length(interest) = 1")
 
     if (size < 0)               stop("Invalid size: size > 0")
     if (benefit < 0)            stop("Invalid benefit: benefit > 0")
-    if (loading < 0)            stop("Invalid loading: loading > 0")
     if (interest < 0)           stop("Invalid interest: interest > 0")
 
     if (!all.equal(size, as.integer(size)))
@@ -162,8 +149,7 @@ create_policy_PA <- function(benefit, size, interest, loading) {
     pol <- data.frame(name = c("PA"),
                       benefit = c(benefit),
                       size = c(size),
-                      interest = c(interest),
-                      loading = c(loading))
+                      interest = c(interest))
 
     return(pol)
 }
